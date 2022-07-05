@@ -121,13 +121,11 @@ export const exampleRouter = createRouter()
 
             const data = await ctx.prisma.file.create({ data: newData });
 
-            console.log(getBaseUrl(), process.env.VERCEL_URL);
-
             return {
                 id: data.id,
                 name: data.name,
                 type: data.type,
-                url: `${getBaseUrl()}/file/${data.id}`,
+                url: `${ctx.req?.headers.origin}/file/${data.id}`,
                 password: data.password || "None",
                 error: null,
             };
