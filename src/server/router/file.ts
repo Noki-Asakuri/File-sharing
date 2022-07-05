@@ -121,6 +121,8 @@ export const exampleRouter = createRouter()
 
             const data = await ctx.prisma.file.create({ data: newData });
 
+            console.log(getBaseUrl(), process.env.VERCEL_URL);
+
             return {
                 id: data.id,
                 name: data.name,
