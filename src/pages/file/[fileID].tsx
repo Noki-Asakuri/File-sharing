@@ -101,6 +101,7 @@ const FileDownload: React.FC = () => {
                     Password
                 </span>
                 <div className="max-w-max flex justify-center items-center gap-x-4">
+                    <label htmlFor="password">Password: </label>
                     <input
                         className="bg-slate-700 rounded-2xl px-4 py-2 focus:outline-none"
                         type={showPassword ? "password" : "text"}
@@ -108,7 +109,7 @@ const FileDownload: React.FC = () => {
                         id="password"
                         onChange={passwordHandler}
                     />
-                    <button className="" onClick={showPasswordHandler}>
+                    <button aria-label="toggle password display" onClick={showPasswordHandler}>
                         {showPassword ? <FaEyeSlash /> : <FaEye />}
                     </button>
                 </div>

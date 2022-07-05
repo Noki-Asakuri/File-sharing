@@ -5,6 +5,7 @@
 @font-face {
     font-family: "Firecode";
     src: url("../../public/FiraCode.ttf");
+    font-display: swap
 }
 
 * {

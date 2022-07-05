@@ -120,7 +120,7 @@ const Home: NextPage = () => {
                             id="password"
                             onChange={passwordHandler}
                         />
-                        <button className="" onClick={showPasswordHandler}>
+                        <button aria-label="toggle password display" onClick={showPasswordHandler}>
                             {showPassword ? <FaEyeSlash /> : <FaEye />}
                         </button>
                     </div>
