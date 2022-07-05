@@ -1,16 +1,6 @@
 import * as Toast from "@radix-ui/react-toast";
 import { FaCheck } from "react-icons/fa";
 
-// backgroundColor: 'white',
-// borderRadius: 6,
-// boxShadow: 'hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px',
-// padding: 15,
-// display: 'grid',
-// gridTemplateAreas: '"title action" "description action"',
-// gridTemplateColumns: 'auto max-content',
-// columnGap: 15,
-// alignItems: 'center',
-
 const CopytoClipboardToast: React.FC<{
     Popup: boolean;
     setPopup: React.Dispatch<React.SetStateAction<boolean>>;

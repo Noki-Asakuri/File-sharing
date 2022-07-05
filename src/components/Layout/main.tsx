@@ -7,7 +7,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <Head>
                 <title>File Sharing - Freunds</title>
                 <link rel="icon" href="/favicon.svg" />
-                <meta name="description" content="Free file sharing!" />
+                <meta name="description" content="Free file sharing website!" />
                 <meta name="author" content="Freunds#8323" />
                 <meta
                     name="viewport"
@@ -15,7 +15,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 />
                 <meta
                     property="og:title"
-                    content="A free file sharing website"
+                    content="Website to share files."
                 />
                 <meta property="og:site_name" content="File Sharing" />
                 <meta

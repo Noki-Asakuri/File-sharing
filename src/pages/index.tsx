@@ -1,7 +1,12 @@
 import type { NextPage } from "next";
 
 import React, { useEffect, useState } from "react";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import {
+    FaEye,
+    FaEyeSlash,
+    FaClipboard,
+    FaClipboardCheck,
+} from "react-icons/fa";
 
 import CopytoClipboardToast from "@/components/Toast";
 import Image from "next/future/image";
@@ -72,8 +77,8 @@ const Home: NextPage = () => {
         setShowPassword((current) => !current);
     };
 
-    const copyToClipboard = (text: string) => {
-        if (fileMutation.data) {
+    const copyToClipboard = (text: string | undefined) => {
+        if (fileMutation.data && text) {
             setPopup(true);
             navigator.clipboard.writeText(text);
 
@@ -164,11 +169,11 @@ const Home: NextPage = () => {
                     )}
                 </form>
 
-                <div className="flex flex-col gap-y-7 items-start p-10 rounded-2xl bg-slate-800 w-[455px]">
-                    <span className="w-full flex justify-center text-2xl">
+                <div className="flex flex-col gap-y-7 items-start p-10 rounded-2xl bg-slate-800 w-[455px] mb-40 h-[300px]">
+                    <span className="w-full flex justify-center text-2xl ">
                         File Uploaded
                     </span>
-                    <ul className="flex flex-col text-lg">
+                    <ul className="flex flex-col gap-y-2">
                         <li>
                             ID:{" "}
                             <span className="text-sm">
@@ -183,7 +188,7 @@ const Home: NextPage = () => {
                                     "None"}
                             </span>
                         </li>
-                        <li className="break-words">
+                        <li>
                             Password:{" "}
                             <span className="text-sm">
                                 {password || "None"}
@@ -195,21 +200,32 @@ const Home: NextPage = () => {
                                 Popup={popup}
                                 setPopup={setPopup}
                             >
-                                <button
-                                    className="text-sm"
-                                    onClick={(e) =>
-                                        copyToClipboard(
-                                            fileMutation.data?.url || "None"
-                                        )
-                                    }
-                                >
+                                <button className="text-ellipsis whitespace-nowrap overflow-hidden max-w-[280px] cursor-default">
                                     {fileMutation.data?.url || "None"}
                                 </button>
+                                {fileMutation.data && fileMutation.data.url && (
+                                    <button
+                                        className="pl-2"
+                                        onClick={() =>
+                                            copyToClipboard(
+                                                fileMutation.data?.url
+                                            )
+                                        }
+                                    >
+                                        {!popup ? (
+                                            <FaClipboard />
+                                        ) : (
+                                            <FaClipboardCheck />
+                                        )}
+                                    </button>
+                                )}
                             </CopytoClipboardToast>
                         </li>
 
                         {/* TODO: Move this somewhere else. */}
-                        {fileMutation.data?.error && <li>Error: Error </li>}
+                        {fileMutation.data?.error && (
+                            <li>Error: {fileMutation.data.error.message} </li>
+                        )}
                     </ul>
                 </div>
             </div>
