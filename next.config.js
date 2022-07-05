@@ -1,6 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
-}
+    reactStrictMode: true,
+    experimental: {
+        images: {
+            allowFutureImage: true,
+        },
+    },
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
+

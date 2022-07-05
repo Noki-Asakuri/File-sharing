@@ -6,11 +6,17 @@ generator client {
 }
 
 datasource db {
-    provider = "sqlite"
-    url      = "file:./db.sqlite"
-    // url      = env("DATABASE_URL")
+    provider = "postgresql"
+    // url      = "file:./db.sqlite"
+    url      = env("DATABASE_URL")
 }
 
-model Example {
-    id String @id @default(cuid())
+model file {
+    id            String  @id
+    name          String
+    password      String?
+    fileUrl       String
+    type          String
+    path          String
+    downloadCount Int     @default(0)
 }
