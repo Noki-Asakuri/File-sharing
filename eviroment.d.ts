@@ -2,6 +2,14 @@ declare global {
     namespace NodeJS {
         interface ProcessEnv {
             SUPABASE_KEY: string;
+
+            FIREBASE_API: string;
+            FIREBASE_AUTH: string;
+            FIREBASE_PROJECT: string;
+            FIREBASE_STORAGE: string;
+            FIREBASE_MESSAGE: string;
+            FIREBASE_APP: string;
+            FIREBASE_MEASUREMENT: string;
         }
     }
 }
