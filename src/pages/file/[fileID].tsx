@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { trpc } from "@/utils/trpc";
 import Image from "next/future/image";
+import Head from "next/head";
 import download from "@/utils/download";
 
 const FileDownload: React.FC = () => {
@@ -10,6 +11,7 @@ const FileDownload: React.FC = () => {
     const [showPassword, setShowPassword] = useState<boolean>(true);
     const [isUploading, setUploading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const [title, setTile] = useState<string | null>(null);
 
     const router = useRouter();
     const { refetch } = trpc.useQuery([
@@ -60,6 +62,7 @@ const FileDownload: React.FC = () => {
                 return;
             }
             const { passwordLock } = refetchQuery.data;
+            setTile(refetchQuery.data.name as string);
 
             if (!passwordLock) {
                 // No password provided! Downloading ...
@@ -91,49 +94,59 @@ const FileDownload: React.FC = () => {
 
             setUploading(false);
         });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [passwordMutation.data, router.isReady]);
 
     return (
-        <div className="flex justify-center items-center h-screen">
-            <form className="flex flex-col gap-y-7 items-start relative max-w-max p-10 rounded-2xl bg-slate-800">
-                <span className="w-full flex justify-center text-2xl">
-                    Password
-                </span>
-                <div className="max-w-max flex justify-center items-center gap-x-4">
-                    <label htmlFor="password">Password: </label>
-                    <input
-                        className="bg-slate-700 rounded-2xl px-4 py-2 focus:outline-none"
-                        type={showPassword ? "password" : "text"}
-                        name="password"
-                        id="password"
-                        onChange={passwordHandler}
-                    />
-                    <button aria-label="toggle password display" onClick={showPasswordHandler}>
-                        {showPassword ? <FaEyeSlash /> : <FaEye />}
-                    </button>
-                </div>
-                <button
-                    className="bg-slate-700 py-2 w-full rounded-2xl h-[40px]"
-                    onClick={submitHandler}
-                >
-                    {!isUploading ? (
-                        "Download"
-                    ) : (
-                        <Image
-                            className="flex justify-center items-center h-7 w-full"
-                            src="/uploading.svg"
-                            alt="Uploading images"
+        <>
+            <Head>
+                <title>File: {title || "None"}</title>
+            </Head>
+            <div className="flex justify-center items-center h-screen">
+                <form className="flex flex-col gap-y-7 items-start relative max-w-max p-10 rounded-2xl bg-slate-800">
+                    <span className="w-full flex justify-center text-2xl">
+                        Password
+                    </span>
+                    <div className="max-w-max flex justify-center items-center gap-x-4">
+                        <label htmlFor="password">Password: </label>
+                        <input
+                            className="bg-slate-700 rounded-2xl px-4 py-2 focus:outline-none"
+                            type={showPassword ? "password" : "text"}
+                            name="password"
+                            id="password"
+                            onChange={passwordHandler}
                         />
-                    )}
-                </button>
-                {error && (
-                    <div className="">
-                        <span className="text-sm text-red-600">{error}</span>
+                        <button
+                            aria-label="toggle password display"
+                            onClick={showPasswordHandler}
+                        >
+                            {showPassword ? <FaEyeSlash /> : <FaEye />}
+                        </button>
                     </div>
-                )}
-            </form>
-        </div>
+                    <button
+                        className="bg-slate-700 py-2 w-full rounded-2xl h-[40px]"
+                        onClick={submitHandler}
+                    >
+                        {!isUploading ? (
+                            "Download"
+                        ) : (
+                            <Image
+                                className="flex justify-center items-center h-7 w-full"
+                                src="/uploading.svg"
+                                alt="Uploading images"
+                            />
+                        )}
+                    </button>
+                    {error && (
+                        <div className="">
+                            <span className="text-sm text-red-600">
+                                {error}
+                            </span>
+                        </div>
+                    )}
+                </form>
+            </div>
+        </>
     );
 };
 

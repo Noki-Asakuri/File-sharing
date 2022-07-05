@@ -3,10 +3,11 @@ import type { NextPage } from "next";
 import React, { useEffect, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
+import CopytoClipboardToast from "@/components/Toast";
 import Image from "next/future/image";
-import Link from "next/link";
 import { trpc } from "@/utils/trpc";
 import { encode } from "base64-arraybuffer";
+import getBaseUrl from "@/utils/getBaseUrl";
 
 interface UploadFile {
     name: string;
@@ -20,6 +21,7 @@ const Home: NextPage = () => {
     const [error, setError] = useState<string | null>(null);
     const [showPassword, setShowPassword] = useState<boolean>(true);
     const [isUploading, setUploading] = useState<boolean>(false);
+    const [popup, setPopup] = useState<boolean>(false);
 
     const fileMutation = trpc.useMutation("file.upload-file");
 
@@ -68,6 +70,17 @@ const Home: NextPage = () => {
         e.preventDefault();
 
         setShowPassword((current) => !current);
+    };
+
+    const copyToClipboard = (text: string) => {
+        if (fileMutation.data) {
+            setPopup(true);
+            navigator.clipboard.writeText(text);
+
+            setTimeout(() => {
+                setPopup(false);
+            }, 2000);
+        }
     };
 
     useEffect(() => {
@@ -120,7 +133,10 @@ const Home: NextPage = () => {
                             id="password"
                             onChange={passwordHandler}
                         />
-                        <button aria-label="toggle password display" onClick={showPasswordHandler}>
+                        <button
+                            aria-label="toggle password display"
+                            onClick={showPasswordHandler}
+                        >
                             {showPassword ? <FaEyeSlash /> : <FaEye />}
                         </button>
                     </div>
@@ -148,45 +164,54 @@ const Home: NextPage = () => {
                     )}
                 </form>
 
-                {fileMutation.data && fileMutation.data.url && (
-                    <div className="flex flex-col gap-y-7 items-start p-10 rounded-2xl bg-slate-800 max-w-[455px]">
-                        <span className="w-full flex justify-center text-2xl">
-                            File Uploaded
-                        </span>
-                        <ul className="flex flex-col text-lg">
-                            <li>
-                                ID:{" "}
-                                <span className="text-sm">
-                                    {fileMutation.data.id}
-                                </span>
-                            </li>
-                            <li>
-                                Name:{" "}
-                                <span className="text-sm">
-                                    {fileMutation.data.name}
-                                </span>
-                            </li>
-                            <li className="break-words">
-                                Password:{" "}
-                                <span className="text-sm">
-                                    {password || "None"}
-                                </span>
-                            </li>
-                            <li>
-                                Url:{" "}
-                                <Link
+                <div className="flex flex-col gap-y-7 items-start p-10 rounded-2xl bg-slate-800 w-[455px]">
+                    <span className="w-full flex justify-center text-2xl">
+                        File Uploaded
+                    </span>
+                    <ul className="flex flex-col text-lg">
+                        <li>
+                            ID:{" "}
+                            <span className="text-sm">
+                                {fileMutation.data?.id || "None"}
+                            </span>
+                        </li>
+                        <li>
+                            Name:{" "}
+                            <span className="text-sm">
+                                {fileMutation.data?.name ||
+                                    file?.name ||
+                                    "None"}
+                            </span>
+                        </li>
+                        <li className="break-words">
+                            Password:{" "}
+                            <span className="text-sm">
+                                {password || "None"}
+                            </span>
+                        </li>
+                        <li>
+                            Url:{" "}
+                            <CopytoClipboardToast
+                                Popup={popup}
+                                setPopup={setPopup}
+                            >
+                                <button
                                     className="text-sm"
-                                    href={fileMutation.data.url}
+                                    onClick={(e) =>
+                                        copyToClipboard(
+                                            fileMutation.data?.url || "None"
+                                        )
+                                    }
                                 >
-                                    {fileMutation.data.url}
-                                </Link>
-                            </li>
+                                    {fileMutation.data?.url || "None"}
+                                </button>
+                            </CopytoClipboardToast>
+                        </li>
 
-                            {/* TODO: Move this somewhere else. */}
-                            {fileMutation.data.error && <li>Error: Error </li>}
-                        </ul>
-                    </div>
-                )}
+                        {/* TODO: Move this somewhere else. */}
+                        {fileMutation.data?.error && <li>Error: Error </li>}
+                    </ul>
+                </div>
             </div>
         </div>
     );
