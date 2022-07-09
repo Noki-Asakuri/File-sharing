@@ -64,7 +64,7 @@ const PasswordForm: React.FC<{
                     onChange={(e) => setPassword(e.target.value)}
                 />
                 <button
-                    className="bg-slate-700 p-3 rounded- xl"
+                    className="bg-slate-700 p-3 rounded-xl"
                     aria-label="toggle password display"
                     onClick={(e) => {
                         e.preventDefault();
