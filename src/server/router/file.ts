@@ -1,8 +1,6 @@
 import { z } from "zod";
 import { createRouter } from "./context";
 
-import genID from "@/utils/genID";
-import { decode } from "base64-arraybuffer";
 import * as bcrypt from "bcrypt";
 
 const UploadFile = z.object({
@@ -45,11 +43,6 @@ export const exampleRouter = createRouter()
             };
         },
     })
-    .query("get-all", {
-        async resolve({ ctx }) {
-            return await ctx.prisma.file.findMany();
-        },
-    })
     .mutation("password-check", {
         input: z.object({
             filePassword: z.string(),
@@ -89,59 +82,42 @@ export const exampleRouter = createRouter()
     })
     .mutation("upload-file", {
         input: z.object({
+            fileID: z.string(),
             name: z.string(),
             password: z.string().optional(),
             type: z.string(),
-            fileBuffer: z.string(),
+            path: z.string(),
         }),
         resolve: async ({ input, ctx }) => {
-            const { file, fileID } = genID(input.name);
-
-            const { error } = await ctx.supabase.storage
-                .from("files")
-                .upload(file, decode(input.fileBuffer), {
-                    contentType: input.type,
-                });
-
-            if (error) {
-                return {
-                    id: fileID,
-                    name: input.name,
-                    url: "None",
-                    password: "None",
-                    type: input.type,
-                    error: error,
-                };
-            }
+            const { path, name, type, fileID, password } = input;
 
             const { publicURL } = ctx.supabase.storage
                 .from("files")
-                .getPublicUrl(file);
+                .getPublicUrl(path);
 
             let newData: UploadFile = {
                 id: fileID,
-                name: input.name,
-                type: input.type,
-                path: file,
+                name: name,
+                type: type,
+                path: path,
                 fileUrl: publicURL as string,
             };
 
-            if (input.password) {
+            if (password) {
                 newData = {
                     ...newData,
-                    password: await bcrypt.hash(input.password, 10),
+                    password: await bcrypt.hash(password, 10),
                 };
             }
 
             const data = await ctx.prisma.file.create({ data: newData });
 
             return {
-                id: data.id,
+                fileID: data.id,
                 name: data.name,
                 type: data.type,
                 url: `${ctx.req?.headers.origin}/file/${data.id}`,
                 password: data.password || "None",
-                error: null,
             };
         },
     });

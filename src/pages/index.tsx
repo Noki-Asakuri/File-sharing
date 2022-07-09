@@ -2,16 +2,24 @@ import type { NextPage } from "next";
 
 import React, { useEffect, useState } from "react";
 
-import { trpc } from "@/utils/trpc";
-import { encode } from "base64-arraybuffer";
-import UploadForm from "@/components/UploadForm";
 import UploadedFile from "@/components/UploadedFile";
+import UploadForm from "@/components/UploadForm";
+import useStorage from "@/server/hooks/useStorage";
 import Head from "next/head";
 
 interface UploadFile {
+    fileID: string;
     name: string;
     type: string;
     password?: string;
+}
+
+interface ReturnFile {
+    fileID: string;
+    name: string;
+    type: string;
+    url: string;
+    password: string;
 }
 
 const Home: NextPage = () => {
@@ -20,7 +28,11 @@ const Home: NextPage = () => {
     const [error, setError] = useState<string | null>(null);
     const [isUploading, setUploading] = useState<boolean>(false);
 
-    const fileMutation = trpc.useMutation("file.upload-file");
+    const [uploadFile, setUploadFile] = useState<ReturnFile | undefined>(
+        undefined
+    );
+
+    useStorage({ file, isUploading, password, setUploadFile });
 
     const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         let selected = e.target.files![0];
@@ -30,7 +42,7 @@ const Home: NextPage = () => {
             setError("");
         } else {
             setFile(null);
-            setError("File over 50mb limit!");
+            setError("File size over 50mb limit!");
         }
     };
 
@@ -41,35 +53,15 @@ const Home: NextPage = () => {
     const submitHandler = (e: React.FormEvent) => {
         e.preventDefault();
         setUploading(true);
-
-        if (!file) {
-            return;
-        }
-
-        let mutateData: UploadFile = {
-            name: file.name,
-            type: file.type,
-        };
-
-        if (password.length > 0) {
-            mutateData = { ...mutateData, password: password };
-        }
-
-        file.arrayBuffer().then((data) => {
-            fileMutation.mutate({
-                ...mutateData,
-                fileBuffer: encode(data),
-            });
-        });
     };
 
     useEffect(() => {
-        if (fileMutation.data) {
+        if (uploadFile) {
             setUploading(false);
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [fileMutation.data]);
+    }, [uploadFile]);
 
     return (
         <>
@@ -102,11 +94,7 @@ const Home: NextPage = () => {
                         changeHandler={changeHandler}
                     />
 
-                    <UploadedFile
-                        file={file}
-                        password={password}
-                        fileMutation={fileMutation.data}
-                    />
+                    <UploadedFile file={file} uploadFile={uploadFile} />
                 </div>
 
                 <footer className="relative my-20 bottom-0 flex justify-center items-center">

@@ -3,25 +3,22 @@ import CopytoClipboardToast from "./Toast";
 
 import { FaClipboard, FaClipboardCheck } from "react-icons/fa";
 
-type FileMutationType =
-    | {
-          id: string;
-          name: string;
-          url: string;
-          password: string;
-          type: string;
-      }
-    | undefined;
+interface ReturnFile {
+    fileID: string;
+    name: string;
+    type: string;
+    url: string;
+    password: string;
+}
 
 const UploadedFile: React.FC<{
     file: File | null;
-    fileMutation: FileMutationType;
-    password: string | null;
-}> = ({ file, fileMutation, password }) => {
+    uploadFile: ReturnFile | undefined;
+}> = ({ file, uploadFile }) => {
     const [popup, setPopup] = useState<boolean>(false);
 
     const copyToClipboard = (text: string | undefined) => {
-        if (fileMutation && text) {
+        if (uploadFile && text) {
             setPopup(true);
             navigator.clipboard.writeText(text);
 
@@ -39,31 +36,32 @@ const UploadedFile: React.FC<{
             <ul className="flex flex-col gap-y-2">
                 <li>
                     <span className="text-sm">
-                        ID: {fileMutation?.id || "None"}
+                        ID: {uploadFile?.fileID || "None"}
                     </span>
                 </li>
                 <li>
                     <span className="text-sm">
-                        Name: {fileMutation?.name || "None"}
+                        Name: {uploadFile?.name || "None"}
                     </span>
                 </li>
                 <li>
                     <span className="text-sm">
-                        Password: {fileMutation?.password || "None"}
+                        Password:{" "}
+                        {uploadFile?.password === "None"
+                            ? "None"
+                            : "*".repeat(6)}
                     </span>
                 </li>
                 <li className="relative">
                     <CopytoClipboardToast Popup={popup} setPopup={setPopup}>
                         <span className="inline-block text-sm text-ellipsis whitespace-nowrap overflow-hidden max-w-[350px] cursor-default">
-                            Url: {fileMutation?.url || "None"}
+                            Url: {uploadFile?.url || "None"}
                         </span>
 
-                        {fileMutation && fileMutation.url && (
+                        {uploadFile && uploadFile.url && (
                             <button
                                 className="-right-11 -top-2 p-3 bg-slate-700 rounded-xl absolute"
-                                onClick={() =>
-                                    copyToClipboard(fileMutation?.url)
-                                }
+                                onClick={() => copyToClipboard(uploadFile?.url)}
                             >
                                 {!popup ? (
                                     <FaClipboard />
