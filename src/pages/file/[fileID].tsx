@@ -1,153 +1,177 @@
-import React, { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { trpc } from "@/utils/trpc";
-import Image from "next/future/image";
-import Head from "next/head";
 import download from "@/utils/download";
+import { GetServerSidePropsContext } from "next";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
-const FileDownload: React.FC = () => {
+import { prisma } from "@/server/db/client";
+import { trpc } from "@/utils/trpc";
+
+type PrismaFile = {
+    id: string;
+    name: string;
+    password?: string;
+    fileUrl: string;
+    type: string;
+    path: string;
+    downloadCount: number;
+};
+
+const PasswordForm: React.FC<{
+    filePassword: string;
+    setPasswordLocked: React.Dispatch<React.SetStateAction<boolean>>;
+}> = ({ filePassword, setPasswordLocked }) => {
     const [password, setPassword] = useState<string>("");
-    const [showPassword, setShowPassword] = useState<boolean>(true);
-    const [isUploading, setUploading] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
-    const [title, setTile] = useState<string | null>(null);
+    const [error, setError] = useState<string>("");
+    const [showPassword, setShowPassword] = useState<boolean>(false);
 
-    const router = useRouter();
-    const { refetch } = trpc.useQuery([
-        "file.get-file",
-        { id: router.query.fileID as string },
-    ]);
-    const passwordMutation = trpc.useMutation("file.password-check");
+    const passwordCheck = trpc.useMutation(["file.password-check"]);
 
-    const showPasswordHandler = (e: React.FormEvent) => {
+    const handleSubmitPassword = async (
+        e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    ) => {
         e.preventDefault();
 
-        setShowPassword((current) => !current);
-    };
-
-    const passwordHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setPassword(e.target.value);
-    };
-
-    const submitHandler = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setUploading(true);
-
-        if (!password) {
-            return;
-        }
-
-        passwordMutation.mutate({
-            id: router.query.fileID as string,
-            password: password,
+        passwordCheck.mutate({
+            filePassword,
+            inputPassword: password,
         });
     };
 
     useEffect(() => {
-        if (!router.isReady) {
+        if (!passwordCheck.data) {
             return;
         }
-        refetch().then((refetchQuery) => {
-            if (!refetchQuery.data) {
-                return;
-            }
-            if (refetchQuery.data.error) {
-                setError(refetchQuery.data.error);
 
-                setTimeout(() => {
-                    router.push("/");
-                }, 3000);
+        if (passwordCheck.data.download) {
+            setPasswordLocked(false);
+        } else {
+            setError(passwordCheck.data.error || "");
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [passwordCheck.data]);
 
-                return;
-            }
-            const { passwordLock } = refetchQuery.data;
-            setTile(refetchQuery.data.name as string);
+    return (
+        <form className="flex flex-col gap-y-7 items-start relative max-w-max p-10 rounded-2xl bg-slate-800">
+            <div className="w-full flex justify-center text-2xl">Password</div>
+            <div className="max-w-max flex justify-center items-center gap-x-4">
+                <input
+                    className="bg-slate-700 rounded-2xl px-4 py-2 focus:outline-none"
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    id="password"
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+                <button
+                    className="bg-slate-700 p-3 rounded- xl"
+                    aria-label="toggle password display"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        setShowPassword((current) => !current);
+                    }}
+                >
+                    {showPassword ? <FaEye /> : <FaEyeSlash />}
+                </button>
+            </div>
 
-            if (!passwordLock) {
-                // No password provided! Downloading ...
-                download(
-                    refetchQuery.data.url as string,
-                    refetchQuery.data.name as string
-                );
-            } else {
-                if (!passwordMutation.data) {
-                    return;
-                }
+            <button
+                className="bg-slate-700 py-2 px-4 w-full rounded-2xl h-[40px]"
+                onClick={handleSubmitPassword}
+            >
+                Download
+            </button>
+            {error && (
+                <div className="">
+                    <span className="text-sm text-red-600">{error}</span>
+                </div>
+            )}
+        </form>
+    );
+};
 
-                if (passwordMutation.data.error) {
-                    setError(passwordMutation.data.error);
-                    setUploading(false);
-                    return;
-                }
+const FileDownload: React.FC<{ fileInfo: PrismaFile | null }> = ({
+    fileInfo,
+}) => {
+    const [file] = useState<PrismaFile | null>(fileInfo);
+    const [passwordLocked, setPasswordLocked] = useState<boolean>(false);
+    const router = useRouter();
 
-                if (passwordMutation.data.download) {
-                    // Password is correct. Downloading...
-                    download(
-                        refetchQuery.data.url as string,
-                        refetchQuery.data.name as string
-                    );
+    const downloadFile = () => {
+        if (!file) {
+            return;
+        }
 
-                    setError(null);
-                }
-            }
+        download(file.fileUrl, file.name);
+    };
 
-            setUploading(false);
-        });
+    useEffect(() => {
+        if (!file) {
+            setTimeout(() => router.push("/"), 3000);
+        } else {
+            setPasswordLocked(file.password !== null);
+        }
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [passwordMutation.data, router.isReady]);
+    }, []);
 
     return (
         <>
             <Head>
-                <title>File: {title || "None"}</title>
+                <title>{`File: ${file && file.name}`}</title>
+                <meta
+                    property="og:title"
+                    content={`File: ${file && file.name}.`}
+                />
             </Head>
-            <div className="flex justify-center items-center h-screen">
-                <form className="flex flex-col gap-y-7 items-start relative max-w-max p-10 rounded-2xl bg-slate-800">
-                    <span className="w-full flex justify-center text-2xl">
-                        Password
-                    </span>
-                    <div className="max-w-max flex justify-center items-center gap-x-4">
-                        <label htmlFor="password">Password: </label>
-                        <input
-                            className="bg-slate-700 rounded-2xl px-4 py-2 focus:outline-none"
-                            type={showPassword ? "password" : "text"}
-                            name="password"
-                            id="password"
-                            onChange={passwordHandler}
+            {!file && (
+                <div className="flex w-full h-screen justify-center items-center">
+                    <h1 className="text-xl text-red-500">
+                        Error 404: No page found. Redirecting ...
+                    </h1>
+                </div>
+            )}
+            {file && (
+                <div className="flex justify-center items-center h-screen">
+                    {passwordLocked ? (
+                        <PasswordForm
+                            filePassword={file.password as string}
+                            setPasswordLocked={setPasswordLocked}
                         />
-                        <button
-                            aria-label="toggle password display"
-                            onClick={showPasswordHandler}
-                        >
-                            {showPassword ? <FaEyeSlash /> : <FaEye />}
-                        </button>
-                    </div>
-                    <button
-                        className="bg-slate-700 py-2 w-full rounded-2xl h-[40px]"
-                        onClick={submitHandler}
-                    >
-                        {!isUploading ? (
-                            "Download"
-                        ) : (
-                            <Image
-                                className="flex justify-center items-center h-7 w-full"
-                                src="/uploading.svg"
-                                alt="Uploading images"
-                            />
-                        )}
-                    </button>
-                    {error && (
-                        <div className="">
-                            <span className="text-sm text-red-600">
-                                {error}
-                            </span>
+                    ) : (
+                        <div className="flex flex-col gap-y-7 items-start relative max-w-max p-10 rounded-2xl bg-slate-800">
+                            <button
+                                className="bg-slate-700 py-2 px-4 w-full rounded-2xl h-[40px]"
+                                onClick={() => {
+                                    downloadFile();
+                                }}
+                            >
+                                Click to download
+                            </button>
                         </div>
                     )}
-                </form>
-            </div>
+                </div>
+            )}
         </>
     );
 };
 
 export default FileDownload;
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+    const file = await prisma.file.findFirst({
+        where: { id: context.query.fileID as string },
+    });
+
+    if (!file) {
+        return {
+            props: {
+                fileInfo: null,
+            },
+        };
+    }
+
+    return {
+        props: { fileInfo: { ...file } },
+    };
+}

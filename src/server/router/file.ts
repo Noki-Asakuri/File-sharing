@@ -3,7 +3,6 @@ import { createRouter } from "./context";
 import supabase from "@/server/db/supabase";
 
 import genID from "@/utils/genID";
-import getBaseUrl from "@/utils/getBaseUrl";
 import { decode } from "base64-arraybuffer";
 import * as bcrypt from "bcrypt";
 
@@ -54,23 +53,14 @@ export const exampleRouter = createRouter()
     })
     .mutation("password-check", {
         input: z.object({
-            id: z.string(),
-            password: z.string(),
+            filePassword: z.string(),
+            inputPassword: z.string(),
         }),
-        resolve: async ({ ctx, input }) => {
-            const file = await ctx.prisma.file.findFirst({
-                where: { id: input.id },
-            });
-
-            if (!file) {
-                return { download: false, error: "No file found!" };
-            }
-
-            if (await bcrypt.compare(input.password, file.password as string)) {
+        resolve: async ({ input }) => {
+            if (await bcrypt.compare(input.inputPassword, input.filePassword)) {
                 return { download: true, error: null };
-            } else {
-                return { download: false, error: "Wrong password!" };
             }
+            return { download: false, error: "Wrong password!" };
         },
     })
     .mutation("upload-file", {
@@ -131,4 +121,3 @@ export const exampleRouter = createRouter()
             };
         },
     });
-
