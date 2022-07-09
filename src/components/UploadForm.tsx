@@ -71,6 +71,7 @@ const UploadForm: React.FC<{
                     "Submit"
                 ) : (
                     <Image
+                        priority
                         className="flex justify-center items-center h-7 w-full"
                         src="/uploading.svg"
                         alt="Uploading images"
