@@ -53,14 +53,15 @@ const useStorage = ({
             mutateData = { ...mutateData, password };
         }
 
-        console.log(fileInfo);
         file.arrayBuffer().then((data) => {
             supabase.storage
                 .from("files")
-                .upload(fileInfo.file, data, { contentType: file.type });
+                .upload(fileInfo.file, data, { contentType: file.type })
+                .then(() => {
+                    fileMutation.mutate(mutateData);
+                });
         });
 
-        fileMutation.mutate(mutateData);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isUploading]);
 
