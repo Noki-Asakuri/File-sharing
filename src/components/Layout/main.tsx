@@ -16,7 +16,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 <meta property="og:site_name" content="File Sharing" />
                 <meta
                     property="og:description"
-                    content="A worst possible website to share file."
+                    content="The worst possible website to share file."
                 />
                 <meta property="og:image" content="/favicon.svg" />
                 <meta name="theme-color" content="#2f3136" />

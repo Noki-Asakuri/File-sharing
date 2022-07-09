@@ -118,10 +118,9 @@ const FileDownload: React.FC<{ fileInfo: PrismaFile | null }> = ({
     return (
         <>
             <Head>
-                <title>{`File: ${file && file.name}`}</title>
                 <meta
                     property="og:title"
-                    content={`File: ${file && file.name}.`}
+                    content={`File: ${file && file.name}`}
                 />
             </Head>
             {!file && (
