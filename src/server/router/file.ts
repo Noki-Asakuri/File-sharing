@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { createRouter } from "./context";
-import supabase from "@/server/db/supabase";
 
 import genID from "@/utils/genID";
 import { decode } from "base64-arraybuffer";
@@ -98,7 +97,7 @@ export const exampleRouter = createRouter()
         resolve: async ({ input, ctx }) => {
             const { file, fileID } = genID(input.name);
 
-            const { error } = await supabase.storage
+            const { error } = await ctx.supabase.storage
                 .from("files")
                 .upload(file, decode(input.fileBuffer), {
                     contentType: input.type,
@@ -115,7 +114,7 @@ export const exampleRouter = createRouter()
                 };
             }
 
-            const { publicURL } = supabase.storage
+            const { publicURL } = ctx.supabase.storage
                 .from("files")
                 .getPublicUrl(file);
 

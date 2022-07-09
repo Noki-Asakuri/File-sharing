@@ -74,10 +74,7 @@ const Home: NextPage = () => {
     return (
         <>
             <Head>
-                <meta
-                    property="og:title"
-                    content="Website to share files."
-                />
+                <meta property="og:title" content="Website to share files." />
             </Head>
             <div className="max-w-7xl mx-auto my-0 h-screen">
                 <header>

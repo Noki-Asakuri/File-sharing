@@ -10,15 +10,6 @@ type FileMutationType =
           url: string;
           password: string;
           type: string;
-          error: Error;
-      }
-    | {
-          id: string;
-          name: string;
-          type: string;
-          url: string;
-          password: string;
-          error: null;
       }
     | undefined;
 
@@ -58,7 +49,7 @@ const UploadedFile: React.FC<{
                 </li>
                 <li>
                     <span className="text-sm">
-                        Password: {password || "None"}
+                        Password: {fileMutation?.password || "None"}
                     </span>
                 </li>
                 <li className="relative">
@@ -83,11 +74,6 @@ const UploadedFile: React.FC<{
                         )}
                     </CopytoClipboardToast>
                 </li>
-
-                {/* TODO: Move this somewhere else. */}
-                {fileMutation?.error && (
-                    <li>Error: {fileMutation.error.message} </li>
-                )}
             </ul>
         </div>
     );
