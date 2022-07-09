@@ -77,7 +77,7 @@ const Home: NextPage = () => {
                     <span className="text-3xl tracking-wider text-blue-500">Freunds</span>
                 </nav>
                 <h2 className="mt-16 text-4xl text-center">File Sharing</h2>
-                <p className="text-center pt-5 max-w-2xl">
+                <p className="text-center pt-5 max-w-2xl m-auto">
                     A simple file sharing website so i don&apos;t need to
                     fucking host the fucking file on fucking google drive each
                     time i need to fucking share a file though discord without a

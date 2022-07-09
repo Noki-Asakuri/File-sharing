@@ -63,7 +63,7 @@ const UploadedFile: React.FC<{
                 </li>
                 <li className="relative">
                     <CopytoClipboardToast Popup={popup} setPopup={setPopup}>
-                        <span className="inline-block text-ellipsis whitespace-nowrap overflow-hidden max-w-[350px] cursor-default">
+                        <span className="inline-block text-sm text-ellipsis whitespace-nowrap overflow-hidden max-w-[350px] cursor-default">
                             Url: {fileMutation?.url || "None"}
                         </span>
 
