@@ -74,7 +74,6 @@ const Home: NextPage = () => {
     return (
         <>
             <Head>
-                <title>{`File: ${file && file.name}`}</title>
                 <meta
                     property="og:title"
                     content="Website to share files."
