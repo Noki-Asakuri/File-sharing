@@ -63,6 +63,31 @@ export const exampleRouter = createRouter()
             return { download: false, error: "Wrong password!" };
         },
     })
+    .mutation("update-download-count", {
+        input: z.object({
+            id: z.string(),
+        }),
+        resolve: async ({ input, ctx }) => {
+            const file = await ctx.prisma.file.findFirst({
+                where: { id: input.id },
+            });
+
+            if (!file) {
+                return {
+                    error: "No file found with provided id.",
+                };
+            }
+
+            const newFile = await ctx.prisma.file.update({
+                where: { id: input.id },
+                data: { downloadCount: file.downloadCount + 1 },
+            });
+
+            return {
+                downloadCount: newFile.downloadCount,
+            };
+        },
+    })
     .mutation("upload-file", {
         input: z.object({
             name: z.string(),

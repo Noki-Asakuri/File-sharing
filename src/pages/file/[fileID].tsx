@@ -49,7 +49,7 @@ const PasswordForm: React.FC<{
         } else {
             setError(passwordCheck.data.error || "");
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [passwordCheck.data]);
 
     return (
@@ -95,6 +95,8 @@ const FileDownload: React.FC<{ fileInfo: PrismaFile | null }> = ({
 }) => {
     const [file] = useState<PrismaFile | null>(fileInfo);
     const [passwordLocked, setPasswordLocked] = useState<boolean>(false);
+    const downloadMutation = trpc.useMutation(["file.update-download-count"]);
+
     const router = useRouter();
 
     const downloadFile = () => {
@@ -103,6 +105,7 @@ const FileDownload: React.FC<{ fileInfo: PrismaFile | null }> = ({
         }
 
         download(file.fileUrl, file.name);
+        downloadMutation.mutate({ id: file.id });
     };
 
     useEffect(() => {
@@ -140,6 +143,14 @@ const FileDownload: React.FC<{ fileInfo: PrismaFile | null }> = ({
                         />
                     ) : (
                         <div className="flex flex-col gap-y-7 items-start relative max-w-max p-10 rounded-2xl bg-slate-800">
+                            <div className="w-full flex justify-center text-2xl">
+                                Info
+                            </div>
+                            <div className="flex flex-col">
+                                <span>Name: {file.name}</span>
+                                {/* <span>Author: W.I.P</span> */}
+                                <span>Download: {file.downloadCount}</span>
+                            </div>
                             <button
                                 className="bg-slate-700 py-2 px-4 w-full rounded-2xl h-[40px]"
                                 onClick={() => {
