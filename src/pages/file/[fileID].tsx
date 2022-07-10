@@ -135,10 +135,9 @@ const FileDownload: React.FC<{ fileInfo: PrismaFile | null }> = ({
                 <meta property="og:site_name" content={`${data?.user?.name}`} />
                 <meta
                     property="og:description"
-                    content={`Files: ${file && file.name}.\nAuthor: <@${
-                        // @ts-ignore
-                        data?.user?.discordID
-                    }>`}
+                    content={`Files: ${file && file.name}.\nAuthor: ${
+                        data?.user?.name
+                    }.\nDownload: ${file && file.downloadCount}`}
                 />
                 <meta
                     property="og:image"
