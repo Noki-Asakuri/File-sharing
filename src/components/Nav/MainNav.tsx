@@ -1,6 +1,7 @@
 import React from "react";
 import { FaGithub, FaSignInAlt, FaSignOutAlt } from "react-icons/fa";
 import { useSession, signIn, signOut } from "next-auth/react";
+import Link from "next/link";
 
 const LoginProfile: React.FC<{}> = ({}) => {
     const data = useSession();
@@ -44,7 +45,7 @@ const Navbar: React.FC<{}> = ({}) => {
         <nav className="font-normal bg-slate-800">
             <div className="max-w-7xl mx-auto my-0 flex justify-between py-2">
                 <div className="text-3xl tracking-wider text-blue-500 flex justify-center items-center">
-                    Freunds
+                    <Link href={"/"}>Freunds</Link>
                 </div>
                 <div className="flex justify-center items-center gap-x-5">
                     <div className="bg-slate-600 p-3 rounded-lg">
