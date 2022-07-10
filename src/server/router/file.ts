@@ -8,13 +8,14 @@ const UploadFile = z.object({
     name: z.string(),
     type: z.string(),
     path: z.string(),
+    author: z.string(),
     fileUrl: z.string(),
     password: z.string().optional(),
 });
 
 type UploadFile = z.infer<typeof UploadFile>;
 
-export const exampleRouter = createRouter()
+export const fileRouter = createRouter()
     .query("get-file", {
         input: z.object({
             id: z.string().optional(),
@@ -87,9 +88,10 @@ export const exampleRouter = createRouter()
             password: z.string().optional(),
             type: z.string(),
             path: z.string(),
+            author: z.string(),
         }),
         resolve: async ({ input, ctx }) => {
-            const { path, name, type, fileID, password } = input;
+            const { path, name, type, fileID, password, author } = input;
 
             const { publicURL } = ctx.supabase.storage
                 .from("files")
@@ -100,6 +102,7 @@ export const exampleRouter = createRouter()
                 name: name,
                 type: type,
                 path: path,
+                author: author,
                 fileUrl: publicURL as string,
             };
 

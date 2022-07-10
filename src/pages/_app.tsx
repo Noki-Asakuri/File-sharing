@@ -5,13 +5,19 @@ import getBaseUrl from "@/utils/getBaseUrl";
 import { withTRPC } from "@trpc/next";
 import type { AppType } from "next/dist/shared/lib/utils";
 import superjson from "superjson";
+import { SessionProvider } from "next-auth/react";
 import "../styles/globals.css";
 
-const MyApp: AppType = ({ Component, pageProps }) => {
+const MyApp: AppType = ({
+    Component,
+    pageProps: { session, ...pageProps },
+}) => {
     return (
-        <MainLayout>
-            <Component {...pageProps} />
-        </MainLayout>
+        <SessionProvider session={session}>
+            <MainLayout>
+                <Component {...pageProps} />
+            </MainLayout>
+        </SessionProvider>
     );
 };
 

@@ -2,6 +2,9 @@ declare global {
     namespace NodeJS {
         interface ProcessEnv {
             NEXT_PUBLIC_SUPABASE_KEY: string;
+
+            DISCORD_CLIENT_ID: string;
+            DISCORD_CLIENT_SECRET: string;
         }
     }
 }

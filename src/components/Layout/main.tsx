@@ -1,5 +1,6 @@
 import React from "react";
 import Head from "next/head";
+import Navbar from "../Nav/MainNav";
 
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
@@ -21,6 +22,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 <meta property="og:image" content="/favicon.svg" />
                 <meta name="theme-color" content="#2f3136" />
             </Head>
+            <Navbar />
             {children}
         </>
     );

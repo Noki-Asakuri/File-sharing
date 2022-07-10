@@ -1,3 +1,4 @@
+import { useSession } from "next-auth/react";
 import supabase from "@/server/db/supabase";
 import React, { useEffect } from "react";
 import { trpc } from "@/utils/trpc";
@@ -9,6 +10,7 @@ interface UploadFile {
     type: string;
     path: string;
     password?: string;
+    author: string;
 }
 
 interface ReturnFile {
@@ -30,6 +32,7 @@ const useStorage = ({
     password: string;
     setUploadFile: React.Dispatch<React.SetStateAction<ReturnFile | undefined>>;
 }) => {
+    const { data: session } = useSession();
     const fileMutation = trpc.useMutation(["file.upload-file"]);
 
     useEffect(() => {
@@ -47,6 +50,7 @@ const useStorage = ({
             path: fileInfo.file,
             name: file.name,
             type: file.type,
+            author: session?.user?.name as string,
         };
 
         if (password.length > 0) {

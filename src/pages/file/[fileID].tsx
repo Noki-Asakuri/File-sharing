@@ -15,6 +15,7 @@ type PrismaFile = {
     fileUrl: string;
     type: string;
     path: string;
+    author: string;
     downloadCount: number;
 };
 
@@ -148,7 +149,7 @@ const FileDownload: React.FC<{ fileInfo: PrismaFile | null }> = ({
                             </div>
                             <div className="flex flex-col">
                                 <span>Name: {file.name}</span>
-                                {/* <span>Author: W.I.P</span> */}
+                                <span>Author: {file.author}</span>
                                 <span>Download: {file.downloadCount}</span>
                             </div>
                             <button
