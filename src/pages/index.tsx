@@ -8,21 +8,6 @@ import useStorage from "@/server/hooks/useStorage";
 import Head from "next/head";
 import { useSession } from "next-auth/react";
 
-interface UploadFile {
-    fileID: string;
-    name: string;
-    type: string;
-    password?: string;
-}
-
-interface ReturnFile {
-    fileID: string;
-    name: string;
-    type: string;
-    url: string;
-    password: string;
-}
-
 const Home: NextPage = () => {
     const [file, setFile] = useState<File | null>(null);
     const [password, setPassword] = useState<string>("");
@@ -30,18 +15,14 @@ const Home: NextPage = () => {
     const [isUploading, setUploading] = useState<boolean>(false);
     const { data: session } = useSession();
 
-    const [uploadFile, setUploadFile] = useState<ReturnFile | undefined>(
-        undefined
-    );
-
-    useStorage({ file, isUploading, password, setUploadFile });
+    const uploadFile = useStorage({ file, isUploading, password });
 
     const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         let selected = e.target.files![0];
 
         if (selected && selected.size < 52428800) {
             setFile(selected);
-            setError("");
+            setError(null);
         } else {
             setFile(null);
             setError("File size over 50mb limit!");
@@ -111,7 +92,7 @@ const Home: NextPage = () => {
                             changeHandler={changeHandler}
                         />
 
-                        <UploadedFile file={file} uploadFile={uploadFile} />
+                        <UploadedFile uploadFile={uploadFile}/>
                     </div>
                 )}
 

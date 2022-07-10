@@ -1,6 +1,6 @@
 import { useSession } from "next-auth/react";
 import supabase from "@/server/db/supabase";
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { trpc } from "@/utils/trpc";
 import genID from "@/utils/genID";
 
@@ -13,34 +13,21 @@ interface UploadFile {
     author: string;
 }
 
-interface ReturnFile {
-    fileID: string;
-    name: string;
-    type: string;
-    url: string;
-    password: string;
-}
-
 const useStorage = ({
     file,
     isUploading,
     password,
-    setUploadFile,
 }: {
     file: File | null;
     isUploading: boolean;
     password: string;
-    setUploadFile: React.Dispatch<React.SetStateAction<ReturnFile | undefined>>;
 }) => {
     const { data: session } = useSession();
+    const [uploadPassword, setUploadPassword] = useState<string | null>(null);
     const fileMutation = trpc.useMutation(["file.upload-file"]);
 
     useEffect(() => {
-        if (!isUploading) {
-            return;
-        }
-
-        if (!file) {
+        if (!isUploading || !file) {
             return;
         }
 
@@ -63,19 +50,21 @@ const useStorage = ({
                 .upload(fileInfo.file, data, { contentType: file.type })
                 .then(() => {
                     fileMutation.mutate(mutateData);
+
+                    if (password.length >= 1) {
+                        setUploadPassword(password);
+                    } else {
+                        setUploadPassword(null);
+                    }
                 });
         });
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isUploading]);
 
-    useEffect(() => {
-        if (fileMutation.data) {
-            setUploadFile(fileMutation.data);
-        }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [fileMutation.data]);
+    if (fileMutation.data) {
+        return { ...fileMutation.data, uploadPassword };
+    }
 };
 
 export default useStorage;

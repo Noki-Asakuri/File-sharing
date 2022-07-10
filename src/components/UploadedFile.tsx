@@ -4,27 +4,40 @@ import CopytoClipboardToast from "./Toast";
 import { FaClipboard, FaClipboardCheck } from "react-icons/fa";
 
 interface ReturnFile {
-    fileID: string;
-    name: string;
-    type: string;
-    url: string;
-    password: string;
+    uploadPassword: string | null;
+    fileID?: string | undefined;
+    name?: string | undefined;
+    type?: string | undefined;
+    url?: string | undefined;
+    password?: string | undefined;
 }
 
 const UploadedFile: React.FC<{
-    file: File | null;
     uploadFile: ReturnFile | undefined;
-}> = ({ file, uploadFile }) => {
-    const [popup, setPopup] = useState<boolean>(false);
+}> = ({ uploadFile }) => {
+    const [popupUrl, setPopupUrl] = useState<boolean>(false);
+    const [popupPass, setPopupPass] = useState<boolean>(false);
 
-    const copyToClipboard = (text: string | undefined) => {
+    const copyToClipboard = (
+        text: string | undefined,
+        type: "password" | "url"
+    ) => {
         if (uploadFile && text) {
-            setPopup(true);
-            navigator.clipboard.writeText(text);
+            if (type == "url") {
+                setPopupUrl(true);
+                navigator.clipboard.writeText(text);
 
-            setTimeout(() => {
-                setPopup(false);
-            }, 2000);
+                setTimeout(() => {
+                    setPopupUrl(false);
+                }, 2000);
+            } else {
+                setPopupPass(true);
+                navigator.clipboard.writeText(text);
+
+                setTimeout(() => {
+                    setPopupPass(false);
+                }, 2000);
+            }
         }
     };
 
@@ -44,26 +57,58 @@ const UploadedFile: React.FC<{
                         Name: {uploadFile?.name || "None"}
                     </span>
                 </li>
-                <li>
-                    <span className="text-sm">
-                        Password:{" "}
-                        {uploadFile?.password === "None"
-                            ? "None"
-                            : "*".repeat(6)}
-                    </span>
+                <li className="relative">
+                    <CopytoClipboardToast
+                        popup={popupPass}
+                        setPopup={setPopupPass}
+                        name="password"
+                    >
+                        <span className="text-sm">
+                            Password:{" "}
+                            {!uploadFile?.uploadPassword
+                                ? "None"
+                                : "*".repeat(
+                                      uploadFile?.uploadPassword
+                                          .length as number
+                                  )}
+                        </span>
+                        {uploadFile && uploadFile.uploadPassword && (
+                            <button
+                                className="-right-11 -top-2 p-3 rounded-xl absolute hover:bg-slate-700 transition-all duration-500"
+                                onClick={() =>
+                                    copyToClipboard(
+                                        uploadFile?.uploadPassword as string,
+                                        "password"
+                                    )
+                                }
+                            >
+                                {!popupPass ? (
+                                    <FaClipboard />
+                                ) : (
+                                    <FaClipboardCheck />
+                                )}
+                            </button>
+                        )}
+                    </CopytoClipboardToast>
                 </li>
                 <li className="relative">
-                    <CopytoClipboardToast Popup={popup} setPopup={setPopup}>
-                        <span className="inline-block text-sm text-ellipsis whitespace-nowrap overflow-hidden max-w-[350px] cursor-default">
+                    <CopytoClipboardToast
+                        popup={popupUrl}
+                        setPopup={setPopupUrl}
+                        name="url"
+                    >
+                        <span className="inline-block text-sm text-ellipsis whitespace-nowrap overflow-hidden max-w-[350px]">
                             Url: {uploadFile?.url || "None"}
                         </span>
 
                         {uploadFile && uploadFile.url && (
                             <button
-                                className="-right-11 -top-2 p-3 bg-slate-700 rounded-xl absolute"
-                                onClick={() => copyToClipboard(uploadFile?.url)}
+                                className="-right-11 -top-2 p-3 rounded-xl absolute hover:bg-slate-700 transition-all duration-500"
+                                onClick={() =>
+                                    copyToClipboard(uploadFile?.url, "url")
+                                }
                             >
-                                {!popup ? (
+                                {!popupUrl ? (
                                     <FaClipboard />
                                 ) : (
                                     <FaClipboardCheck />

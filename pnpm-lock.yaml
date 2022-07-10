@@ -28,6 +28,7 @@ specifiers:
   react-query: ^3.39.1
   superjson: ^1.9.1
   tailwindcss: ^3.1.4
+  tailwindcss-radix: ^2.3.1
   typescript: 4.7.4
   zod: ^3.17.3
 
@@ -49,6 +50,7 @@ dependencies:
   react-icons: 4.4.0_react@18.2.0
   react-query: 3.39.1_biqbaboplfbrettd7655fr4n2y
   superjson: 1.9.1
+  tailwindcss-radix: 2.3.1
   zod: 3.17.3
 
 devDependencies:
@@ -3039,6 +3041,10 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
     dev: true
+
+  /tailwindcss-radix/2.3.1:
+    resolution: {integrity: sha512-ZaFG0CRE9maHXF87cu8EXhmLWq+IopMSAHnPa430/Luqa7OctaPNH50aCWkxrS/35R5+0keqCdNF3ER1reKoTA==}
+    dev: false
 
   /tailwindcss/3.1.4:
     resolution: {integrity: sha512-NrxbFV4tYsga/hpWbRyUfIaBrNMXDxx5BsHgBS4v5tlyjf+sDsgBg5m9OxjrXIqAS/uR9kicxLKP+bEHI7BSeQ==}

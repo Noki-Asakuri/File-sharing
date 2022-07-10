@@ -1,14 +1,14 @@
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { signOut, useSession } from "next-auth/react";
-import React from "react";
-import { FaSignOutAlt } from "react-icons/fa";
 import Link from "next/link";
+import React from "react";
+import { FaSignOutAlt, FaHome, FaUserCog, FaCogs } from "react-icons/fa";
 
 const DropdownItem: React.FC<{ children: React.ReactNode }> = ({
     children,
 }) => {
     return (
-        <DropdownMenu.Item className="hover:bg-slate-800 focus:outline-none p-2 rounded-md">
+        <DropdownMenu.Item className="focus:bg-slate-800 focus:outline-none p-2 rounded-md transition-colors">
             {children}
         </DropdownMenu.Item>
     );
@@ -19,30 +19,47 @@ const Dropdown: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
     return (
         <DropdownMenu.Root>
-            <DropdownMenu.Trigger asChild>{children}</DropdownMenu.Trigger>
+            <DropdownMenu.Trigger asChild className="rounded-full">{children}</DropdownMenu.Trigger>
 
             <DropdownMenu.Content
-                className="bg-slate-700 p-4 rounded-lg"
+                className="bg-slate-700 p-4 rounded-lg radix-state-open:animate-fadeIn radix-state-closed:animate-fadeOut"
                 sideOffset={5}
                 loop
             >
-                <DropdownMenu.Label className="p-2">
+                <DropdownMenu.Label className="px-2 pb-2">
                     {session?.user?.name}
                 </DropdownMenu.Label>
-                <DropdownMenu.Separator className="h-[1px] my-1 bg-white" />
+                <DropdownMenu.Separator className="h-px my-1 bg-white" />
                 <DropdownItem>
-                    <span>
-                        <Link href={"/dashboard"}>Dashboard</Link>
-                    </span>
+                    <Link href={"/"} passHref>
+                        <a className="w-full">
+                            <div className="flex justify-between items-center ">
+                                Home <FaHome />
+                            </div>
+                        </a>
+                    </Link>
                 </DropdownItem>
                 <DropdownItem>
-                    <span>
-                        <Link href={"/user"}>User settings</Link>
-                    </span>
+                    <Link href={"/dashboard"} passHref>
+                        <a className="w-full">
+                            <div className="flex justify-between items-center">
+                                Dashboard <FaCogs />
+                            </div>
+                        </a>
+                    </Link>
                 </DropdownItem>
                 <DropdownItem>
-                    <button onClick={() => signOut()}>
-                        <span className="flex justify-center items-center gap-x-2">
+                    <Link href={"/user"} passHref>
+                        <a className="w-full">
+                            <div className="flex justify-between items-center">
+                                User <FaUserCog />
+                            </div>
+                        </a>
+                    </Link>
+                </DropdownItem>
+                <DropdownItem>
+                    <button className="w-full" onClick={() => signOut()}>
+                        <span className="flex justify-between items-center gap-x-2">
                             Logout <FaSignOutAlt />
                         </span>
                     </button>
