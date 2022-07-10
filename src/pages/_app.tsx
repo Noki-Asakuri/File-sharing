@@ -1,11 +1,12 @@
 // src/pages/_app.tsx
+import AuthWrapper from "@/components/Layout/AuthWrapper";
 import MainLayout from "@/components/Layout/main";
 import type { AppRouter } from "@/server/router";
 import getBaseUrl from "@/utils/getBaseUrl";
 import { withTRPC } from "@trpc/next";
+import { SessionProvider } from "next-auth/react";
 import type { AppType } from "next/dist/shared/lib/utils";
 import superjson from "superjson";
-import { SessionProvider } from "next-auth/react";
 import "../styles/globals.css";
 
 const MyApp: AppType = ({
@@ -14,9 +15,11 @@ const MyApp: AppType = ({
 }) => {
     return (
         <SessionProvider session={session}>
-            <MainLayout>
-                <Component {...pageProps} />
-            </MainLayout>
+            <AuthWrapper>
+                <MainLayout>
+                    <Component {...pageProps} />
+                </MainLayout>
+            </AuthWrapper>
         </SessionProvider>
     );
 };

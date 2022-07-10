@@ -7,6 +7,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 import { prisma } from "@/server/db/client";
 import { trpc } from "@/utils/trpc";
+import { useSession } from "next-auth/react";
 
 type PrismaFile = {
     id: string;
@@ -96,7 +97,11 @@ const FileDownload: React.FC<{ fileInfo: PrismaFile | null }> = ({
 }) => {
     const [file] = useState<PrismaFile | null>(fileInfo);
     const [passwordLocked, setPasswordLocked] = useState<boolean>(false);
+    const [downloadText, setDownloadText] =
+        useState<string>("Click to download");
+
     const downloadMutation = trpc.useMutation(["file.update-download-count"]);
+    const { data } = useSession();
 
     const router = useRouter();
 
@@ -125,13 +130,25 @@ const FileDownload: React.FC<{ fileInfo: PrismaFile | null }> = ({
                 <title>{`File: ${file && file.name}`}</title>
                 <meta
                     property="og:title"
-                    content={`File: ${file && file.name}`}
+                    content={`File Sharing by Freunds#8323`}
+                />
+                <meta property="og:site_name" content={`${data?.user?.name}`} />
+                <meta
+                    property="og:description"
+                    content={`Files: ${file && file.name}.\nAuthor: <@${
+                        // @ts-ignore
+                        data?.user?.discordID
+                    }>`}
+                />
+                <meta
+                    property="og:image"
+                    content={data?.user?.image as string}
                 />
             </Head>
             {!file && (
                 <div className="flex w-full h-screen justify-center items-center">
                     <h1 className="text-xl text-red-500">
-                        Error 404: No page found. Redirecting ...
+                        Error 404: No file found. Redirecting ...
                     </h1>
                 </div>
             )}
@@ -156,9 +173,13 @@ const FileDownload: React.FC<{ fileInfo: PrismaFile | null }> = ({
                                 className="bg-slate-700 py-2 px-4 w-full rounded-2xl h-[40px]"
                                 onClick={() => {
                                     downloadFile();
+                                    setDownloadText("Downloading ...");
+                                    setTimeout(() => {
+                                        setDownloadText("Click to download");
+                                    }, 1000);
                                 }}
                             >
-                                Click to download
+                                {downloadText}
                             </button>
                         </div>
                     )}

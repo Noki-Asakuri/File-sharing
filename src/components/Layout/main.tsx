@@ -14,12 +14,6 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                     name="viewport"
                     content="width=device-width, initial-scale=1.0"
                 />
-                <meta property="og:site_name" content="File Sharing" />
-                <meta
-                    property="og:description"
-                    content="The worst possible website to share file."
-                />
-                <meta property="og:image" content="/favicon.svg" />
                 <meta name="theme-color" content="#2f3136" />
             </Head>
             <Navbar />

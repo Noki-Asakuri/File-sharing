@@ -2,30 +2,25 @@ import React from "react";
 import { FaGithub, FaSignInAlt, FaSignOutAlt } from "react-icons/fa";
 import { useSession, signIn, signOut } from "next-auth/react";
 import Link from "next/link";
+import Image from "next/future/image";
+import Dropdown from "./Dropdown";
 
 const LoginProfile: React.FC<{}> = ({}) => {
-    const data = useSession();
-
-    const { data: session } = data;
-
-    console.log(data);
+    const { data: session } = useSession();
 
     if (session) {
         return (
-            <>
-                <div className="bg-slate-600 p-3 rounded-lg">
-                    <div>
-                        <span>{session.user?.name}</span>
-                    </div>
-                </div>
-                <div className="bg-slate-600 p-3 rounded-lg">
-                    <button onClick={() => signOut()}>
-                        <span className="flex justify-center items-center gap-x-2">
-                            Logout <FaSignOutAlt />
-                        </span>
-                    </button>
-                </div>
-            </>
+            <Dropdown>
+                <button className="flex">
+                    <Image
+                        className="rounded-full"
+                        src={session.user?.image as string}
+                        alt={"Discord profile image"}
+                        width={"44px"}
+                        height={"44px"}
+                    />
+                </button>
+            </Dropdown>
         );
     }
 
@@ -43,7 +38,7 @@ const LoginProfile: React.FC<{}> = ({}) => {
 const Navbar: React.FC<{}> = ({}) => {
     return (
         <nav className="font-normal bg-slate-800">
-            <div className="max-w-7xl mx-auto my-0 flex justify-between py-2">
+            <div className="max-w-7xl mx-auto my-0 flex justify-between py-2 px-4">
                 <div className="text-3xl tracking-wider text-blue-500 flex justify-center items-center">
                     <Link href={"/"}>Freunds</Link>
                 </div>
