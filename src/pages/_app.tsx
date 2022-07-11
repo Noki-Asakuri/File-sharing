@@ -1,5 +1,4 @@
 // src/pages/_app.tsx
-import AuthWrapper from "@/components/Layout/AuthWrapper";
 import MainLayout from "@/components/Layout/MainLayout";
 
 import type { AppRouter } from "@/server/router";
@@ -19,11 +18,9 @@ const MyApp: AppType = ({
 }) => {
     return (
         <SessionProvider session={session}>
-            <AuthWrapper>
                 <MainLayout>
                     <Component {...pageProps} />
                 </MainLayout>
-            </AuthWrapper>
         </SessionProvider>
     );
 };

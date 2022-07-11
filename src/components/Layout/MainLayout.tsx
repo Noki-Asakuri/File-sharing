@@ -3,6 +3,8 @@ import Head from "next/head";
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
 
+import AuthWrapper from "./AuthWrapper";
+
 const Navbar = dynamic(() => import("../Nav/MainNav"), { suspense: true });
 
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -22,7 +24,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <Suspense fallback={"Loading ..."}>
                 <Navbar />
             </Suspense>
-            {children}
+            <AuthWrapper>{children}</AuthWrapper>
         </>
     );
 };

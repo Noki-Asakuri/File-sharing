@@ -1,8 +1,13 @@
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 import React from "react";
+import ProtectedRoute from "./ProtectedRoute";
+
+const protectedRoute: string[] = ["/dashboard", "/user"];
 
 const AuthWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { status } = useSession();
+    const router = useRouter();
 
     if (status === "loading") {
         return (
@@ -90,6 +95,10 @@ const AuthWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 {children}
             </>
         );
+    }
+
+    if (protectedRoute.includes(router.pathname)) {
+        return <ProtectedRoute>{children}</ProtectedRoute>;
     }
 
     return <>{children}</>;
