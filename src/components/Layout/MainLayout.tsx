@@ -1,6 +1,9 @@
 import React from "react";
 import Head from "next/head";
-import Navbar from "../Nav/MainNav";
+import dynamic from "next/dynamic";
+import { Suspense } from "react";
+
+const Navbar = dynamic(() => import("../Nav/MainNav"), { suspense: true });
 
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
@@ -16,7 +19,9 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 />
                 <meta name="theme-color" content="#2f3136" />
             </Head>
-            <Navbar />
+            <Suspense fallback={"Loading ..."}>
+                <Navbar />
+            </Suspense>
             {children}
         </>
     );

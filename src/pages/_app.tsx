@@ -1,6 +1,6 @@
 // src/pages/_app.tsx
 import AuthWrapper from "@/components/Layout/AuthWrapper";
-import MainLayout from "@/components/Layout/main";
+import MainLayout from "@/components/Layout/MainLayout";
 import type { AppRouter } from "@/server/router";
 import getBaseUrl from "@/utils/getBaseUrl";
 import { withTRPC } from "@trpc/next";

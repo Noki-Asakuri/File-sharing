@@ -1,46 +1,119 @@
 import type { NextPage } from "next";
 
-import React, { useEffect, useState } from "react";
+import React, { Reducer, useEffect, useReducer } from "react";
 
-import UploadedFile from "@/components/UploadedFile";
-import UploadForm from "@/components/UploadForm";
 import useStorage from "@/server/hooks/useStorage";
-import Head from "next/head";
 import { useSession } from "next-auth/react";
+import dynamic from "next/dynamic";
+import Head from "next/head";
+import { Suspense } from "react";
+
+const UploadedFile = dynamic(() => import("@/components/UploadedFile"), {
+    suspense: true,
+});
+const UploadForm = dynamic(() => import("@/components/UploadForm"), {
+    suspense: true,
+});
+
+export enum Action {
+    SUBMIT = "SUBMIT-HANDLER",
+    PASSWORD = "PASSWORD-HANDLER",
+    CHANGE = "ON-CHANGE-HANDLER",
+    UPLOADED = "UPLOADED",
+}
+
+export interface ActionType {
+    type: Action;
+    payload:
+        | React.ChangeEvent<HTMLInputElement>
+        | React.MouseEvent<HTMLButtonElement, MouseEvent>
+        | null;
+}
+
+export interface State {
+    file: File | null;
+    password: string;
+    error: string | null;
+    isUploading: boolean;
+}
+
+function instanceOfChangeEvent(
+    object: any
+): object is React.ChangeEvent<HTMLInputElement> {
+    return "files" in object.target;
+}
+
+const reducer = (state: State, action: ActionType) => {
+    const { type, payload } = action;
+
+    switch (type) {
+        case Action.CHANGE:
+            if (!payload || !instanceOfChangeEvent(payload)) {
+                return state;
+            }
+            let selected = payload.target.files![0];
+
+            if (selected && selected.size < 52428800) {
+                return {
+                    ...state,
+                    file: selected,
+                    error: null,
+                };
+            }
+            return {
+                ...state,
+                file: null,
+                error: "File size over 50mb limit!",
+            };
+
+        case Action.PASSWORD:
+            if (!payload || !instanceOfChangeEvent(payload)) {
+                return state;
+            }
+
+            return { ...state, password: payload.target.value };
+        case Action.SUBMIT:
+            if (!payload || instanceOfChangeEvent(payload)) {
+                return state;
+            }
+            payload.preventDefault();
+
+            if (!state.file) {
+                return { ...state, error: "No file to upload!" };
+            }
+
+            return { ...state, isUploading: true };
+
+        case Action.UPLOADED:
+            if (payload) {
+                return state;
+            }
+
+            return { ...state, isUploading: false };
+        default:
+            return state;
+    }
+};
 
 const Home: NextPage = () => {
-    const [file, setFile] = useState<File | null>(null);
-    const [password, setPassword] = useState<string>("");
-    const [error, setError] = useState<string | null>(null);
-    const [isUploading, setUploading] = useState<boolean>(false);
     const { data: session } = useSession();
 
-    const uploadFile = useStorage({ file, isUploading, password });
+    const [state, dispatch] = useReducer<Reducer<State, ActionType>>(reducer, {
+        file: null,
+        password: "",
+        error: null,
+        isUploading: false,
+    });
 
-    const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-        let selected = e.target.files![0];
-
-        if (selected && selected.size < 52428800) {
-            setFile(selected);
-            setError(null);
-        } else {
-            setFile(null);
-            setError("File size over 50mb limit!");
-        }
-    };
-
-    const passwordHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setPassword(e.target.value);
-    };
-
-    const submitHandler = (e: React.FormEvent) => {
-        e.preventDefault();
-        setUploading(true);
-    };
+    const uploadFile = useStorage({
+        file: state.file,
+        isUploading: state.isUploading,
+        password: state.password,
+    });
 
     useEffect(() => {
         if (uploadFile) {
-            setUploading(false);
+            dispatch({ type: Action.UPLOADED, payload: null });
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -82,18 +155,13 @@ const Home: NextPage = () => {
                 )}
 
                 {session && (
-                    <div className="flex justify-around flex-wrap pt-20 gap-10">
-                        <UploadForm
-                            file={file}
-                            error={error}
-                            isUploading={isUploading}
-                            submitHandler={submitHandler}
-                            passwordHandler={passwordHandler}
-                            changeHandler={changeHandler}
-                        />
+                    <Suspense fallback={"Loading..."}>
+                        <div className="flex justify-around flex-wrap pt-20 gap-10">
+                            <UploadForm state={state} dispatch={dispatch} />
 
-                        <UploadedFile uploadFile={uploadFile}/>
-                    </div>
+                            <UploadedFile uploadFile={uploadFile} />
+                        </div>
+                    </Suspense>
                 )}
 
                 <footer className="relative my-20 bottom-0 flex justify-center items-center">

@@ -8,7 +8,7 @@ const DropdownItem: React.FC<{ children: React.ReactNode }> = ({
     children,
 }) => {
     return (
-        <DropdownMenu.Item className="focus:bg-slate-800 focus:outline-none p-2 rounded-md transition-colors">
+        <DropdownMenu.Item className="focus:bg-slate-800 focus:outline-none rounded-md transition-colors">
             {children}
         </DropdownMenu.Item>
     );
@@ -33,7 +33,7 @@ const Dropdown: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 <DropdownItem>
                     <Link href={"/"} passHref>
                         <a className="w-full">
-                            <div className="flex justify-between items-center ">
+                            <div className="flex justify-between items-center p-2">
                                 Home <FaHome />
                             </div>
                         </a>
@@ -42,7 +42,7 @@ const Dropdown: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 <DropdownItem>
                     <Link href={"/dashboard"} passHref>
                         <a className="w-full">
-                            <div className="flex justify-between items-center">
+                            <div className="flex justify-between items-center p-2">
                                 Dashboard <FaCogs />
                             </div>
                         </a>
@@ -51,15 +51,15 @@ const Dropdown: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 <DropdownItem>
                     <Link href={"/user"} passHref>
                         <a className="w-full">
-                            <div className="flex justify-between items-center">
+                            <div className="flex justify-between items-center p-2">
                                 User <FaUserCog />
                             </div>
                         </a>
                     </Link>
                 </DropdownItem>
                 <DropdownItem>
-                    <button className="w-full" onClick={() => signOut()}>
-                        <span className="flex justify-between items-center gap-x-2">
+                    <button className="w-full" onClick={() => signOut({ callbackUrl: "/"})}>
+                        <span className="flex justify-between items-center gap-x-2 p-2">
                             Logout <FaSignOutAlt />
                         </span>
                     </button>

@@ -8,7 +8,7 @@ const AuthWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         return (
             <>
                 <div className="flex justify-center items-center absolute top-0 left-0 w-full h-full bg-[#333] z-50">
-                    <h1 className="text-xl">Loading ...</h1>
+                    <img className="w-20 h-auto" src="/loading.svg" alt="Loading image" />
                 </div>
                 {children}
             </>
