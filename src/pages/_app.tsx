@@ -1,12 +1,16 @@
 // src/pages/_app.tsx
 import AuthWrapper from "@/components/Layout/AuthWrapper";
 import MainLayout from "@/components/Layout/MainLayout";
+
 import type { AppRouter } from "@/server/router";
-import getBaseUrl from "@/utils/getBaseUrl";
+import type { AppType } from "next/dist/shared/lib/utils";
+
 import { withTRPC } from "@trpc/next";
 import { SessionProvider } from "next-auth/react";
-import type { AppType } from "next/dist/shared/lib/utils";
 import superjson from "superjson";
+
+import getBaseUrl from "@/utils/getBaseUrl";
+
 import "../styles/globals.css";
 
 const MyApp: AppType = ({

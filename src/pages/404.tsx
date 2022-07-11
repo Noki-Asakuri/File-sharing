@@ -1,14 +1,15 @@
+import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 
-const FourOhFourPage: React.FC = () => {
+const FourOhFourPage: NextPage = () => {
     const router = useRouter();
 
     useEffect(() => {
         setTimeout(() => {
             router.push("/");
         }, 3000);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (

@@ -1,5 +1,6 @@
 import download from "@/utils/download";
 import { GetServerSidePropsContext } from "next";
+import type { NextPage } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
@@ -92,7 +93,7 @@ const PasswordForm: React.FC<{
     );
 };
 
-const FileDownload: React.FC<{ fileInfo: PrismaFile | null }> = ({
+const FileDownload: NextPage<{ fileInfo: PrismaFile | null }> = ({
     fileInfo,
 }) => {
     const [file] = useState<PrismaFile | null>(fileInfo);
