@@ -1,4 +1,4 @@
-import { ActionType, Action, State } from "@/pages";
+import { Action, ActionType, State } from "@/pages";
 import React, { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
@@ -24,7 +24,12 @@ const UploadForm: React.FC<{
                 type="file"
                 id="file"
                 name="file"
-                onChange={(e) => dispatch({ type: Action.CHANGE, payload: e })}
+                onChange={(e) =>
+                    dispatch({
+                        type: Action.CHANGE,
+                        payload: e.target.files![0],
+                    })
+                }
                 required
             />
             <div className="max-w-max flex justify-center items-center gap-x-4">
@@ -36,7 +41,10 @@ const UploadForm: React.FC<{
                     name="password"
                     id="password"
                     onChange={(e) =>
-                        dispatch({ type: Action.PASSWORD, payload: e })
+                        dispatch({
+                            type: Action.PASSWORD,
+                            payload: e.target.value,
+                        })
                     }
                 />
                 <button
@@ -54,7 +62,10 @@ const UploadForm: React.FC<{
 
             <button
                 className="bg-slate-700 py-2 w-full rounded-2xl h-[40px]"
-                onClick={(e) => dispatch({ type: Action.SUBMIT, payload: e })}
+                onClick={(e) => {
+                    e.preventDefault();
+                    dispatch({ type: Action.SUBMIT, payload: null });
+                }}
             >
                 {!state.isUploading ? (
                     "Submit"

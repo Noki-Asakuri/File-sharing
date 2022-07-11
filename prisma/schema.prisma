@@ -15,10 +15,11 @@ model File {
     id            String  @id
     name          String
     password      String?
-    fileUrl       String
-    type          String
-    path          String
     author        String
+    authorID      String
+    url           String
+    type          String?
+    path          String
     downloadCount Int     @default(0)
 }
 
@@ -51,7 +52,7 @@ model Session {
 
 model User {
     id            String    @id @default(cuid())
-    discordID     String
+    discordID     String    @unique
     name          String?
     email         String?   @unique
     emailVerified DateTime?

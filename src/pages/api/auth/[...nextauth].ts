@@ -35,8 +35,10 @@ export default NextAuth({
                 // return '/unauthorized'
             }
         },
-        async session({ session, user, token }) {
-            return { session, user, expires: session.expires };
+        async session({ session, user }) {
+            session.user.discordID = user.discordID;
+
+            return session;
         },
     },
 });

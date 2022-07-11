@@ -1,8 +1,8 @@
-import { useSession } from "next-auth/react";
 import supabase from "@/server/db/supabase";
-import React, { useState, useEffect } from "react";
-import { trpc } from "@/utils/trpc";
 import genID from "@/utils/genID";
+import { trpc } from "@/utils/trpc";
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 
 interface UploadFile {
     fileID: string;
@@ -11,6 +11,7 @@ interface UploadFile {
     path: string;
     password?: string;
     author: string;
+    authorID: string;
 }
 
 const useStorage = ({
@@ -27,37 +28,36 @@ const useStorage = ({
     const fileMutation = trpc.useMutation(["file.upload-file"]);
 
     useEffect(() => {
-        if (!isUploading || !file) {
-            return;
+        if (isUploading && file) {
+            const fileInfo = genID(file.name);
+            let mutateData: UploadFile = {
+                fileID: fileInfo.fileID,
+                path: fileInfo.file,
+                name: file.name,
+                type: file.type,
+                author: session?.user?.name as string,
+                authorID: session?.user?.discordID as string,
+            };
+
+            if (password.length > 0) {
+                mutateData = { ...mutateData, password };
+            }
+
+            file.arrayBuffer().then((data) => {
+                supabase.storage
+                    .from("files")
+                    .upload(fileInfo.file, data, { contentType: file.type })
+                    .then(() => {
+                        fileMutation.mutate(mutateData);
+
+                        if (password.length >= 1) {
+                            setUploadPassword(password);
+                        } else {
+                            setUploadPassword(null);
+                        }
+                    });
+            });
         }
-
-        const fileInfo = genID(file.name);
-        let mutateData: UploadFile = {
-            fileID: fileInfo.fileID,
-            path: fileInfo.file,
-            name: file.name,
-            type: file.type,
-            author: session?.user?.name as string,
-        };
-
-        if (password.length > 0) {
-            mutateData = { ...mutateData, password };
-        }
-
-        file.arrayBuffer().then((data) => {
-            supabase.storage
-                .from("files")
-                .upload(fileInfo.file, data, { contentType: file.type })
-                .then(() => {
-                    fileMutation.mutate(mutateData);
-
-                    if (password.length >= 1) {
-                        setUploadPassword(password);
-                    } else {
-                        setUploadPassword(null);
-                    }
-                });
-        });
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isUploading]);

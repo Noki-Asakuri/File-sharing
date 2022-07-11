@@ -1,6 +1,6 @@
 import download from "@/utils/download";
-import { GetServerSidePropsContext } from "next";
 import type { NextPage } from "next";
+import { GetServerSidePropsContext } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
@@ -14,7 +14,7 @@ type PrismaFile = {
     id: string;
     name: string;
     password?: string;
-    fileUrl: string;
+    url: string;
     type: string;
     path: string;
     author: string;
@@ -98,8 +98,7 @@ const FileDownload: NextPage<{ fileInfo: PrismaFile | null }> = ({
 }) => {
     const [file] = useState<PrismaFile | null>(fileInfo);
     const [passwordLocked, setPasswordLocked] = useState<boolean>(false);
-    const [downloadText, setDownloadText] =
-        useState<string>("Click to download");
+    const [isDownload, setIsDownload] = useState<boolean>(false);
 
     const downloadMutation = trpc.useMutation(["file.update-download-count"]);
     const { data } = useSession();
@@ -111,7 +110,7 @@ const FileDownload: NextPage<{ fileInfo: PrismaFile | null }> = ({
             return;
         }
 
-        download(file.fileUrl, file.name);
+        download(file.url, file.name);
         downloadMutation.mutate({ id: file.id });
     };
 
@@ -144,14 +143,14 @@ const FileDownload: NextPage<{ fileInfo: PrismaFile | null }> = ({
                 />
             </Head>
             {!file && (
-                <div className="flex w-full h-screen justify-center items-center">
+                <div className="flex w-full h-max justify-center items-center">
                     <h1 className="text-xl text-red-500">
                         Error 404: No file found. Redirecting ...
                     </h1>
                 </div>
             )}
             {file && (
-                <div className="flex justify-center items-center h-screen">
+                <div className="flex justify-center items-center h-[80vh]">
                     {passwordLocked ? (
                         <PasswordForm
                             filePassword={file.password as string}
@@ -171,13 +170,43 @@ const FileDownload: NextPage<{ fileInfo: PrismaFile | null }> = ({
                                 className="bg-slate-700 py-2 px-4 w-full rounded-2xl h-[40px]"
                                 onClick={() => {
                                     downloadFile();
-                                    setDownloadText("Downloading ...");
+                                    setIsDownload((current) => !current);
                                     setTimeout(() => {
-                                        setDownloadText("Click to download");
+                                        setIsDownload((current) => !current);
                                     }, 1000);
                                 }}
                             >
-                                {downloadText}
+                                <div className="flex justify-center items-center gap-2">
+                                    {isDownload ? (
+                                        <>
+                                            <span>Downloading</span>
+                                            <div className="flex justify-center items-center">
+                                                <svg
+                                                    className="animate-spin h-6 w-6 text-white"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <circle
+                                                        className="opacity-25"
+                                                        cx="12"
+                                                        cy="12"
+                                                        r="10"
+                                                        stroke="currentColor"
+                                                        strokeWidth="4"
+                                                    ></circle>
+                                                    <path
+                                                        className="opacity-75"
+                                                        fill="currentColor"
+                                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                                    ></path>
+                                                </svg>
+                                            </div>
+                                        </>
+                                    ) : (
+                                            <span>Click to download</span>
+                                    )}
+                                </div>
                             </button>
                         </div>
                     )}

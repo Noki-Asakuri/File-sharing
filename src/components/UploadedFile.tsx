@@ -5,11 +5,11 @@ import { FaClipboard, FaClipboardCheck } from "react-icons/fa";
 
 interface ReturnFile {
     uploadPassword: string | null;
-    fileID?: string | undefined;
-    name?: string | undefined;
-    type?: string | undefined;
-    url?: string | undefined;
-    password?: string | undefined;
+    fileID: string;
+    name: string;
+    type: string | null;
+    url: string;
+    password: string;
 }
 
 const UploadedFile: React.FC<{

@@ -6,10 +6,11 @@ import * as bcrypt from "bcrypt";
 const UploadFile = z.object({
     id: z.string(),
     name: z.string(),
+    url: z.string(),
     type: z.string(),
     path: z.string(),
     author: z.string(),
-    fileUrl: z.string(),
+    authorID: z.string(),
     password: z.string().optional(),
 });
 
@@ -39,7 +40,7 @@ export const fileRouter = createRouter()
             return {
                 passwordLock: !!file.password,
                 error: null,
-                url: file.fileUrl,
+                url: file.url,
                 name: file.name,
             };
         },
@@ -89,9 +90,11 @@ export const fileRouter = createRouter()
             type: z.string(),
             path: z.string(),
             author: z.string(),
+            authorID: z.string(),
         }),
         resolve: async ({ input, ctx }) => {
-            const { path, name, type, fileID, password, author } = input;
+            const { path, name, type, fileID, password, author, authorID } =
+                input;
 
             const { publicURL } = ctx.supabase.storage
                 .from("files")
@@ -103,7 +106,8 @@ export const fileRouter = createRouter()
                 type: type,
                 path: path,
                 author: author,
-                fileUrl: publicURL as string,
+                authorID: authorID,
+                url: publicURL as string,
             };
 
             if (password) {

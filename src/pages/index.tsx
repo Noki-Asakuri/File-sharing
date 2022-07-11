@@ -1,10 +1,11 @@
 import type { NextPage } from "next";
 
-import React, { Reducer, useEffect, useReducer } from "react";
+import { Reducer, useEffect, useReducer } from "react";
 
 import useStorage from "@/server/hooks/useStorage";
 import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
+import Image from "next/future/image";
 import Head from "next/head";
 import { Suspense } from "react";
 
@@ -24,10 +25,7 @@ export enum Action {
 
 export interface ActionType {
     type: Action;
-    payload:
-        | React.ChangeEvent<HTMLInputElement>
-        | React.MouseEvent<HTMLButtonElement, MouseEvent>
-        | null;
+    payload: File | string | null | undefined;
 }
 
 export interface State {
@@ -37,59 +35,49 @@ export interface State {
     isUploading: boolean;
 }
 
-function instanceOfChangeEvent(
-    object: any
-): object is React.ChangeEvent<HTMLInputElement> {
-    return "files" in object.target;
-}
-
-const reducer = (state: State, action: ActionType) => {
+const reducer = (state: State, action: ActionType): State => {
     const { type, payload } = action;
 
     switch (type) {
         case Action.CHANGE:
-            if (!payload || !instanceOfChangeEvent(payload)) {
+            if (!payload || typeof payload === "string") {
                 return state;
             }
-            let selected = payload.target.files![0];
 
-            if (selected && selected.size < 52428800) {
+            if (payload.size < 52428800) {
                 return {
                     ...state,
-                    file: selected,
+                    file: payload,
                     error: null,
                 };
             }
             return {
                 ...state,
                 file: null,
-                error: "File size over 50mb limit!",
+                error: "File size over 50MB limit!",
             };
 
         case Action.PASSWORD:
-            if (!payload || !instanceOfChangeEvent(payload)) {
+            if (!payload || typeof payload !== "string") {
                 return state;
             }
 
-            return { ...state, password: payload.target.value };
+            return { ...state, password: payload };
+
         case Action.SUBMIT:
-            if (!payload || instanceOfChangeEvent(payload)) {
-                return state;
-            }
-            payload.preventDefault();
-
             if (!state.file) {
-                return { ...state, error: "No file to upload!" };
+                return {
+                    ...state,
+                    isUploading: false,
+                    error: "No file to upload!",
+                };
             }
 
-            return { ...state, isUploading: true };
+            return { ...state, isUploading: true, error: null };
 
         case Action.UPLOADED:
-            if (payload) {
-                return state;
-            }
-
             return { ...state, isUploading: false };
+
         default:
             return state;
     }
@@ -112,12 +100,10 @@ const Home: NextPage = () => {
     });
 
     useEffect(() => {
-        if (uploadFile) {
+        if (uploadFile && state.isUploading) {
             dispatch({ type: Action.UPLOADED, payload: null });
         }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [uploadFile]);
+    }, [state.isUploading, uploadFile]);
 
     return (
         <>
@@ -130,7 +116,7 @@ const Home: NextPage = () => {
                 />
                 <meta property="og:image" content="/favicon.svg" />
             </Head>
-            <div className="max-w-7xl mx-auto my-0 h-screen">
+            <div className="max-w-7xl mx-auto my-0 h-max">
                 <header>
                     <h2 className="mt-16 text-4xl text-center">File Sharing</h2>
                     <p className="text-center pt-5 max-w-2xl m-auto">
@@ -155,7 +141,16 @@ const Home: NextPage = () => {
                 )}
 
                 {session && (
-                    <Suspense fallback={"Loading..."}>
+                    <Suspense
+                        fallback={
+                            <div className="flex justify-center items-center h-[300px]">
+                                <Image
+                                    src={"/loading.svg"}
+                                    alt="Loading image"
+                                />
+                            </div>
+                        }
+                    >
                         <div className="flex justify-around flex-wrap pt-20 gap-10">
                             <UploadForm state={state} dispatch={dispatch} />
 
