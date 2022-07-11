@@ -50,6 +50,7 @@ const Navbar: React.FC<{}> = ({}) => {
                             rel="noreferrer"
                         >
                             <div className="flex justify-center items-center gap-x-2 w-max h-max">
+                                <span className="hidden">Github</span>
                                 <FaGithub className="w-11 h-11 rounded-full hover:text-sky-700 transition-colors"/>
                             </div>
                         </a>

@@ -134,10 +134,10 @@ const Home: NextPage = () => {
                 <header>
                     <h2 className="mt-16 text-4xl text-center">File Sharing</h2>
                     <p className="text-center pt-5 max-w-2xl m-auto">
-                        A simple file sharing website so i don&apos;t need to
+                        A simple file-sharing website so I don&apos;t need to
                         fucking host the fucking file on fucking google drive
-                        each time i need to fucking share a file though discord
-                        without a bullshit 8mb limit.
+                        each time I need to fucking share a file through discord
+                        without a bullshit 8MB limit.
                     </p>
                 </header>
 
