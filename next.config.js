@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    reactStrictMode: false,
+    reactStrictMode: true,
     images: {
         domains: ["cdn.discordapp.com"],
     },
@@ -12,4 +12,3 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
-

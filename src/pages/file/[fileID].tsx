@@ -143,14 +143,14 @@ const FileDownload: NextPage<{ fileInfo: PrismaFile | null }> = ({
                 />
             </Head>
             {!file && (
-                <div className="flex w-full h-max justify-center items-center">
+                <div className="flex justify-center items-center h-[90vh]">
                     <h1 className="text-xl text-red-500">
                         Error 404: No file found. Redirecting ...
                     </h1>
                 </div>
             )}
             {file && (
-                <div className="flex justify-center items-center h-[80vh]">
+                <div className="flex justify-center items-center h-[90vh]">
                     {passwordLocked ? (
                         <PasswordForm
                             filePassword={file.password as string}

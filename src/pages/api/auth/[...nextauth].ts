@@ -21,9 +21,14 @@ export default NextAuth({
         }),
     ],
     callbacks: {
-        async signIn({ user, profile }) {
+        async signIn({ user, profile, account }) {
+            const role = profile.id === "188903265931362304" ? "Owner" : "User";
+
             user.name = `${profile.username}#${profile.discriminator}`;
             user.discordID = profile.id;
+
+            account.role = role;
+            user.role = role;
 
             const isAllowedToSignIn = true;
             if (isAllowedToSignIn) {
@@ -37,6 +42,7 @@ export default NextAuth({
         },
         async session({ session, user }) {
             session.user.discordID = user.discordID;
+            session.user.role = user.role;
 
             return session;
         },

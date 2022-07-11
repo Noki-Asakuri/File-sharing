@@ -98,7 +98,14 @@ const UploadedFile: React.FC<{
                         name="url"
                     >
                         <span className="inline-block text-sm text-ellipsis whitespace-nowrap overflow-hidden max-w-[350px]">
-                            Url: {uploadFile?.url || "None"}
+                            Url:{" "}
+                            <a
+                                href={uploadFile?.url}
+                                target="_blank"
+                                rel="noreferrer"
+                            >
+                                {uploadFile?.url || "None"}
+                            </a>
                         </span>
 
                         {uploadFile && uploadFile.url && (

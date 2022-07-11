@@ -95,7 +95,7 @@ const UploadForm: React.FC<{
                 )}
             </button>
             {state.error && (
-                <div className="absolute left-[200px] top-[95px]">
+                <div className="absolute left-[200px] top-[97px]">
                     <span className="text-sm text-red-600">{state.error}</span>
                 </div>
             )}

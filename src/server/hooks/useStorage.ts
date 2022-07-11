@@ -1,8 +1,9 @@
+import { Action, ActionType, State } from "@/pages";
 import supabase from "@/server/db/supabase";
 import genID from "@/utils/genID";
 import { trpc } from "@/utils/trpc";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { Dispatch, useEffect, useRef } from "react";
 
 interface UploadFile {
     fileID: string;
@@ -15,17 +16,17 @@ interface UploadFile {
 }
 
 const useStorage = ({
-    file,
-    isUploading,
-    password,
+    state,
+    dispatch,
 }: {
-    file: File | null;
-    isUploading: boolean;
-    password: string;
+    state: State;
+    dispatch: Dispatch<ActionType>;
 }) => {
     const { data: session } = useSession();
-    const [uploadPassword, setUploadPassword] = useState<string | null>(null);
+    const uploadPassword = useRef<string | null>(null);
     const fileMutation = trpc.useMutation(["file.upload-file"]);
+
+    const { isUploading, file, password } = state;
 
     useEffect(() => {
         if (isUploading && file) {
@@ -51,19 +52,20 @@ const useStorage = ({
                         fileMutation.mutate(mutateData);
 
                         if (password.length >= 1) {
-                            setUploadPassword(password);
+                            uploadPassword.current = password;
                         } else {
-                            setUploadPassword(null);
+                            uploadPassword.current = null;
                         }
+
+                        dispatch({ type: Action.UPLOADED });
                     });
             });
         }
-
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isUploading]);
 
     if (fileMutation.data) {
-        return { ...fileMutation.data, uploadPassword };
+        return { ...fileMutation.data, uploadPassword: uploadPassword.current };
     }
 };
 

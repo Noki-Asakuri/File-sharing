@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 
-import { Reducer, useEffect, useReducer } from "react";
+import { Reducer, useEffect, useReducer, useRef } from "react";
 
 import useStorage from "@/server/hooks/useStorage";
 import { useSession } from "next-auth/react";
@@ -25,7 +25,7 @@ export enum Action {
 
 export interface ActionType {
     type: Action;
-    payload: File | string | null | undefined;
+    payload?: File | string | null | undefined;
 }
 
 export interface State {
@@ -93,17 +93,7 @@ const Home: NextPage = () => {
         isUploading: false,
     });
 
-    const uploadFile = useStorage({
-        file: state.file,
-        isUploading: state.isUploading,
-        password: state.password,
-    });
-
-    useEffect(() => {
-        if (uploadFile && state.isUploading) {
-            dispatch({ type: Action.UPLOADED, payload: null });
-        }
-    }, [state.isUploading, uploadFile]);
+    const uploadFile = useStorage({ state, dispatch });
 
     return (
         <>
@@ -143,10 +133,12 @@ const Home: NextPage = () => {
                 {session && (
                     <Suspense
                         fallback={
-                            <div className="flex justify-center items-center h-[300px]">
+                            <div className="flex justify-center items-center h-[300px] w-full">
                                 <Image
+                                    width="100px"
+                                    height="100px"
                                     src={"/loading.svg"}
-                                    alt="Loading image"
+                                    alt={"Loading image"}
                                 />
                             </div>
                         }
