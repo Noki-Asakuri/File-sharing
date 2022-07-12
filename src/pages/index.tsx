@@ -1,12 +1,6 @@
 import type { NextPage } from "next";
 
-import {
-    MutableRefObject,
-    Reducer,
-    useEffect,
-    useReducer,
-    useRef,
-} from "react";
+import { MutableRefObject, Reducer, useReducer, useRef } from "react";
 
 import useStorage from "@/server/hooks/useStorage";
 import { useSession } from "next-auth/react";
@@ -103,10 +97,6 @@ const Home: NextPage = () => {
     });
 
     const uploadFile = useStorage({ state, dispatch });
-
-    useEffect(() => {
-        console.log("Run");
-    });
 
     return (
         <>

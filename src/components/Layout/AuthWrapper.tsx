@@ -1,7 +1,7 @@
 import { useSession } from "next-auth/react";
+import Image from "next/future/image";
 import { useRouter } from "next/router";
 import React from "react";
-import Image from "next/future/image";
 import ProtectedRoute from "./ProtectedRoute";
 
 const protectedRoute: string[] = ["/dashboard", "/user"];

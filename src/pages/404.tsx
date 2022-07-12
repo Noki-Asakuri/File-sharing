@@ -13,7 +13,7 @@ const FourOhFourPage: NextPage = () => {
     }, []);
 
     return (
-        <div className="flex w-full h-screen justify-center items-center">
+        <div className="flex w-full h-[90vh] justify-center items-center">
             <h1 className="text-xl text-red-500">
                 Error 404: No page found. Redirecting ...
             </h1>
