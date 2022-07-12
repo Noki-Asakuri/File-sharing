@@ -40,26 +40,31 @@ const useStorage = ({
                 authorID: session?.user?.discordID as string,
             };
 
-            if (password.length > 0) {
-                mutateData = { ...mutateData, password };
+            if (password.current.length > 0) {
+                mutateData = { ...mutateData, password: password.current };
             }
 
-            file.arrayBuffer().then((data) => {
-                supabase.storage
+            const uploadFileToStorage = async () => {
+                const fileBuffer = await file.arrayBuffer();
+
+                await supabase.storage
                     .from("files")
-                    .upload(fileInfo.file, data, { contentType: file.type })
-                    .then(() => {
-                        fileMutation.mutate(mutateData);
-
-                        if (password.length >= 1) {
-                            uploadPassword.current = password;
-                        } else {
-                            uploadPassword.current = null;
-                        }
-
-                        dispatch({ type: Action.UPLOADED });
+                    .upload(fileInfo.file, fileBuffer, {
+                        contentType: file.type,
                     });
-            });
+
+                fileMutation.mutate(mutateData);
+
+                if (password.current.length >= 1) {
+                    uploadPassword.current = password.current;
+                } else {
+                    uploadPassword.current = null;
+                }
+
+                dispatch({ type: Action.UPLOADED });
+            };
+
+            uploadFileToStorage();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isUploading]);

@@ -204,7 +204,7 @@ const FileDownload: NextPage<{ fileInfo: PrismaFile | null }> = ({
                                             </div>
                                         </>
                                     ) : (
-                                            <span>Click to download</span>
+                                        <span>Click to download</span>
                                     )}
                                 </div>
                             </button>

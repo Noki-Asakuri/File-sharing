@@ -1,6 +1,12 @@
 import type { NextPage } from "next";
 
-import { Reducer, useEffect, useReducer, useRef } from "react";
+import {
+    MutableRefObject,
+    Reducer,
+    useEffect,
+    useReducer,
+    useRef,
+} from "react";
 
 import useStorage from "@/server/hooks/useStorage";
 import { useSession } from "next-auth/react";
@@ -30,7 +36,7 @@ export interface ActionType {
 
 export interface State {
     file: File | null;
-    password: string;
+    password: MutableRefObject<string>;
     error: string | null;
     isUploading: boolean;
 }
@@ -62,7 +68,8 @@ const reducer = (state: State, action: ActionType): State => {
                 return state;
             }
 
-            return { ...state, password: payload };
+            state.password.current = payload;
+            return state;
 
         case Action.SUBMIT:
             if (!state.file) {
@@ -86,14 +93,20 @@ const reducer = (state: State, action: ActionType): State => {
 const Home: NextPage = () => {
     const { data: session } = useSession();
 
+    const passwordRef = useRef("");
+
     const [state, dispatch] = useReducer<Reducer<State, ActionType>>(reducer, {
         file: null,
-        password: "",
+        password: passwordRef,
         error: null,
         isUploading: false,
     });
 
     const uploadFile = useStorage({ state, dispatch });
+
+    useEffect(() => {
+        console.log("Run");
+    });
 
     return (
         <>
