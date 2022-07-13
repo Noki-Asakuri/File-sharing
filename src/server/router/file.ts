@@ -4,7 +4,7 @@ import { createRouter } from "./context";
 import * as bcrypt from "bcrypt";
 
 const UploadFile = z.object({
-    id: z.string(),
+    fileID: z.string(),
     name: z.string(),
     url: z.string(),
     type: z.string(),
@@ -27,7 +27,7 @@ export const fileRouter = createRouter()
             }
 
             const file = await ctx.prisma.file.findFirst({
-                where: { id: input.id },
+                where: { fileID: input.id },
             });
 
             if (!file) {
@@ -42,6 +42,45 @@ export const fileRouter = createRouter()
                 error: null,
                 url: file.url,
                 name: file.name,
+            };
+        },
+    })
+    .query("get-file-by-id", {
+        input: z.object({
+            userID: z.string(),
+            search: z.string().optional(),
+            limit: z.number().min(0).max(10),
+        }),
+        resolve: async ({ input, ctx }) => {
+            const { limit, search } = input;
+
+            const user = await ctx.prisma.user.findFirst({
+                where: { discordID: input.userID },
+            });
+
+            if (!user) {
+                throw new Error("No user found!");
+            }
+
+            const files = await ctx.prisma.file.findMany({
+                where: {
+                    authorID:
+                        user.role !== "Owner" ? user.discordID : undefined,
+                    name: search?.length ? { contains: search } : undefined,
+                },
+                orderBy: { id: "asc" },
+            });
+
+            const totalPage = Math.ceil(files.length / limit);
+            let pages: typeof files[] = [];
+
+            for (let i = 0; i < totalPage; i++) {
+                pages = [...pages, files.slice(i * limit, (i + 1) * limit)];
+            }
+
+            return {
+                totalPage,
+                pages: pages,
             };
         },
     })
@@ -63,7 +102,7 @@ export const fileRouter = createRouter()
         }),
         resolve: async ({ input, ctx }) => {
             const file = await ctx.prisma.file.findFirst({
-                where: { id: input.id },
+                where: { fileID: input.id },
             });
 
             if (!file) {
@@ -73,7 +112,7 @@ export const fileRouter = createRouter()
             }
 
             const newFile = await ctx.prisma.file.update({
-                where: { id: input.id },
+                where: { id: file.id },
                 data: { downloadCount: file.downloadCount + 1 },
             });
 
@@ -101,7 +140,7 @@ export const fileRouter = createRouter()
                 .getPublicUrl(path);
 
             let newData: UploadFile = {
-                id: fileID,
+                fileID: fileID,
                 name: name,
                 type: type,
                 path: path,
@@ -120,11 +159,40 @@ export const fileRouter = createRouter()
             const data = await ctx.prisma.file.create({ data: newData });
 
             return {
-                fileID: data.id,
+                fileID: data.fileID,
                 name: data.name,
                 type: data.type,
-                url: `${ctx.req?.headers.origin}/file/${data.id}`,
+                url: `${ctx.req?.headers.origin}/file/${data.fileID}`,
                 password: data.password || "None",
+            };
+        },
+    })
+    .mutation("delete-file-by-id", {
+        input: z.object({
+            fileID: z.string(),
+        }),
+        resolve: async ({ input, ctx }) => {
+            const file = await ctx.prisma.file.findFirst({
+                where: {
+                    fileID: input.fileID,
+                },
+            });
+
+            if (!file) {
+                return {
+                    state: "Failed",
+                    error: "No file found with that id!",
+                };
+            }
+
+            await ctx.supabase.storage.from("files").remove([file.path]);
+            await ctx.prisma.file.delete({
+                where: { id: file.id },
+            });
+
+            return {
+                state: "Success",
+                error: null,
             };
         },
     });

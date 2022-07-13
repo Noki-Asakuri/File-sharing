@@ -47,13 +47,13 @@ const useStorage = ({
             const uploadFileToStorage = async () => {
                 const fileBuffer = await file.arrayBuffer();
 
-                await supabase.storage
+                const { error } = await supabase.storage
                     .from("files")
                     .upload(fileInfo.file, fileBuffer, {
                         contentType: file.type,
                     });
 
-                fileMutation.mutate(mutateData);
+                await fileMutation.mutateAsync(mutateData);
 
                 if (password.current.length >= 1) {
                     uploadPassword.current = password.current;
@@ -69,7 +69,7 @@ const useStorage = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isUploading]);
 
-    if (fileMutation.data) {
+    if (fileMutation.isSuccess) {
         return { ...fileMutation.data, uploadPassword: uploadPassword.current };
     }
 };

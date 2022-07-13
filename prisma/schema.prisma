@@ -12,7 +12,8 @@ datasource db {
 }
 
 model File {
-    id            String  @id
+    id            Int     @id @default(autoincrement())
+    fileID        String
     name          String
     password      String?
     author        String

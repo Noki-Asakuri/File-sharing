@@ -96,7 +96,7 @@ const FileDownload: NextPage<{ fileInfo: File | null }> = ({ fileInfo }) => {
         }
 
         download(file.url, file.name);
-        downloadMutation.mutate({ id: file.id });
+        downloadMutation.mutate({ id: file.fileID });
     };
 
     useEffect(() => {
@@ -186,7 +186,7 @@ export default FileDownload;
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
     const file = await prisma.file.findFirst({
-        where: { id: context.query.fileID as string },
+        where: { fileID: context.query.fileID as string },
     });
 
     if (!file) {
