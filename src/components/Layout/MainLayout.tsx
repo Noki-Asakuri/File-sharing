@@ -1,5 +1,11 @@
 import React from "react";
 import Head from "next/head";
+import dynamic from "next/dynamic";
+import { Suspense } from "react";
+
+import AuthWrapper from "./AuthWrapper";
+
+const Navbar = dynamic(() => import("../Nav/MainNav"), { suspense: true });
 
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
@@ -13,22 +19,12 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                     name="viewport"
                     content="width=device-width, initial-scale=1.0"
                 />
-                <meta
-                    property="og:title"
-                    content="Website to share files."
-                />
-                <meta property="og:site_name" content="File Sharing" />
-                <meta
-                    property="og:description"
-                    content="A worst possible website to share file."
-                />
-                <meta
-                    property="og:image"
-                    content="/favicon.svg"
-                />
                 <meta name="theme-color" content="#2f3136" />
             </Head>
-            {children}
+            <Suspense fallback={"Loading ..."}>
+                <Navbar />
+            </Suspense>
+            <AuthWrapper>{children}</AuthWrapper>
         </>
     );
 };

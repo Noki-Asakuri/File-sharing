@@ -2,14 +2,14 @@ import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
-const FileDownload: NextPage = () => {
+const FourOhFourPage: NextPage = () => {
     const router = useRouter();
 
     useEffect(() => {
         setTimeout(() => {
             router.push("/");
         }, 3000);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
@@ -21,4 +21,4 @@ const FileDownload: NextPage = () => {
     );
 };
 
-export default FileDownload;
+export default FourOhFourPage;

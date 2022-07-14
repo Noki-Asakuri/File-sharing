@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "File" ALTER COLUMN "id" DROP DEFAULT;
+DROP SEQUENCE "File_id_seq";
