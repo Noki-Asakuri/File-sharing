@@ -71,9 +71,9 @@ const DashboardFile: React.FC<{
                 }}
             >
                 {deleting ? (
-                    <SpinningCircle height={8} width={8} />
+                    <SpinningCircle />
                 ) : (
-                    <FaTrash className="w-8 h-8" />
+                    <FaTrash className="w-6 h-6" />
                 )}
             </button>
 

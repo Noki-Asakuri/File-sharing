@@ -1,10 +1,7 @@
-const SpinningCircle: React.FC<{ width?: number; height?: number }> = ({
-    height = 6,
-    width = 6,
-}) => {
+const SpinningCircle: React.FC = () => {
     return (
         <svg
-            className={`animate-spin ${"h-" + height} ${"w-" + width} text-white`}
+            className={`animate-spin w-6 h-6 text-white`}
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"

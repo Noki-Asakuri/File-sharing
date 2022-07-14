@@ -22,11 +22,11 @@ const Dropdown: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <DropdownMenu.Trigger asChild className="rounded-full">{children}</DropdownMenu.Trigger>
 
             <DropdownMenu.Content
-                className="bg-slate-700 p-4 rounded-lg radix-state-open:animate-fadeIn radix-state-closed:animate-fadeOut"
+                className="bg-slate-700 min-w-[170px] p-4 rounded-lg radix-state-open:animate-fadeIn radix-state-closed:animate-fadeOut"
                 sideOffset={5}
                 loop
             >
-                <DropdownMenu.Label className="px-2 pb-2">
+                <DropdownMenu.Label className="flex px-2 pb-2 justify-center items-center">
                     {session?.user?.name}
                 </DropdownMenu.Label>
                 <DropdownMenu.Separator className="h-px my-1 bg-white" />
