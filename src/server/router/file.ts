@@ -49,7 +49,7 @@ export const fileRouter = createRouter()
         input: z.object({
             userID: z.string(),
             search: z.string().optional(),
-            limit: z.number().min(0).max(10),
+            limit: z.number().min(0).max(25),
         }),
         resolve: async ({ input, ctx }) => {
             const { limit, search } = input;
@@ -80,7 +80,7 @@ export const fileRouter = createRouter()
 
             return {
                 totalPage,
-                pages: pages,
+                pages,
             };
         },
     })

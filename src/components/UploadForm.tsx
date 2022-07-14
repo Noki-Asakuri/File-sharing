@@ -72,7 +72,7 @@ const UploadForm: React.FC<{
                     "Submit"
                 ) : (
                     <div className="flex justify-center items-center w-full">
-                        <SpinningCircle />{" "}
+                        <SpinningCircle />
                     </div>
                 )}
             </button>

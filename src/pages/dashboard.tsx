@@ -127,6 +127,33 @@ const Dashboard: NextPage = ({}) => {
                     <span className="flex justify-center items-center text-2xl p-2 w-full">
                         Dashboard
                     </span>
+
+                    <div className="absolute top-1 right-14 flex justify-center items-center gap-3">
+                        <button
+                            className={`bg-slate-600 rounded-lg p-2 w-10 ${
+                                limit == 5 && "bg-sky-500"
+                            }`}
+                            onClick={() => setLimit(5)}
+                        >
+                            5
+                        </button>
+                        <button
+                            className={`bg-slate-600 rounded-lg p-2 w-10 ${
+                                limit == 10 && "bg-sky-500"
+                            }`}
+                            onClick={() => setLimit(10)}
+                        >
+                            10
+                        </button>
+                        <button
+                            className={`bg-slate-600 rounded-lg p-2 w-10 ${
+                                limit == 25 && "bg-sky-500"
+                            }`}
+                            onClick={() => setLimit(25)}
+                        >
+                            25
+                        </button>
+                    </div>
                     <div>
                         <button
                             className="bg-slate-600 p-2 rounded-full absolute top-2 right-3"
@@ -160,7 +187,7 @@ const Dashboard: NextPage = ({}) => {
 
                 {!isLoading && (
                     <>
-                        <div className="flex flex-col gap-y-4 w-full h-full pt-2 overflow-scroll">
+                        <div className="flex flex-col gap-y-4 w-full h-[82%] pt-2 overflow-scroll">
                             {data &&
                                 data.pages[state.currentPage - 1]?.map(
                                     (file) => {
