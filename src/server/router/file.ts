@@ -4,19 +4,6 @@ import { createRouter } from "./context";
 import * as bcrypt from "bcrypt";
 import { TRPCError } from "@trpc/server";
 
-const UploadFile = z.object({
-    fileID: z.string(),
-    name: z.string(),
-    url: z.string(),
-    type: z.string(),
-    path: z.string(),
-    author: z.string(),
-    authorID: z.string(),
-    password: z.string().optional(),
-});
-
-type UploadFile = z.infer<typeof UploadFile>;
-
 export const fileRouter = createRouter()
     .query("get-file", {
         input: z.object({
@@ -136,10 +123,9 @@ export const fileRouter = createRouter()
             password: z.string().optional(),
             type: z.string(),
             path: z.string(),
-            author: z.string(),
         }),
         resolve: async ({ input, ctx }) => {
-            const { path, name, type, fileID, password, author } = input;
+            const { path, name, type, fileID, password } = input;
 
             if (!ctx.session) {
                 throw new TRPCError({
@@ -152,24 +138,18 @@ export const fileRouter = createRouter()
                 .from("files")
                 .getPublicUrl(path);
 
-            let newData: UploadFile = {
-                fileID: fileID,
-                name: name,
-                type: type,
-                path: path,
-                author: author,
-                authorID: ctx.session.user.discordID as string,
-                url: publicURL as string,
-            };
-
-            if (password) {
-                newData = {
-                    ...newData,
-                    password: await bcrypt.hash(password, 10),
-                };
-            }
-
-            const data = await ctx.prisma.file.create({ data: newData });
+            const data = await ctx.prisma.file.create({
+                data: {
+                    fileID: fileID,
+                    name: name,
+                    type: type,
+                    path: path,
+                    author: ctx.session.user.name as string,
+                    authorID: ctx.session.user.discordID as string,
+                    url: publicURL as string,
+                    password: password ? await bcrypt.hash(password, 10) : null,
+                },
+            });
 
             return {
                 fileID: data.fileID,

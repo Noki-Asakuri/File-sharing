@@ -17,14 +17,9 @@ const PasswordForm: React.FC<{
     setPasswordLocked: React.Dispatch<React.SetStateAction<boolean>>;
 }> = ({ filePassword, setPasswordLocked }) => {
     const [password, setPassword] = useState<string>("");
-    const [error, setError] = useState<string>("");
     const [showPassword, setShowPassword] = useState<boolean>(false);
 
-    const passwordCheck = trpc.useMutation(["file.password-check"], {
-        onError: ({ data, message, shape }) => {
-            setError(message);
-        },
-    });
+    const passwordCheck = trpc.useMutation(["file.password-check"]);
 
     useEffect(() => {
         if (!passwordCheck.data) {
