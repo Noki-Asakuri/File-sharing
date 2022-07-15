@@ -68,9 +68,11 @@ const PasswordForm: React.FC<{
             >
                 Download
             </button>
-            {error && (
+            {passwordCheck.error && (
                 <div className="">
-                    <span className="text-sm text-red-600">{error}</span>
+                    <span className="text-sm text-red-600">
+                        {passwordCheck.error.message}
+                    </span>
                 </div>
             )}
         </form>
