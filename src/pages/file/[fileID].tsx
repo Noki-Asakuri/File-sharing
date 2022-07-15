@@ -20,7 +20,11 @@ const PasswordForm: React.FC<{
     const [error, setError] = useState<string>("");
     const [showPassword, setShowPassword] = useState<boolean>(false);
 
-    const passwordCheck = trpc.useMutation(["file.password-check"]);
+    const passwordCheck = trpc.useMutation(["file.password-check"], {
+        onError: ({ data, message, shape }) => {
+            setError(message);
+        },
+    });
 
     useEffect(() => {
         if (!passwordCheck.data) {
@@ -29,8 +33,6 @@ const PasswordForm: React.FC<{
 
         if (passwordCheck.data.download) {
             setPasswordLocked(false);
-        } else {
-            setError(passwordCheck.data.error || "");
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [passwordCheck.data]);

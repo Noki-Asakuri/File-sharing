@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createRouter } from "./context";
 
 import * as bcrypt from "bcrypt";
+import { TRPCError } from "@trpc/server";
 
 const UploadFile = z.object({
     fileID: z.string(),
@@ -31,15 +32,14 @@ export const fileRouter = createRouter()
             });
 
             if (!file) {
-                return {
-                    passwordLock: null,
-                    error: "File not found! Redirecting ...",
-                };
+                throw new TRPCError({
+                    message: "No file found with provided id",
+                    code: "NOT_FOUND",
+                });
             }
 
             return {
                 passwordLock: !!file.password,
-                error: null,
                 url: file.url,
                 name: file.name,
             };
@@ -47,7 +47,6 @@ export const fileRouter = createRouter()
     })
     .query("get-file-by-id", {
         input: z.object({
-            userID: z.string(),
             search: z.string().optional(),
             limit: z.number().min(0).max(25),
         }),
@@ -55,11 +54,14 @@ export const fileRouter = createRouter()
             const { limit, search } = input;
 
             const user = await ctx.prisma.user.findFirst({
-                where: { discordID: input.userID },
+                where: { discordID: ctx.session?.user.discordID },
             });
 
             if (!user) {
-                throw new Error("No user found!");
+                throw new TRPCError({
+                    message: "No user found!",
+                    code: "NOT_FOUND",
+                });
             }
 
             const files = await ctx.prisma.file.findMany({
@@ -90,10 +92,15 @@ export const fileRouter = createRouter()
             inputPassword: z.string(),
         }),
         resolve: async ({ input }) => {
-            if (await bcrypt.compare(input.inputPassword, input.filePassword)) {
-                return { download: true, error: null };
+            if (
+                !(await bcrypt.compare(input.inputPassword, input.filePassword))
+            ) {
+                throw new TRPCError({
+                    message: "Wrong password!",
+                    code: "BAD_REQUEST",
+                });
             }
-            return { download: false, error: "Wrong password!" };
+            return { download: true };
         },
     })
     .mutation("update-download-count", {
@@ -106,18 +113,19 @@ export const fileRouter = createRouter()
             });
 
             if (!file) {
-                return {
-                    error: "No file found with provided id.",
-                };
+                throw new TRPCError({
+                    message: "No file found with provided id",
+                    code: "NOT_FOUND",
+                });
             }
 
-            const newFile = await ctx.prisma.file.update({
+            await ctx.prisma.file.update({
                 where: { id: file.id },
                 data: { downloadCount: file.downloadCount + 1 },
             });
 
             return {
-                downloadCount: newFile.downloadCount,
+                status: "Success",
             };
         },
     })
@@ -129,11 +137,16 @@ export const fileRouter = createRouter()
             type: z.string(),
             path: z.string(),
             author: z.string(),
-            authorID: z.string(),
         }),
         resolve: async ({ input, ctx }) => {
-            const { path, name, type, fileID, password, author, authorID } =
-                input;
+            const { path, name, type, fileID, password, author } = input;
+
+            if (!ctx.session) {
+                throw new TRPCError({
+                    message: "UNAUTHORIZED",
+                    code: "UNAUTHORIZED",
+                });
+            }
 
             const { publicURL } = ctx.supabase.storage
                 .from("files")
@@ -145,7 +158,7 @@ export const fileRouter = createRouter()
                 type: type,
                 path: path,
                 author: author,
-                authorID: authorID,
+                authorID: ctx.session.user.discordID as string,
                 url: publicURL as string,
             };
 
@@ -179,10 +192,10 @@ export const fileRouter = createRouter()
             });
 
             if (!file) {
-                return {
-                    state: "Failed",
-                    error: "No file found with that id!",
-                };
+                throw new TRPCError({
+                    message: "No file found with that id!",
+                    code: "NOT_FOUND",
+                });
             }
 
             await ctx.supabase.storage.from("files").remove([file.path]);
@@ -191,8 +204,7 @@ export const fileRouter = createRouter()
             });
 
             return {
-                state: "Success",
-                error: null,
+                status: "Success",
             };
         },
     });
