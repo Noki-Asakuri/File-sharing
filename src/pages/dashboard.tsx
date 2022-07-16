@@ -129,7 +129,9 @@ const Dashboard: NextPage = ({}) => {
                             className={`bg-slate-600 rounded-lg p-2 w-10 ${
                                 limit == 5 && "bg-sky-500"
                             }`}
-                        ></button>
+                        >
+                            5
+                        </button>
                         <button
                             className={`bg-slate-600 rounded-lg p-2 w-10 ${
                                 limit == 10 && "bg-sky-500"
