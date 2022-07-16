@@ -17,9 +17,9 @@ const UploadForm = dynamic(() => import("@/components/UploadForm"), {
 });
 
 export enum Action {
-    SUBMIT = "SUBMIT-HANDLER",
-    PASSWORD = "PASSWORD-HANDLER",
-    CHANGE = "ON-CHANGE-HANDLER",
+    SUBMIT = "SUBMIT",
+    PASSWORD = "PASSWORD",
+    CHANGE = "ON-CHANGE",
     UPLOADED = "UPLOADED",
 }
 

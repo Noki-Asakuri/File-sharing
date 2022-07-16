@@ -2,7 +2,6 @@ import DashboardFile from "@/components/DashboardFile";
 import useDebounce from "@/server/hooks/useDebounce";
 import { trpc } from "@/utils/trpc";
 import type { NextPage } from "next";
-import { useSession } from "next-auth/react";
 import Image from "next/future/image";
 import { Reducer, useReducer, useState } from "react";
 
@@ -82,10 +81,11 @@ const reducer = (state: State, action: ActionType) => {
 };
 
 const Dashboard: NextPage = ({}) => {
-    const { data: session } = useSession();
     const [limit, setLimit] = useState<5 | 10 | 25>(5);
+
     const [searchText, setSearchText] = useState<string>("");
     const [search, setSearch] = useState<string>("");
+
     const [isRefetching, setFetching] = useState<boolean>(false);
 
     useDebounce(() => setSearch(searchText), 500, [searchText]);
@@ -93,7 +93,6 @@ const Dashboard: NextPage = ({}) => {
     const { data, isLoading, refetch } = trpc.useQuery([
         "file.get-file-by-id",
         {
-            userID: session?.user?.discordID as string,
             limit: limit,
             search: search,
         },
@@ -109,18 +108,15 @@ const Dashboard: NextPage = ({}) => {
             <div className="bg-slate-700 p-2 rounded-2xl h-[70vh] w-[50%] min-w-[550px] flex flex-col justify-start items-center relative">
                 <div className="relative w-full flex items-center justify-between px-5">
                     <div className="flex group justify-center items-center absolute bg-slate-600 px-3 rounded-lg">
-                        <FaSearch
-                            className={`absolute w-4 h-4 group-focus-within:hidden transition-all ${
-                                search.length ? "hidden" : ""
-                            }`}
-                        />
+                        <FaSearch className="absolute w-4 h-4 transition-all group-focus-within:right-3" />
                         <input
-                            className={`bg-transparent group-focus-within:outline-none px-2 z-50 py-1 group-focus-within:w-40 transition-[width] ${
-                                search.length ? "w-40" : "w-2"
+                            className={`bg-transparent group-focus-within:outline-none px-2 z-50 py-1 group-focus-within:w-40 transition-[width] placeholder:text-sm ${
+                                search.length ? "w-40 pl-2 pr-5" : "w-2"
                             }`}
                             type="text"
                             name="search-file"
                             id="search-file"
+                            placeholder="Search by name"
                             onChange={(e) => setSearchText(e.target.value)}
                         />
                     </div>
@@ -133,10 +129,7 @@ const Dashboard: NextPage = ({}) => {
                             className={`bg-slate-600 rounded-lg p-2 w-10 ${
                                 limit == 5 && "bg-sky-500"
                             }`}
-                            onClick={() => setLimit(5)}
-                        >
-                            5
-                        </button>
+                        ></button>
                         <button
                             className={`bg-slate-600 rounded-lg p-2 w-10 ${
                                 limit == 10 && "bg-sky-500"

@@ -7,21 +7,23 @@ generator client {
 
 datasource db {
     provider = "postgresql"
-    // url      = "file:./db.sqlite"
     url      = env("DATABASE_URL")
 }
 
 model File {
     id            Int     @id @default(autoincrement())
-    fileID        String
     name          String
-    password      String?
-    author        String
-    authorID      String
-    url           String
-    type          String?
+    fileID        String  @unique
+    url           String  @db.VarChar(1000)
     path          String
     downloadCount Int     @default(0)
+    password      String?
+    type          String?
+
+    author   String
+    authorID String
+
+    user User @relation(fields: [authorID], references: [discordID])
 }
 
 model Account {
@@ -62,6 +64,7 @@ model User {
     role          String
     accounts      Account[]
     sessions      Session[]
+    File          File[]
 }
 
 model VerificationToken {

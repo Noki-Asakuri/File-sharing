@@ -1,9 +1,11 @@
+import { prisma } from "@/server/db/client";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import NextAuth from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { prisma } from "@/server/db/client";
 
-export default NextAuth({
+import type { NextAuthOptions } from "next-auth";
+
+export const authOptions: NextAuthOptions = {
     adapter: PrismaAdapter(prisma),
     session: {
         maxAge: 24 * 60 * 60,
@@ -47,4 +49,6 @@ export default NextAuth({
             return session;
         },
     },
-});
+};
+
+export default NextAuth(authOptions);
