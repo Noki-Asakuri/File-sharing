@@ -129,6 +129,7 @@ const Dashboard: NextPage = ({}) => {
                             className={`bg-slate-600 rounded-lg p-2 w-10 ${
                                 limit == 5 && "bg-sky-500"
                             }`}
+                            onClick={() => setLimit(5)}
                         >
                             5
                         </button>
