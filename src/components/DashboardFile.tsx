@@ -77,9 +77,9 @@ const DashboardFile: React.FC<{
                 )}
             </button>
 
-            {deleteFile.data && deleteFile.data.error && (
+            {deleteFile.error && (
                 <div className="text-red-500">
-                    <span>{deleteFile.data.error}</span>
+                    <span>{deleteFile.error.message}</span>
                 </div>
             )}
         </div>

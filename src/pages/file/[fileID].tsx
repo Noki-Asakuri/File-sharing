@@ -17,7 +17,6 @@ const PasswordForm: React.FC<{
     setPasswordLocked: React.Dispatch<React.SetStateAction<boolean>>;
 }> = ({ filePassword, setPasswordLocked }) => {
     const [password, setPassword] = useState<string>("");
-    const [error, setError] = useState<string>("");
     const [showPassword, setShowPassword] = useState<boolean>(false);
 
     const passwordCheck = trpc.useMutation(["file.password-check"]);
@@ -29,8 +28,6 @@ const PasswordForm: React.FC<{
 
         if (passwordCheck.data.download) {
             setPasswordLocked(false);
-        } else {
-            setError(passwordCheck.data.error || "");
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [passwordCheck.data]);
@@ -71,9 +68,11 @@ const PasswordForm: React.FC<{
             >
                 Download
             </button>
-            {error && (
+            {passwordCheck.error && (
                 <div className="">
-                    <span className="text-sm text-red-600">{error}</span>
+                    <span className="text-sm text-red-600">
+                        {passwordCheck.error.message}
+                    </span>
                 </div>
             )}
         </form>

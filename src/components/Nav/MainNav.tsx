@@ -26,7 +26,7 @@ const LoginProfile: React.FC<{}> = ({}) => {
 
     return (
         <div className="bg-slate-600 rounded-lg">
-            <button onClick={() => signIn()}>
+            <button onClick={() => signIn("discord")}>
                 <span className="flex justify-center p-3 items-center gap-x-2">
                     Login <FaSignInAlt />
                 </span>
@@ -45,14 +45,16 @@ const Navbar: React.FC<{}> = ({}) => {
                 <div className="flex justify-center items-center gap-x-5">
                     <div>
                         <a
+                            className="flex justify-center items-center gap-x-2 w-max h-max relative text-[0px]"
                             href="https://github.com/iahacker123/File-sharing"
                             target="_blank"
                             rel="noreferrer"
                         >
-                            <div className="flex justify-center items-center gap-x-2 w-max h-max">
-                                <span className="hidden">Github</span>
-                                <FaGithub className="w-11 h-11 rounded-full hover:text-sky-700 transition-colors"/>
-                            </div>
+                            <span className="absolute">
+
+                            Github
+                            </span>
+                            <FaGithub className="w-11 h-11 rounded-full hover:text-sky-700 transition-colors relative z-50" />
                         </a>
                     </div>
 
