@@ -163,7 +163,7 @@ const Home: NextPage = () => {
                 )}
 
                 <footer className="relative my-20 bottom-0 flex justify-center items-center">
-                    <span>Made by Freunds#8323</span>
+                    <span>Made by Asakuri#8323</span>
                 </footer>
             </div>
         </>
