@@ -18,9 +18,9 @@ const MyApp: AppType = ({
 }) => {
     return (
         <SessionProvider session={session}>
-                <MainLayout>
-                    <Component {...pageProps} />
-                </MainLayout>
+            <MainLayout>
+                <Component {...pageProps} />
+            </MainLayout>
         </SessionProvider>
     );
 };
@@ -36,6 +36,11 @@ export default withTRPC<AppRouter>({
         return {
             url,
             transformer: superjson,
+            queryClientConfig: {
+                defaultOptions: {
+                    queries: { refetchOnWindowFocus: false },
+                },
+            },
             /**
              * @link https://react-query.tanstack.com/reference/QueryClient
              */
@@ -45,5 +50,6 @@ export default withTRPC<AppRouter>({
     /**
      * @link https://trpc.io/docs/ssr
      */
+
     ssr: false,
 })(MyApp);

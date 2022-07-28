@@ -15,13 +15,7 @@ export const createContext = async (
     const session =
         req && res && (await getServerSession(req, res, nextAuthOptions));
 
-    return {
-        req,
-        res,
-        session,
-        prisma,
-        supabase,
-    };
+    return { req, res, session, prisma, supabase };
 };
 
 type Context = trpc.inferAsyncReturnType<typeof createContext>;

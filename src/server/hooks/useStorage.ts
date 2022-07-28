@@ -12,7 +12,11 @@ const useStorage = ({
     dispatch: Dispatch<ActionType>;
 }) => {
     const uploadPassword = useRef<string | null>(null);
-    const fileMutation = trpc.useMutation(["file.upload-file"]);
+    const fileMutation = trpc.useMutation(["file.upload-file"], {
+        onError: ({ message }) => {
+            dispatch({ type: Action.ERROR, payload: message });
+        },
+    });
 
     const { isUploading, file, password } = state;
 

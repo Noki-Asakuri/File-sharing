@@ -8,7 +8,7 @@ import type { NextAuthOptions } from "next-auth";
 export const authOptions: NextAuthOptions = {
     adapter: PrismaAdapter(prisma),
     session: {
-        maxAge: 24 * 60 * 60,
+        maxAge: 30 * 24 * 60 * 60, // NOTE: 30 days maxAges.
     },
     theme: {
         colorScheme: "dark", // "auto" | "dark" | "light"

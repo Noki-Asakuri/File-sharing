@@ -1,7 +1,6 @@
-import React from "react";
-import Head from "next/head";
 import dynamic from "next/dynamic";
-import { Suspense } from "react";
+import Head from "next/head";
+import React, { Suspense } from "react";
 
 import AuthWrapper from "./AuthWrapper";
 
