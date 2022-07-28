@@ -10,10 +10,10 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
         <>
             <Head>
-                <title>File Sharing - Freunds</title>
+                <title>File Sharing</title>
                 <link rel="icon" href="/favicon.svg" />
                 <meta name="description" content="Free file sharing website!" />
-                <meta name="author" content="Freunds#8323" />
+                <meta name="author" content="Asakuri#8323" />
                 <meta
                     name="viewport"
                     content="width=device-width, initial-scale=1.0"
