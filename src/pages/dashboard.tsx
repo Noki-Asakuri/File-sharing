@@ -1,6 +1,7 @@
 import DashboardFile from "@/components/DashboardFile";
 import useDebounce from "@/server/hooks/useDebounce";
 import { trpc } from "@/utils/trpc";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import type { NextPage } from "next";
 import Image from "next/future/image";
 import { Reducer, useReducer, useState } from "react";
@@ -10,7 +11,7 @@ import {
     FaAngleDoubleRight,
     FaAngleLeft,
     FaAngleRight,
-    FaSearch,
+    FaSearch
 } from "react-icons/fa";
 import { IoReloadSharp } from "react-icons/io5";
 
@@ -21,6 +22,7 @@ export enum Action {
     LAST = "LAST",
     SET = "SET",
     DELETE = "DELETE",
+    UPDATE = "UPDATE",
 }
 
 export interface ActionType {
@@ -30,6 +32,7 @@ export interface ActionType {
 
 export interface State {
     currentPage: number;
+    totalPages: number;
     refetch(): void;
 }
 
@@ -75,6 +78,13 @@ const reducer = (state: State, action: ActionType) => {
 
             return state;
 
+        case Action.UPDATE:
+            if (typeof payload !== "number") {
+                return state;
+            }
+
+            return { ...state, totalPages: payload };
+
         default:
             return state;
     }
@@ -82,6 +92,7 @@ const reducer = (state: State, action: ActionType) => {
 
 const Dashboard: NextPage = ({}) => {
     const [limit, setLimit] = useState<5 | 10 | 25>(5);
+    const [animationParent] = useAutoAnimate<HTMLUListElement>();
 
     const [searchText, setSearchText] = useState<string>("");
     const [search, setSearch] = useState<string>("");
@@ -90,16 +101,18 @@ const Dashboard: NextPage = ({}) => {
 
     useDebounce(() => setSearch(searchText), 500, [searchText]);
 
-    const { data, isLoading, refetch } = trpc.useQuery([
-        "file.get-file-by-id",
+    const { data, isLoading, refetch } = trpc.useQuery(
+        ["file.get-file-by-id", { limit, search }],
         {
-            limit: limit,
-            search: search,
-        },
-    ]);
+            onSuccess: ({ totalPage }) => {
+                dispatch({ type: Action.UPDATE, payload: totalPage });
+            },
+        }
+    );
 
     const [state, dispatch] = useReducer<Reducer<State, ActionType>>(reducer, {
         currentPage: 1,
+        totalPages: data?.totalPage || 1,
         refetch: refetch,
     });
 
@@ -126,24 +139,24 @@ const Dashboard: NextPage = ({}) => {
 
                     <div className="absolute top-1 right-14 flex justify-center items-center gap-3">
                         <button
-                            className={`bg-slate-600 rounded-lg p-2 w-10 ${
-                                limit == 5 && "bg-sky-500"
+                            className={`bg-slate-600 rounded-lg transition-colors duration-500 p-2 w-10 ${
+                                limit === 5 && "bg-sky-500"
                             }`}
                             onClick={() => setLimit(5)}
                         >
                             5
                         </button>
                         <button
-                            className={`bg-slate-600 rounded-lg p-2 w-10 ${
-                                limit == 10 && "bg-sky-500"
+                            className={`bg-slate-600 rounded-lg transition-colors duration-500 p-2 w-10 ${
+                                limit === 10 && "bg-sky-500"
                             }`}
                             onClick={() => setLimit(10)}
                         >
                             10
                         </button>
                         <button
-                            className={`bg-slate-600 rounded-lg p-2 w-10 ${
-                                limit == 25 && "bg-sky-500"
+                            className={`bg-slate-600 rounded-lg transition-colors duration-500 p-2 w-10 ${
+                                limit === 25 && "bg-sky-500"
                             }`}
                             onClick={() => setLimit(25)}
                         >
@@ -222,7 +235,7 @@ const Dashboard: NextPage = ({}) => {
                                     <FaAngleLeft />
                                 </button>
                                 <div className="bg-slate-600 rounded-lg py-2 px-3 w-10 h-10 flex justify-center items-center">
-                                    {state.currentPage}
+                                    {state.currentPage}/{state.totalPages}
                                 </div>
                                 <button
                                     className="bg-slate-600 rounded-lg py-2 px-3 w-10 h-10 flex justify-center items-center"

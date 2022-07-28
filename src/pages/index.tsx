@@ -21,6 +21,7 @@ export enum Action {
     PASSWORD = "PASSWORD",
     CHANGE = "ON-CHANGE",
     UPLOADED = "UPLOADED",
+    ERROR = "ERROR",
 }
 
 export interface ActionType {
@@ -78,6 +79,13 @@ const reducer = (state: State, action: ActionType): State => {
 
         case Action.UPLOADED:
             return { ...state, isUploading: false };
+
+        case Action.ERROR:
+            if (typeof payload !== "string") {
+                return state;
+            }
+
+            return { ...state, isUploading: false, error: payload, file: null };
 
         default:
             return state;

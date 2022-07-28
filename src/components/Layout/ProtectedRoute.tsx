@@ -16,7 +16,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
 
     if (status === "unauthenticated") {
         return (
-            <div className="flex w-full h-screen justify-center items-center">
+            <div className="flex w-full h-[90vh] justify-center items-center">
                 <h1 className="text-xl text-red-500">
                     Error 401: Unauthenticated. Redirecting ...
                 </h1>

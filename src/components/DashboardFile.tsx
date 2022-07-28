@@ -2,9 +2,13 @@ import { Action, ActionType } from "@/pages/dashboard";
 import getBaseUrl from "@/utils/getBaseUrl";
 import { trpc } from "@/utils/trpc";
 import { File } from "@prisma/client";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 import React, { Dispatch, useRef, useState } from "react";
 import { FaCheckCircle, FaTimesCircle, FaTrash } from "react-icons/fa";
 import SpinningCircle from "./SpinningCircle";
+
+dayjs.extend(relativeTime);
 
 const DashboardFile: React.FC<{
     file: File;
@@ -17,27 +21,29 @@ const DashboardFile: React.FC<{
 
     return (
         <div className="max-w-full flex justify-between items-center bg-slate-800 mx-3 py-2 px-5 rounded-lg">
-            <ul className="grid grid-cols-[minmax(244px,2fr)_1fr] gap-x-10 w-[80%]">
-                <li className="col-span-2">
+            <ul className="grid grid-cols-[1fr_1fr_1fr_1fr] gap-x-10 w-[80%]">
+                <li className="col-span-4">
                     <div className="text-ellipsis whitespace-nowrap overflow-hidden">
                         Name: {file.name}
                     </div>
                 </li>
-                <li>
+                <li className="col-span-2">
                     <div className="text-ellipsis whitespace-nowrap overflow-hidden">
                         Author: {file.author}
                     </div>
                 </li>
-                <li>
-                    <div className="text-ellipsis whitespace-nowrap overflow-hidden">
-                        Download: {file.downloadCount}
+                <li className="col-span-2">
+                    <div>
+                        <span>
+                            Uploaded {dayjs(file.createdAt).fromNow()}
+                        </span>
                     </div>
                 </li>
-                <li>
+                <li className="col-span-2">
                     <span className="text-ellipsis whitespace-nowrap overflow-hidden">
                         Url:{" "}
                         <a
-                            href={fileUrl.current}
+                            href={fileUrl.current} 
                             target="_blank"
                             rel="noreferrer"
                         >
@@ -45,6 +51,12 @@ const DashboardFile: React.FC<{
                         </a>
                     </span>
                 </li>
+                <li>
+                    <div className="text-ellipsis whitespace-nowrap overflow-hidden">
+                        Download: {file.downloadCount}
+                    </div>
+                </li>
+
                 <li>
                     <div className="flex items-center gap-2">
                         <span>Locked:</span>

@@ -11,14 +11,15 @@ datasource db {
 }
 
 model File {
-    id            Int     @id @default(autoincrement())
+    id            Int      @id @default(autoincrement())
     name          String
-    fileID        String  @unique
-    url           String  @db.VarChar(1000)
+    fileID        String   @unique
+    url           String   @db.VarChar(1000)
     path          String
-    downloadCount Int     @default(0)
+    downloadCount Int      @default(0)
     password      String?
     type          String?
+    createdAt     DateTime @default(now())
 
     author   String
     authorID String
@@ -62,9 +63,10 @@ model User {
     emailVerified DateTime?
     image         String?
     role          String
-    accounts      Account[]
-    sessions      Session[]
-    File          File[]
+
+    accounts Account[]
+    sessions Session[]
+    File     File[]
 }
 
 model VerificationToken {

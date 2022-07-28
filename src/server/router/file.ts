@@ -5,33 +5,6 @@ import * as bcrypt from "bcrypt";
 import { TRPCError } from "@trpc/server";
 
 export const fileRouter = createRouter()
-    .query("get-file", {
-        input: z.object({
-            id: z.string().optional(),
-        }),
-        resolve: async ({ input, ctx }) => {
-            if (!input.id) {
-                return { passwordLock: null, error: "No ID provided!" };
-            }
-
-            const file = await ctx.prisma.file.findFirst({
-                where: { fileID: input.id },
-            });
-
-            if (!file) {
-                throw new TRPCError({
-                    message: "No file found with provided id",
-                    code: "NOT_FOUND",
-                });
-            }
-
-            return {
-                passwordLock: !!file.password,
-                url: file.url,
-                name: file.name,
-            };
-        },
-    })
     .query("get-file-by-id", {
         input: z.object({
             search: z.string().optional(),
