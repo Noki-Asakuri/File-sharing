@@ -1,6 +1,6 @@
 import download from "@/utils/download";
 import type { NextPage } from "next";
-import { GetServerSidePropsContext } from "next";
+import { GetStaticPropsContext } from "next";
 import Head from "next/head";
 import React, { useCallback, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -21,7 +21,7 @@ const PasswordForm: React.FC<{
     const [password, setPassword] = useState<string>("");
     const [showPassword, setShowPassword] = useState<boolean>(false);
 
-    const passwordCheck = trpc.useMutation(["file.password-check"], {
+    const passwordCheck = trpc.useMutation(["check.password"], {
         onSuccess: ({ download }) => {
             if (download) {
                 setPasswordLocked(false);
@@ -129,7 +129,9 @@ const FileDownload: NextPage<{ fileInfo: File }> = ({ fileInfo }) => {
                             <span>Name: {file.name}</span>
                             <span>Author: {file.author}</span>
                             <span>Download: {file.downloadCount}</span>
-                            <span>Uploaded {file.createdAt as unknown as string}</span>
+                            <span>
+                                Uploaded {file.createdAt as unknown as string}
+                            </span>
                         </div>
                         <button
                             className="bg-slate-700 py-2 px-4 w-full rounded-2xl h-[40px]"
@@ -163,9 +165,9 @@ const FileDownload: NextPage<{ fileInfo: File }> = ({ fileInfo }) => {
 
 export default FileDownload;
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
+export async function getStaticProps(ctx: GetStaticPropsContext) {
     const file = await prisma.file.findFirst({
-        where: { fileID: context.query.fileID as string },
+        where: { fileID: ctx.params?.fileID as string },
     });
 
     if (!file) {
@@ -173,6 +175,17 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     }
 
     return {
-        props: { fileInfo: { ...file, createdAt: dayjs(file.createdAt).fromNow() } },
+        props: {
+            fileInfo: { ...file, createdAt: dayjs(file.createdAt).fromNow() },
+        },
+        revalidate: 60,
     };
+}
+
+export async function getStaticPaths() {
+    const file = await prisma.file.findMany();
+
+    const paths = file.map((f) => ({ params: { fileID: f.fileID } }));
+
+    return { paths, fallback: "blocking" };
 }

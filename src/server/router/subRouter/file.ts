@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createRouter } from "./context";
+import { createRouter } from "../context";
 
 import * as bcrypt from "bcrypt";
 import { TRPCError } from "@trpc/server";
@@ -46,23 +46,6 @@ export const fileRouter = createRouter()
             };
         },
     })
-    .mutation("password-check", {
-        input: z.object({
-            filePassword: z.string(),
-            inputPassword: z.string(),
-        }),
-        resolve: async ({ input }) => {
-            if (
-                !(await bcrypt.compare(input.inputPassword, input.filePassword))
-            ) {
-                throw new TRPCError({
-                    message: "Wrong password!",
-                    code: "BAD_REQUEST",
-                });
-            }
-            return { download: true };
-        },
-    })
     .mutation("update-download-count", {
         input: z.object({
             id: z.string(),
@@ -86,50 +69,6 @@ export const fileRouter = createRouter()
 
             return {
                 status: "Success",
-            };
-        },
-    })
-    .mutation("upload-file", {
-        input: z.object({
-            fileID: z.string(),
-            name: z.string(),
-            password: z.string().optional(),
-            type: z.string(),
-            path: z.string(),
-        }),
-        resolve: async ({ input, ctx }) => {
-            const { path, name, type, fileID, password } = input;
-
-            if (!ctx.session) {
-                throw new TRPCError({
-                    message: "UNAUTHORIZED",
-                    code: "UNAUTHORIZED",
-                });
-            }
-
-            const { publicURL } = ctx.supabase.storage
-                .from("files")
-                .getPublicUrl(path);
-
-            const data = await ctx.prisma.file.create({
-                data: {
-                    fileID: fileID,
-                    name: name,
-                    type: type,
-                    path: path,
-                    author: ctx.session.user.name as string,
-                    authorID: ctx.session.user.discordID as string,
-                    url: publicURL as string,
-                    password: password ? await bcrypt.hash(password, 10) : null,
-                },
-            });
-
-            return {
-                fileID: data.fileID,
-                name: data.name,
-                type: data.type,
-                url: `${ctx.req?.headers.origin}/file/${data.fileID}`,
-                password: data.password || "None",
             };
         },
     })

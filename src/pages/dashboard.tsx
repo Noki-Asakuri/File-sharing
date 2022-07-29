@@ -1,7 +1,6 @@
 import DashboardFile from "@/components/DashboardFile";
 import useDebounce from "@/server/hooks/useDebounce";
 import { trpc } from "@/utils/trpc";
-import { useAutoAnimate } from "@formkit/auto-animate/react";
 import type { NextPage } from "next";
 import Image from "next/future/image";
 import { Reducer, useReducer, useState } from "react";
@@ -92,7 +91,6 @@ const reducer = (state: State, action: ActionType) => {
 
 const Dashboard: NextPage = ({}) => {
     const [limit, setLimit] = useState<5 | 10 | 25>(5);
-    const [animationParent] = useAutoAnimate<HTMLUListElement>();
 
     const [searchText, setSearchText] = useState<string>("");
     const [search, setSearch] = useState<string>("");

@@ -3,7 +3,9 @@ import superjson from "superjson";
 import { ZodError } from "zod";
 import { createRouter } from "./context";
 
-import { fileRouter } from "./file";
+import { fileRouter } from "./subRouter/file";
+import { checkRouter } from "./subRouter/check";
+import { uploadRouter } from "./subRouter/upload";
 
 export const appRouter = createRouter()
     .formatError(({ shape, error }) => {
@@ -20,7 +22,9 @@ export const appRouter = createRouter()
         };
     })
     .transformer(superjson)
-    .merge("file.", fileRouter);
+    .merge("file.", fileRouter)
+    .merge("check.", checkRouter)
+    .merge("upload.", uploadRouter);
 
 // export type definition of API
 export type AppRouter = typeof appRouter;
