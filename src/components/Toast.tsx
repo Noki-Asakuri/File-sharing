@@ -14,7 +14,7 @@ const CopytoClipboardToast: React.FC<{
             <Toast.Root
                 open={popup}
                 onOpenChange={setPopup}
-                className="bg-slate-600 rounded-md p-4 items-center radix-state-open:animate-toast-slide-in-right radix-state-closed:animate-toast-hide"
+                className="items-center p-4 rounded-md bg-slate-600 radix-state-open:animate-toast-slide-in-right radix-state-closed:animate-toast-hide"
             >
                 <Toast.Title>
                     <div

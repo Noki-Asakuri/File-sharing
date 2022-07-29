@@ -43,7 +43,7 @@ const UploadedFile: React.FC<{
 
     return (
         <div className="flex flex-col gap-y-7 items-start p-10 rounded-2xl bg-slate-800 w-[455px] h-[300px]">
-            <span className="w-full flex justify-center text-2xl ">
+            <span className="flex justify-center w-full text-2xl ">
                 File Info
             </span>
             <ul className="flex flex-col gap-y-2">
@@ -74,7 +74,7 @@ const UploadedFile: React.FC<{
                         </span>
                         {uploadFile && uploadFile.uploadPassword && (
                             <button
-                                className="-right-11 -top-2 p-3 rounded-xl absolute hover:bg-slate-700 transition-all duration-500"
+                                className="absolute p-3 transition-all duration-500 -right-11 -top-2 rounded-xl hover:bg-slate-700"
                                 onClick={() =>
                                     copyToClipboard(
                                         uploadFile?.uploadPassword as string,
@@ -110,7 +110,7 @@ const UploadedFile: React.FC<{
 
                         {uploadFile && uploadFile.url && (
                             <button
-                                className="-right-11 -top-2 p-3 rounded-xl absolute hover:bg-slate-700 transition-all duration-500"
+                                className="absolute p-3 transition-all duration-500 -right-11 -top-2 rounded-xl hover:bg-slate-700"
                                 onClick={() =>
                                     copyToClipboard(uploadFile?.url, "url")
                                 }

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createRouter } from "./context";
+import { createRouter } from "../context";
 
 import * as bcrypt from "bcrypt";
 import { TRPCError } from "@trpc/server";
@@ -30,7 +30,7 @@ export const fileRouter = createRouter()
                         user.role !== "Owner" ? user.discordID : undefined,
                     name: search?.length ? { contains: search } : undefined,
                 },
-                orderBy: { id: "asc" },
+                orderBy: { id: "desc" },
             });
 
             const totalPage = Math.ceil(files.length / limit);
@@ -40,27 +40,7 @@ export const fileRouter = createRouter()
                 pages = [...pages, files.slice(i * limit, (i + 1) * limit)];
             }
 
-            return {
-                totalPage,
-                pages,
-            };
-        },
-    })
-    .mutation("password-check", {
-        input: z.object({
-            filePassword: z.string(),
-            inputPassword: z.string(),
-        }),
-        resolve: async ({ input }) => {
-            if (
-                !(await bcrypt.compare(input.inputPassword, input.filePassword))
-            ) {
-                throw new TRPCError({
-                    message: "Wrong password!",
-                    code: "BAD_REQUEST",
-                });
-            }
-            return { download: true };
+            return { totalPage, pages, totalFiles: files.length };
         },
     })
     .mutation("update-download-count", {
@@ -89,50 +69,6 @@ export const fileRouter = createRouter()
             };
         },
     })
-    .mutation("upload-file", {
-        input: z.object({
-            fileID: z.string(),
-            name: z.string(),
-            password: z.string().optional(),
-            type: z.string(),
-            path: z.string(),
-        }),
-        resolve: async ({ input, ctx }) => {
-            const { path, name, type, fileID, password } = input;
-
-            if (!ctx.session) {
-                throw new TRPCError({
-                    message: "UNAUTHORIZED",
-                    code: "UNAUTHORIZED",
-                });
-            }
-
-            const { publicURL } = ctx.supabase.storage
-                .from("files")
-                .getPublicUrl(path);
-
-            const data = await ctx.prisma.file.create({
-                data: {
-                    fileID: fileID,
-                    name: name,
-                    type: type,
-                    path: path,
-                    author: ctx.session.user.name as string,
-                    authorID: ctx.session.user.discordID as string,
-                    url: publicURL as string,
-                    password: password ? await bcrypt.hash(password, 10) : null,
-                },
-            });
-
-            return {
-                fileID: data.fileID,
-                name: data.name,
-                type: data.type,
-                url: `${ctx.req?.headers.origin}/file/${data.fileID}`,
-                password: data.password || "None",
-            };
-        },
-    })
     .mutation("delete-file-by-id", {
         input: z.object({
             fileID: z.string(),
@@ -155,6 +91,15 @@ export const fileRouter = createRouter()
             await ctx.prisma.file.delete({
                 where: { id: file.id },
             });
+
+            try {
+                ctx.res?.revalidate(`/file/${input.fileID}`);
+            } catch (err) {
+                throw new TRPCError({
+                    message: err as string,
+                    code: "INTERNAL_SERVER_ERROR",
+                });
+            }
 
             return {
                 status: "Success",
