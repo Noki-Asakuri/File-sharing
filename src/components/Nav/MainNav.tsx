@@ -40,7 +40,7 @@ const Navbar: React.FC<{}> = ({}) => {
         <nav className="font-normal bg-slate-800">
             <div className="max-w-7xl mx-auto my-0 flex justify-between py-2 px-4">
                 <div className="text-3xl tracking-wider text-blue-500 flex justify-center items-center">
-                    <Link href={"/"}>Freunds</Link>
+                    <Link href={"/"}>File sharing</Link>
                 </div>
                 <div className="flex justify-center items-center gap-x-5">
                     <div>

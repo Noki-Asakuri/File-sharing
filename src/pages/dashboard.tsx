@@ -1,4 +1,3 @@
-import DashboardFile from "@/components/DashboardFile";
 import useDebounce from "@/server/hooks/useDebounce";
 import { trpc } from "@/utils/trpc";
 import type { NextPage } from "next";
@@ -10,9 +9,14 @@ import {
     FaAngleDoubleRight,
     FaAngleLeft,
     FaAngleRight,
-    FaSearch
+    FaSearch,
 } from "react-icons/fa";
 import { IoReloadSharp } from "react-icons/io5";
+
+import dynamic from "next/dynamic";
+const DashboardFile = dynamic(() => import("@/components/DashboardFile"), {
+    suspense: true,
+});
 
 export enum Action {
     FIRST = "FIRST",
@@ -119,7 +123,11 @@ const Dashboard: NextPage = ({}) => {
             <div className="bg-slate-700 p-2 rounded-2xl h-[70vh] w-[50%] min-w-[550px] flex flex-col justify-start items-center relative">
                 <div className="relative w-full flex items-center justify-between px-5">
                     <div className="flex group justify-center items-center absolute bg-slate-600 px-3 rounded-lg">
-                        <FaSearch className="absolute w-4 h-4 transition-all group-focus-within:right-3" />
+                        <FaSearch
+                            className={`absolute w-4 h-4 transition-all group-focus-within:right-3 ${
+                                searchText.length && "right-3"
+                            }`}
+                        />
                         <input
                             className={`bg-transparent group-focus-within:outline-none px-2 z-50 py-1 group-focus-within:w-40 transition-[width] placeholder:text-sm ${
                                 search.length ? "w-40 pl-2 pr-5" : "w-2"
@@ -215,7 +223,7 @@ const Dashboard: NextPage = ({}) => {
                         </div>
 
                         {data && data.totalPage > 0 && (
-                            <div className="flex justify-center items-center gap-x-3 absolute bottom-5">
+                            <div className="flex justify-center items-center gap-x-3 absolute bottom-5 w-full">
                                 <button
                                     className="bg-slate-600 rounded-lg py-2 px-3 w-10 h-10 flex justify-center items-center"
                                     onClick={() =>
@@ -257,6 +265,9 @@ const Dashboard: NextPage = ({}) => {
                                 >
                                     <FaAngleDoubleRight />
                                 </button>
+                                <span className="absolute right-10">
+                                    Total: {data.totalFiles}
+                                </span>
                             </div>
                         )}
                     </>

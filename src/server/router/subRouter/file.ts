@@ -40,10 +40,7 @@ export const fileRouter = createRouter()
                 pages = [...pages, files.slice(i * limit, (i + 1) * limit)];
             }
 
-            return {
-                totalPage,
-                pages,
-            };
+            return { totalPage, pages, totalFiles: files.length };
         },
     })
     .mutation("update-download-count", {
