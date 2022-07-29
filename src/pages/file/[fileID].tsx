@@ -30,18 +30,18 @@ const PasswordForm: React.FC<{
     });
 
     return (
-        <form className="flex flex-col gap-y-7 items-start relative max-w-max p-10 rounded-2xl bg-slate-800">
-            <div className="w-full flex justify-center text-2xl">Password</div>
-            <div className="max-w-max flex justify-center items-center gap-x-4">
+        <form className="relative flex flex-col items-start p-10 gap-y-7 max-w-max rounded-2xl bg-slate-800">
+            <div className="flex justify-center w-full text-2xl">Password</div>
+            <div className="flex items-center justify-center max-w-max gap-x-4">
                 <input
-                    className="bg-slate-700 rounded-2xl px-4 py-2 focus:outline-none"
+                    className="px-4 py-2 bg-slate-700 rounded-2xl focus:outline-none"
                     type={showPassword ? "text" : "password"}
                     name="password"
                     id="password"
                     onChange={(e) => setPassword(e.target.value)}
                 />
                 <button
-                    className="bg-slate-700 p-3 rounded-xl"
+                    className="p-3 bg-slate-700 rounded-xl"
                     aria-label="toggle password display"
                     onClick={(e) => {
                         e.preventDefault();
@@ -121,8 +121,8 @@ const FileDownload: NextPage<{ fileInfo: File }> = ({ fileInfo }) => {
                         setPasswordLocked={setPasswordLocked}
                     />
                 ) : (
-                    <div className="flex flex-col gap-y-7 items-start relative max-w-max p-10 rounded-2xl bg-slate-800">
-                        <div className="w-full flex justify-center text-2xl">
+                    <div className="relative flex flex-col items-start p-10 gap-y-7 max-w-max rounded-2xl bg-slate-800">
+                        <div className="flex justify-center w-full text-2xl">
                             Info
                         </div>
                         <div className="flex flex-col">
@@ -143,11 +143,11 @@ const FileDownload: NextPage<{ fileInfo: File }> = ({ fileInfo }) => {
                                 }, 1000);
                             }}
                         >
-                            <div className="flex justify-center items-center gap-2">
+                            <div className="flex items-center justify-center gap-2">
                                 {isDownload ? (
                                     <>
                                         <span>Downloading</span>
-                                        <div className="flex justify-center items-center">
+                                        <div className="flex items-center justify-center">
                                             <SpinningCircle />
                                         </div>
                                     </>

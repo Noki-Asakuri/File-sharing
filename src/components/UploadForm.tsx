@@ -11,12 +11,12 @@ const UploadForm: React.FC<{
 
     return (
         <form className="flex flex-col gap-y-7 items-start relative max-w-max p-10 rounded-2xl bg-slate-800 h-[300px]">
-            <span className="w-full flex justify-center text-2xl">
+            <span className="flex justify-center w-full text-2xl">
                 Upload File
             </span>
             <label htmlFor="file">
                 File:{" "}
-                <span className="bg-slate-700 py-2 px-4 rounded-2xl">
+                <span className="px-4 py-2 bg-slate-700 rounded-2xl">
                     {state.file?.name || "None"}
                 </span>
             </label>
@@ -33,11 +33,11 @@ const UploadForm: React.FC<{
                 }
                 required
             />
-            <div className="max-w-max flex justify-center items-center gap-x-4">
+            <div className="flex items-center justify-center max-w-max gap-x-4">
                 <label htmlFor="password">Password: </label>
 
                 <input
-                    className="bg-slate-700 rounded-2xl px-4 py-2 focus:outline-none"
+                    className="px-4 py-2 bg-slate-700 rounded-2xl focus:outline-none"
                     type={showPassword ? "password" : "text"}
                     name="password"
                     id="password"
@@ -49,7 +49,7 @@ const UploadForm: React.FC<{
                     }
                 />
                 <button
-                    className="bg-slate-700 p-3 rounded-xl"
+                    className="p-3 bg-slate-700 rounded-xl"
                     aria-label="toggle password display"
                     onClick={(e) => {
                         e.preventDefault();
@@ -71,7 +71,7 @@ const UploadForm: React.FC<{
                 {!state.isUploading ? (
                     "Submit"
                 ) : (
-                    <div className="flex justify-center items-center w-full">
+                    <div className="flex items-center justify-center w-full">
                         <SpinningCircle />
                     </div>
                 )}

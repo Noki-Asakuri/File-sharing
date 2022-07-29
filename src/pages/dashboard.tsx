@@ -121,8 +121,8 @@ const Dashboard: NextPage = ({}) => {
     return (
         <div className="flex w-full h-[90vh] justify-center items-center">
             <div className="bg-slate-700 p-2 rounded-2xl h-[70vh] w-[50%] min-w-[550px] flex flex-col justify-start items-center relative">
-                <div className="relative w-full flex items-center justify-between px-5">
-                    <div className="flex group justify-center items-center absolute bg-slate-600 px-3 rounded-lg">
+                <div className="relative flex items-center justify-between w-full px-5">
+                    <div className="absolute flex items-center justify-center px-3 rounded-lg group bg-slate-600">
                         <FaSearch
                             className={`absolute w-4 h-4 transition-all group-focus-within:right-3 ${
                                 searchText.length && "right-3"
@@ -139,11 +139,11 @@ const Dashboard: NextPage = ({}) => {
                             onChange={(e) => setSearchText(e.target.value)}
                         />
                     </div>
-                    <span className="flex justify-center items-center text-2xl p-2 w-full">
+                    <span className="flex items-center justify-center w-full p-2 text-2xl">
                         Dashboard
                     </span>
 
-                    <div className="absolute top-1 right-14 flex justify-center items-center gap-3">
+                    <div className="absolute flex items-center justify-center gap-3 top-1 right-14">
                         <button
                             className={`bg-slate-600 rounded-lg transition-colors duration-500 p-2 w-10 ${
                                 limit === 5 && "bg-sky-500"
@@ -171,7 +171,7 @@ const Dashboard: NextPage = ({}) => {
                     </div>
                     <div>
                         <button
-                            className="bg-slate-600 p-2 rounded-full absolute top-2 right-3"
+                            className="absolute p-2 rounded-full bg-slate-600 top-2 right-3"
                             onClick={() => {
                                 setFetching(true);
                                 refetch();
@@ -190,7 +190,7 @@ const Dashboard: NextPage = ({}) => {
                     </div>
                 </div>
                 {isLoading && (
-                    <div className="w-full h-full flex justify-center items-center">
+                    <div className="flex items-center justify-center w-full h-full">
                         <Image
                             width="100px"
                             height="100px"
@@ -216,16 +216,16 @@ const Dashboard: NextPage = ({}) => {
                                     }
                                 )}
                             {data && !data.totalPage && (
-                                <div className="w-full h-full flex justify-center items-center">
+                                <div className="flex items-center justify-center w-full h-full">
                                     Nothing here to show!
                                 </div>
                             )}
                         </div>
 
                         {data && data.totalPage > 0 && (
-                            <div className="flex justify-center items-center gap-x-3 absolute bottom-5 w-full">
+                            <div className="absolute flex items-center justify-center w-full gap-x-3 bottom-5">
                                 <button
-                                    className="bg-slate-600 rounded-lg py-2 px-3 w-10 h-10 flex justify-center items-center"
+                                    className="flex items-center justify-center w-10 h-10 px-3 py-2 rounded-lg bg-slate-600"
                                     onClick={() =>
                                         dispatch({ type: Action.FIRST })
                                     }
@@ -233,18 +233,18 @@ const Dashboard: NextPage = ({}) => {
                                     <FaAngleDoubleLeft />
                                 </button>
                                 <button
-                                    className="bg-slate-600 rounded-lg py-2 px-3 w-10 h-10 flex justify-center items-center"
+                                    className="flex items-center justify-center w-10 h-10 px-3 py-2 rounded-lg bg-slate-600"
                                     onClick={() =>
                                         dispatch({ type: Action.PREV })
                                     }
                                 >
                                     <FaAngleLeft />
                                 </button>
-                                <div className="bg-slate-600 rounded-lg py-2 px-3 w-10 h-10 flex justify-center items-center">
+                                <div className="flex items-center justify-center w-10 h-10 px-3 py-2 rounded-lg bg-slate-600">
                                     {state.currentPage}/{state.totalPages}
                                 </div>
                                 <button
-                                    className="bg-slate-600 rounded-lg py-2 px-3 w-10 h-10 flex justify-center items-center"
+                                    className="flex items-center justify-center w-10 h-10 px-3 py-2 rounded-lg bg-slate-600"
                                     onClick={() =>
                                         dispatch({
                                             type: Action.NEXT,
@@ -255,7 +255,7 @@ const Dashboard: NextPage = ({}) => {
                                     <FaAngleRight />
                                 </button>
                                 <button
-                                    className="bg-slate-600 rounded-lg py-2 px-3 w-10 h-10 flex justify-center items-center"
+                                    className="flex items-center justify-center w-10 h-10 px-3 py-2 rounded-lg bg-slate-600"
                                     onClick={() =>
                                         dispatch({
                                             type: Action.LAST,

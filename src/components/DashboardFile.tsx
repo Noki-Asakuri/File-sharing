@@ -20,15 +20,15 @@ const DashboardFile: React.FC<{
     const deleteFile = trpc.useMutation("file.delete-file-by-id");
 
     return (
-        <div className="max-w-full flex justify-between items-center bg-slate-800 mx-3 py-2 px-5 rounded-lg">
+        <div className="flex items-center justify-between max-w-full px-5 py-2 mx-3 rounded-lg bg-slate-800">
             <ul className="grid grid-cols-[1fr_1fr_1fr_1fr] gap-x-10 w-[80%]">
                 <li className="col-span-4">
-                    <div className="text-ellipsis whitespace-nowrap overflow-hidden">
+                    <div className="overflow-hidden text-ellipsis whitespace-nowrap">
                         Name: {file.name}
                     </div>
                 </li>
                 <li className="col-span-2">
-                    <div className="text-ellipsis whitespace-nowrap overflow-hidden">
+                    <div className="overflow-hidden text-ellipsis whitespace-nowrap">
                         Author: {file.author}
                     </div>
                 </li>
@@ -40,7 +40,7 @@ const DashboardFile: React.FC<{
                     </div>
                 </li>
                 <li className="col-span-2">
-                    <span className="text-ellipsis whitespace-nowrap overflow-hidden">
+                    <span className="overflow-hidden text-ellipsis whitespace-nowrap">
                         Url:{" "}
                         <a
                             href={fileUrl.current} 
@@ -52,7 +52,7 @@ const DashboardFile: React.FC<{
                     </span>
                 </li>
                 <li>
-                    <div className="text-ellipsis whitespace-nowrap overflow-hidden">
+                    <div className="overflow-hidden text-ellipsis whitespace-nowrap">
                         Download: {file.downloadCount}
                     </div>
                 </li>
@@ -71,7 +71,7 @@ const DashboardFile: React.FC<{
                 </li>
             </ul>
             <button
-                className="hover:text-red-500 transition-colors duration-500 bg-slate-700 p-3 rounded-full"
+                className="p-3 transition-colors duration-500 rounded-full hover:text-red-500 bg-slate-700"
                 onClick={() => {
                     const del = async () => {
                         setDeleting(true);

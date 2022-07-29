@@ -117,10 +117,10 @@ const Home: NextPage = () => {
                 />
                 <meta property="og:image" content="/favicon.svg" />
             </Head>
-            <div className="max-w-7xl mx-auto my-0 h-max">
+            <div className="mx-auto my-0 max-w-7xl h-max">
                 <header>
                     <h2 className="mt-16 text-4xl text-center">File Sharing</h2>
-                    <p className="text-center pt-5 max-w-2xl m-auto">
+                    <p className="max-w-2xl pt-5 m-auto text-center">
                         A simple file-sharing website so I don&apos;t need to
                         fucking host the fucking file on fucking google drive
                         each time I need to fucking share a file through discord
@@ -129,9 +129,9 @@ const Home: NextPage = () => {
                 </header>
 
                 {!session && (
-                    <div className="flex justify-around flex-wrap pt-20 gap-10">
-                        <div className="flex flex-col gap-y-7 items-start relative max-w-max p-10 rounded-2xl bg-slate-800">
-                            <span className="w-full flex justify-center text-2xl">
+                    <div className="flex flex-wrap justify-around gap-10 pt-20">
+                        <div className="relative flex flex-col items-start p-10 gap-y-7 max-w-max rounded-2xl bg-slate-800">
+                            <span className="flex justify-center w-full text-2xl">
                                 Error
                             </span>
                             <span>
@@ -154,7 +154,7 @@ const Home: NextPage = () => {
                             </div>
                         }
                     >
-                        <div className="flex justify-around flex-wrap pt-20 gap-10">
+                        <div className="flex flex-wrap justify-around gap-10 pt-20">
                             <UploadForm state={state} dispatch={dispatch} />
 
                             <UploadedFile uploadFile={uploadFile} />
@@ -162,7 +162,7 @@ const Home: NextPage = () => {
                     </Suspense>
                 )}
 
-                <footer className="relative my-20 bottom-0 flex justify-center items-center">
+                <footer className="relative bottom-0 flex items-center justify-center my-20">
                     <span>Made by Asakuri#8323</span>
                 </footer>
             </div>
