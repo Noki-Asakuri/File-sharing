@@ -30,7 +30,7 @@ export const fileRouter = createRouter()
                         user.role !== "Owner" ? user.discordID : undefined,
                     name: search?.length ? { contains: search } : undefined,
                 },
-                orderBy: { id: "asc" },
+                orderBy: { id: "desc" },
             });
 
             const totalPage = Math.ceil(files.length / limit);
@@ -94,6 +94,15 @@ export const fileRouter = createRouter()
             await ctx.prisma.file.delete({
                 where: { id: file.id },
             });
+
+            try {
+                ctx.res?.revalidate(`/file/${input.fileID}`);
+            } catch (err) {
+                throw new TRPCError({
+                    message: err as string,
+                    code: "INTERNAL_SERVER_ERROR",
+                });
+            }
 
             return {
                 status: "Success",
