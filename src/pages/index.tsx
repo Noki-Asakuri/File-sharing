@@ -16,16 +16,8 @@ const UploadForm = dynamic(() => import("@/components/UploadForm"), {
     suspense: true,
 });
 
-export enum Action {
-    SUBMIT = "SUBMIT",
-    PASSWORD = "PASSWORD",
-    CHANGE = "ON-CHANGE",
-    UPLOADED = "UPLOADED",
-    ERROR = "ERROR",
-}
-
 export interface ActionType {
-    type: Action;
+    type: "SUBMIT" | "PASSWORD" | "CHANGE" | "UPLOADED" | "ERROR";
     payload?: File | string | null | undefined;
 }
 
@@ -40,7 +32,7 @@ const reducer = (state: State, action: ActionType): State => {
     const { type, payload } = action;
 
     switch (type) {
-        case Action.CHANGE:
+        case "CHANGE":
             if (!payload || typeof payload === "string") {
                 return state;
             }
@@ -58,7 +50,7 @@ const reducer = (state: State, action: ActionType): State => {
                 error: "File size over 50MB limit!",
             };
 
-        case Action.PASSWORD:
+        case "PASSWORD":
             if (!payload || typeof payload !== "string") {
                 return state;
             }
@@ -66,7 +58,7 @@ const reducer = (state: State, action: ActionType): State => {
             state.password.current = payload;
             return state;
 
-        case Action.SUBMIT:
+        case "SUBMIT":
             if (!state.file) {
                 return {
                     ...state,
@@ -77,10 +69,10 @@ const reducer = (state: State, action: ActionType): State => {
 
             return { ...state, isUploading: true, error: null };
 
-        case Action.UPLOADED:
+        case "UPLOADED":
             return { ...state, isUploading: false };
 
-        case Action.ERROR:
+        case "ERROR":
             if (typeof payload !== "string") {
                 return state;
             }
@@ -145,18 +137,12 @@ const Home: NextPage = () => {
                     <Suspense
                         fallback={
                             <div className="flex justify-center items-center h-[300px] w-full">
-                                <Image
-                                    width="100px"
-                                    height="100px"
-                                    src={"/loading.svg"}
-                                    alt={"Loading image"}
-                                />
+                                <Image width="100px" height="100px" src={"/loading.svg"} alt={"Loading image"} />
                             </div>
                         }
                     >
                         <div className="flex flex-wrap justify-around gap-10 pt-20">
                             <UploadForm state={state} dispatch={dispatch} />
-
                             <UploadedFile uploadFile={uploadFile} />
                         </div>
                     </Suspense>

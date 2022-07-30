@@ -1,4 +1,4 @@
-import { Action, ActionType, State } from "@/pages";
+import { ActionType, State } from "@/pages";
 import supabase from "@/server/db/supabase";
 import genID from "@/utils/genID";
 import { trpc } from "@/utils/trpc";
@@ -14,7 +14,7 @@ const useStorage = ({
     const uploadPassword = useRef<string | null>(null);
     const fileMutation = trpc.useMutation(["upload.file"], {
         onError: ({ message }) => {
-            dispatch({ type: Action.ERROR, payload: message });
+            dispatch({ type: "ERROR", payload: message });
         },
     });
 
@@ -45,7 +45,7 @@ const useStorage = ({
                     ? password.current
                     : null;
 
-                dispatch({ type: Action.UPLOADED });
+                dispatch({ type: "UPLOADED" });
             };
 
             uploadFileToStorage();
@@ -58,4 +58,5 @@ const useStorage = ({
     }
 };
 
+export type returnFile = ReturnType<typeof useStorage>;
 export default useStorage;

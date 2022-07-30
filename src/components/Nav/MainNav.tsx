@@ -14,7 +14,7 @@ const LoginProfile: React.FC<{}> = ({}) => {
                 <button className="flex">
                     <Image
                         className="rounded-full"
-                        src={session.user?.image as string}
+                        src={session.user.image as string}
                         alt={"Discord profile image"}
                         width={"44px"}
                         height={"44px"}
@@ -50,10 +50,7 @@ const Navbar: React.FC<{}> = ({}) => {
                             target="_blank"
                             rel="noreferrer"
                         >
-                            <span className="absolute">
-
-                            Github
-                            </span>
+                            <span className="absolute">Github</span>
                             <FaGithub className="relative z-50 transition-colors rounded-full w-11 h-11 hover:text-sky-700" />
                         </a>
                     </div>
