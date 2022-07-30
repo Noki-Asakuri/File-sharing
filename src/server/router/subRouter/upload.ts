@@ -33,7 +33,7 @@ export const uploadRouter = createRouter().mutation("file", {
                 type: type,
                 path: path,
                 author: ctx.session.user.name as string,
-                authorID: ctx.session.user.discordID as string,
+                authorID: ctx.session.user.discordID,
                 url: publicURL as string,
                 password: password ? await bcrypt.hash(password, 10) : null,
             },
@@ -52,7 +52,8 @@ export const uploadRouter = createRouter().mutation("file", {
             fileID: data.fileID,
             name: data.name,
             type: data.type,
-            url: `${ctx.req?.headers.origin}/file/${data.fileID}`,
+            url: `/file/${data.fileID}`,
+            fullUrl: `${ctx.req?.headers.origin}/file/${data.fileID}`,
             password: data.password || "None",
         };
     },
