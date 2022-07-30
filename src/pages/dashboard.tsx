@@ -8,28 +8,16 @@ import {
     FaAngleDoubleLeft,
     FaAngleDoubleRight,
     FaAngleLeft,
-    FaAngleRight,
-    FaSearch,
+    FaAngleRight, FaRedo, FaSearch
 } from "react-icons/fa";
-import { IoReloadSharp } from "react-icons/io5";
 
 import dynamic from "next/dynamic";
 const DashboardFile = dynamic(() => import("@/components/DashboardFile"), {
     suspense: true,
 });
 
-export enum Action {
-    FIRST = "FIRST",
-    PREV = "PREV",
-    NEXT = "NEXT",
-    LAST = "LAST",
-    SET = "SET",
-    DELETE = "DELETE",
-    UPDATE = "UPDATE",
-}
-
 export interface ActionType {
-    type: Action;
+    type: "FIRST" | "PREV" | "NEXT" | "LAST" | "SET" | "UPDATE" | "DELETE";
     payload?: number | string;
 }
 
@@ -43,45 +31,37 @@ const reducer = (state: State, action: ActionType) => {
     const { type, payload } = action;
 
     switch (type) {
-        case Action.FIRST:
+        case "FIRST":
             return { ...state, currentPage: 1 };
 
-        case Action.LAST:
-            if (!payload || typeof payload === "string") {
-                return state;
-            }
+        case "LAST":
+            return { ...state, currentPage: state.totalPages };
 
-            return { ...state, currentPage: payload };
-
-        case Action.NEXT:
-            if (!payload || typeof payload === "string") {
-                return state;
-            }
-
-            if (state.currentPage + 1 > payload) {
+        case "NEXT":
+            if (state.currentPage + 1 > state.totalPages) {
                 return state;
             }
             return { ...state, currentPage: state.currentPage + 1 };
 
-        case Action.PREV:
+        case "PREV":
             if (state.currentPage - 1 <= 0) {
                 return state;
             }
             return { ...state, currentPage: state.currentPage - 1 };
 
-        case Action.SET:
+        case "SET":
             if (!payload || typeof payload === "string") {
                 return state;
             }
 
             return { ...state, currentPage: payload };
 
-        case Action.DELETE:
+        case "DELETE":
             state.refetch();
 
             return state;
 
-        case Action.UPDATE:
+        case "UPDATE":
             if (typeof payload !== "number") {
                 return state;
             }
@@ -107,7 +87,7 @@ const Dashboard: NextPage = ({}) => {
         ["file.get-file-by-id", { limit, search }],
         {
             onSuccess: ({ totalPage }) => {
-                dispatch({ type: Action.UPDATE, payload: totalPage });
+                dispatch({ type: "UPDATE", payload: totalPage });
             },
         }
     );
@@ -120,7 +100,7 @@ const Dashboard: NextPage = ({}) => {
 
     return (
         <div className="flex w-full h-[90vh] justify-center items-center">
-            <div className="bg-slate-700 p-2 rounded-2xl h-[70vh] w-[50%] min-w-[550px] flex flex-col justify-start items-center relative">
+            <div className="bg-slate-700 p-2 rounded-2xl h-[70vh] w-[50%] min-w-[620px] flex flex-col justify-start items-center relative">
                 <div className="relative flex items-center justify-between w-full px-5">
                     <div className="absolute flex items-center justify-center px-3 rounded-lg group bg-slate-600">
                         <FaSearch
@@ -130,7 +110,7 @@ const Dashboard: NextPage = ({}) => {
                         />
                         <input
                             className={`bg-transparent group-focus-within:outline-none px-2 z-50 py-1 group-focus-within:w-40 transition-[width] placeholder:text-sm ${
-                                search.length ? "w-40 pl-2 pr-5" : "w-2"
+                                searchText.length ? "w-40 pl-2 pr-5" : "w-2"
                             }`}
                             type="text"
                             name="search-file"
@@ -139,39 +119,43 @@ const Dashboard: NextPage = ({}) => {
                             onChange={(e) => setSearchText(e.target.value)}
                         />
                     </div>
+
                     <span className="flex items-center justify-center w-full p-2 text-2xl">
                         Dashboard
                     </span>
 
-                    <div className="absolute flex items-center justify-center gap-3 top-1 right-14">
-                        <button
-                            className={`bg-slate-600 rounded-lg transition-colors duration-500 p-2 w-10 ${
-                                limit === 5 && "bg-sky-500"
-                            }`}
-                            onClick={() => setLimit(5)}
-                        >
-                            5
-                        </button>
-                        <button
-                            className={`bg-slate-600 rounded-lg transition-colors duration-500 p-2 w-10 ${
-                                limit === 10 && "bg-sky-500"
-                            }`}
-                            onClick={() => setLimit(10)}
-                        >
-                            10
-                        </button>
-                        <button
-                            className={`bg-slate-600 rounded-lg transition-colors duration-500 p-2 w-10 ${
-                                limit === 25 && "bg-sky-500"
-                            }`}
-                            onClick={() => setLimit(25)}
-                        >
-                            25
-                        </button>
-                    </div>
+                    {data && data.totalPage > 0 && (
+                        <div className="absolute flex items-center justify-center gap-3 top-1 right-16">
+                            <button
+                                className={`bg-slate-600 rounded-lg transition-colors duration-500 p-2 w-10 ${
+                                    limit === 5 && "bg-sky-500"
+                                }`}
+                                onClick={() => setLimit(5)}
+                            >
+                                5
+                            </button>
+                            <button
+                                className={`bg-slate-600 rounded-lg transition-colors duration-500 p-2 w-10 ${
+                                    limit === 10 && "bg-sky-500"
+                                }`}
+                                onClick={() => setLimit(10)}
+                            >
+                                10
+                            </button>
+                            <button
+                                className={`bg-slate-600 rounded-lg transition-colors duration-500 p-2 w-10 ${
+                                    limit === 25 && "bg-sky-500"
+                                }`}
+                                onClick={() => setLimit(25)}
+                            >
+                                25
+                            </button>
+                        </div>
+                    )}
+
                     <div>
                         <button
-                            className="absolute p-2 rounded-full bg-slate-600 top-2 right-3"
+                            className="absolute p-3 rounded-full bg-slate-600 top-1 right-3"
                             onClick={() => {
                                 setFetching(true);
                                 refetch();
@@ -181,14 +165,17 @@ const Dashboard: NextPage = ({}) => {
                                 }, 1000);
                             }}
                         >
-                            <IoReloadSharp
+                            <FaRedo
                                 className={
-                                    isRefetching ? "animate-refetchSpin" : ""
+                                    isRefetching
+                                        ? "animate-refetchSpin"
+                                        : undefined
                                 }
                             />
                         </button>
                     </div>
                 </div>
+
                 {isLoading && (
                     <div className="flex items-center justify-center w-full h-full">
                         <Image
@@ -200,68 +187,51 @@ const Dashboard: NextPage = ({}) => {
                     </div>
                 )}
 
-                {!isLoading && (
+                {!isLoading && data && (
                     <>
                         <div className="flex flex-col gap-y-4 w-full h-[82%] pt-2 overflow-scroll">
-                            {data &&
-                                data.pages[state.currentPage - 1]?.map(
-                                    (file) => {
-                                        return (
-                                            <DashboardFile
-                                                key={file.fileID}
-                                                file={file}
-                                                dispatch={dispatch}
-                                            />
-                                        );
-                                    }
-                                )}
-                            {data && !data.totalPage && (
+                            {data.pages[state.currentPage - 1]?.map((file) => {
+                                return (
+                                    <DashboardFile
+                                        key={file.fileID}
+                                        file={file}
+                                        dispatch={dispatch}
+                                    />
+                                );
+                            })}
+                            {!data.totalPage && (
                                 <div className="flex items-center justify-center w-full h-full">
                                     Nothing here to show!
                                 </div>
                             )}
                         </div>
 
-                        {data && data.totalPage > 0 && (
+                        {data.totalPage > 0 && (
                             <div className="absolute flex items-center justify-center w-full gap-x-3 bottom-5">
                                 <button
                                     className="flex items-center justify-center w-10 h-10 px-3 py-2 rounded-lg bg-slate-600"
-                                    onClick={() =>
-                                        dispatch({ type: Action.FIRST })
-                                    }
+                                    onClick={() => dispatch({ type: "FIRST" })}
                                 >
                                     <FaAngleDoubleLeft />
                                 </button>
                                 <button
                                     className="flex items-center justify-center w-10 h-10 px-3 py-2 rounded-lg bg-slate-600"
-                                    onClick={() =>
-                                        dispatch({ type: Action.PREV })
-                                    }
+                                    onClick={() => dispatch({ type: "PREV" })}
                                 >
                                     <FaAngleLeft />
                                 </button>
-                                <div className="flex items-center justify-center w-10 h-10 px-3 py-2 rounded-lg bg-slate-600">
+                                <div className="flex items-center justify-center w-10 h-10 px-6 py-2 rounded-lg bg-slate-600">
                                     {state.currentPage}/{state.totalPages}
                                 </div>
                                 <button
                                     className="flex items-center justify-center w-10 h-10 px-3 py-2 rounded-lg bg-slate-600"
-                                    onClick={() =>
-                                        dispatch({
-                                            type: Action.NEXT,
-                                            payload: data?.totalPage,
-                                        })
-                                    }
+                                    onClick={() => dispatch({ type: "NEXT" })}
                                 >
                                     <FaAngleRight />
                                 </button>
                                 <button
                                     className="flex items-center justify-center w-10 h-10 px-3 py-2 rounded-lg bg-slate-600"
-                                    onClick={() =>
-                                        dispatch({
-                                            type: Action.LAST,
-                                            payload: data?.totalPage,
-                                        })
-                                    }
+                                    onClick={() => dispatch({ type: "LAST" })}
                                 >
                                     <FaAngleDoubleRight />
                                 </button>
