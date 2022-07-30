@@ -121,7 +121,7 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
                 <title>{`File: ${file && file.name}`}</title>
                 <meta
                     property="og:title"
-                    content={`File Sharing by Freunds#8323`}
+                    content={`File Sharing.`}
                 />
                 <meta
                     property="og:site_name"
@@ -129,7 +129,7 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
                 />
                 <meta
                     property="og:description"
-                    content={`Files: ${file.name}.\nDownload: ${file.downloadCount}.`}
+                    content={`Files: ${file.name}\nDownload: ${file.downloadCount}\nUpload ${file.createdAt}`}
                 />
                 <meta
                     property="og:image"
