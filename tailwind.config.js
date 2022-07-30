@@ -35,6 +35,9 @@ module.exports = {
                     "toast-slide-in-right 150ms cubic-bezier(0.16, 1, 0.3, 1)",
                 refetchSpin: "spin 0.5s linear infinite",
             },
+            screens: {
+                dashboard: { max: "1380px" },
+            },
         },
     },
     plugins: [require("tailwindcss-radix")()],
