@@ -19,3 +19,8 @@ body {
     color: white;
 }
 
+@layer arrow {
+    .arrow {
+        clip-path: polygon(0 50%, 100% 100%, 100% 0);
+    }
+}
