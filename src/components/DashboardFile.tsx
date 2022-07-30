@@ -1,11 +1,22 @@
-import { Action, ActionType } from "@/pages/dashboard";
+import { ActionType } from "@/pages/dashboard";
 import getBaseUrl from "@/utils/getBaseUrl";
 import { trpc } from "@/utils/trpc";
 import { File } from "@prisma/client";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import React, { Dispatch, useRef, useState } from "react";
-import { FaCheckCircle, FaTimesCircle, FaTrash } from "react-icons/fa";
+import toast, { Toaster } from "react-hot-toast";
+import {
+    FaArrowAltCircleDown,
+    FaCheckCircle,
+    FaCloudDownloadAlt,
+    FaIdCard,
+    FaLock,
+    FaTimesCircle,
+    FaTrash,
+    FaUpload,
+    FaUserAlt
+} from "react-icons/fa";
 import SpinningCircle from "./SpinningCircle";
 
 dayjs.extend(relativeTime);
@@ -17,33 +28,38 @@ const DashboardFile: React.FC<{
     const [deleting, setDeleting] = useState<boolean>(false);
 
     const fileUrl = useRef<string>(getBaseUrl() + "/file/" + file.fileID);
-    const deleteFile = trpc.useMutation("file.delete-file-by-id");
+    const { mutateAsync: deleteFile, error } = trpc.useMutation(
+        "file.delete-file-by-id"
+    );
 
     return (
-        <div className="flex items-center justify-between max-w-full px-5 py-2 mx-3 rounded-lg bg-slate-800">
-            <ul className="grid grid-cols-[1fr_1fr_1fr_1fr] gap-x-10 w-[80%]">
+        <div className="relative flex items-center justify-between max-w-full px-5 py-2 mx-3 rounded-lg bg-slate-800">
+            <ul className="grid grid-cols-[minxmax(200px,1fr)_1fr_1fr] gap-x-10 w-[80%]">
                 <li className="col-span-4">
-                    <div className="overflow-hidden text-ellipsis whitespace-nowrap">
+                    <div className="flex items-center justify-start gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
+                        <FaIdCard />
                         Name: {file.name}
                     </div>
                 </li>
                 <li className="col-span-2">
-                    <div className="overflow-hidden text-ellipsis whitespace-nowrap">
+                    <div className="flex items-center justify-start gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
+                        <FaUserAlt />
                         Author: {file.author}
                     </div>
                 </li>
                 <li className="col-span-2">
                     <div>
-                        <span>
+                        <span className="flex items-center justify-start gap-2">
+                            <FaUpload />
                             Uploaded {dayjs(file.createdAt).fromNow()}
                         </span>
                     </div>
                 </li>
                 <li className="col-span-2">
-                    <span className="overflow-hidden text-ellipsis whitespace-nowrap">
-                        Url:{" "}
+                    <span className="flex items-center justify-start gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
+                        <FaCloudDownloadAlt /> Url:{" "}
                         <a
-                            href={fileUrl.current} 
+                            href={fileUrl.current}
                             target="_blank"
                             rel="noreferrer"
                         >
@@ -52,14 +68,17 @@ const DashboardFile: React.FC<{
                     </span>
                 </li>
                 <li>
-                    <div className="overflow-hidden text-ellipsis whitespace-nowrap">
+                    <div className="flex items-center justify-start gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
+                        <FaArrowAltCircleDown />
                         Download: {file.downloadCount}
                     </div>
                 </li>
 
                 <li>
                     <div className="flex items-center gap-2">
-                        <span>Locked:</span>
+                        <span className="flex items-center justify-start gap-2">
+                            <FaLock /> Locked:
+                        </span>
                         <div>
                             {file.password ? (
                                 <FaCheckCircle className="text-green-500" />
@@ -71,29 +90,52 @@ const DashboardFile: React.FC<{
                 </li>
             </ul>
             <button
-                className="p-3 transition-colors duration-500 rounded-full hover:text-red-500 bg-slate-700"
+                className="p-3 duration-500 rounded-full hover:text-red-500 bg-slate-700 dashboard:absolute dashboard:top-2 dashboard:right-2"
                 onClick={() => {
-                    const del = async () => {
-                        setDeleting(true);
-                        await deleteFile.mutateAsync({ fileID: file.fileID });
-                        dispatch({ type: Action.DELETE, payload: file.fileID });
-                        setDeleting(false);
+                    const deleteFunc = async () => {
+                        await deleteFile({ fileID: file.fileID });
+                        dispatch({ type: "DELETE", payload: file.fileID });
                     };
-                    del();
+
+                    if (window.innerWidth > 1400) {
+                        setDeleting(true);
+                        deleteFunc().then(() => setDeleting(false));
+                    } else {
+                        toast.promise(
+                            deleteFunc(),
+                            {
+                                loading: <b>Deleting...</b>,
+                                success: <b>Deleted file.</b>,
+                                error: <b>Could not delete file.</b>,
+                            },
+                            {
+                                style: {
+                                    borderRadius: "10px",
+                                    background: "#262626",
+                                    color: "#E8DCFF",
+                                },
+                                iconTheme: {
+                                    primary: "#E8DCFF",
+                                    secondary: "#262626",
+                                },
+                            }
+                        );
+                    }
                 }}
             >
                 {deleting ? (
                     <SpinningCircle />
                 ) : (
-                    <FaTrash className="w-6 h-6" />
+                    <FaTrash className="w-6 h-6 dashboard:w-4 dashboard:h-4" />
                 )}
             </button>
 
-            {deleteFile.error && (
+            {error && (
                 <div className="text-red-500">
-                    <span>{deleteFile.error.message}</span>
+                    <span>{error.message}</span>
                 </div>
             )}
+            <Toaster />
         </div>
     );
 };

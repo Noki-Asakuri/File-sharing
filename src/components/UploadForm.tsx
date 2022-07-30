@@ -1,7 +1,6 @@
-import { Action, ActionType, State } from "@/pages";
+import { ActionType, State } from "@/pages";
 import React, { useState } from "react";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
-import SpinningCircle from "./SpinningCircle";
+import { FaEye, FaEyeSlash, FaFile, FaLock } from "react-icons/fa";
 
 const UploadForm: React.FC<{
     state: State;
@@ -10,11 +9,21 @@ const UploadForm: React.FC<{
     const [showPassword, setShowPassword] = useState<boolean>(true);
 
     return (
-        <form className="flex flex-col gap-y-7 items-start relative max-w-max p-10 rounded-2xl bg-slate-800 h-[300px]">
+        <form
+            className="flex flex-col gap-y-6 items-start relative max-w-max p-10 rounded-2xl bg-slate-800 h-[300px]"
+            onSubmit={(e) => {
+                e.preventDefault();
+                dispatch({ type: "SUBMIT" });
+            }}
+        >
             <span className="flex justify-center w-full text-2xl">
                 Upload File
             </span>
-            <label htmlFor="file">
+            <label
+                htmlFor="file"
+                className="flex items-center justify-center gap-2"
+            >
+                <FaFile />
                 File:{" "}
                 <span className="px-4 py-2 bg-slate-700 rounded-2xl">
                     {state.file?.name || "None"}
@@ -26,15 +35,17 @@ const UploadForm: React.FC<{
                 id="file"
                 name="file"
                 onChange={(e) =>
-                    dispatch({
-                        type: Action.CHANGE,
-                        payload: e.target.files![0],
-                    })
+                    dispatch({ type: "CHANGE", payload: e.target.files![0] })
                 }
                 required
             />
             <div className="flex items-center justify-center max-w-max gap-x-4">
-                <label htmlFor="password">Password: </label>
+                <label
+                    htmlFor="password"
+                    className="flex items-center justify-center gap-2"
+                >
+                    <FaLock /> Password:{" "}
+                </label>
 
                 <input
                     className="px-4 py-2 bg-slate-700 rounded-2xl focus:outline-none"
@@ -42,10 +53,7 @@ const UploadForm: React.FC<{
                     name="password"
                     id="password"
                     onChange={(e) =>
-                        dispatch({
-                            type: Action.PASSWORD,
-                            payload: e.target.value,
-                        })
+                        dispatch({ type: "PASSWORD", payload: e.target.value })
                     }
                 />
                 <button
@@ -53,7 +61,6 @@ const UploadForm: React.FC<{
                     aria-label="toggle password display"
                     onClick={(e) => {
                         e.preventDefault();
-
                         setShowPassword((current) => !current);
                     }}
                 >
@@ -61,23 +68,14 @@ const UploadForm: React.FC<{
                 </button>
             </div>
 
-            <button
-                className="bg-slate-700 py-2 w-full rounded-2xl h-[40px]"
-                onClick={(e) => {
-                    e.preventDefault();
-                    dispatch({ type: Action.SUBMIT, payload: null });
-                }}
-            >
-                {!state.isUploading ? (
-                    "Submit"
-                ) : (
-                    <div className="flex items-center justify-center w-full">
-                        <SpinningCircle />
-                    </div>
-                )}
-            </button>
+            <input
+                className="bg-slate-700 py-2 w-full rounded-2xl h-[40px] cursor-pointer"
+                type="submit"
+                value={state.isUploading ? "Uploading..." : "Submit"}
+            />
+
             {state.error && (
-                <div className="absolute left-[200px] top-[97px]">
+                <div className="absolute right-10 top-[108px]">
                     <span className="text-sm text-red-600">{state.error}</span>
                 </div>
             )}
