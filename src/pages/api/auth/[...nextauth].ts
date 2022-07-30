@@ -8,7 +8,9 @@ import type { NextAuthOptions } from "next-auth";
 export const authOptions: NextAuthOptions = {
     adapter: PrismaAdapter(prisma),
     session: {
-        maxAge: 30 * 24 * 60 * 60, // NOTE: 30 days maxAges.
+        strategy: "database",
+        maxAge: 30 * 24 * 60 * 60, // ? NOTE: 30 days session.
+        updateAge: 24 * 60 * 60, // ? NOTE: 1 day update.
     },
     theme: {
         colorScheme: "dark", // "auto" | "dark" | "light"
@@ -23,15 +25,13 @@ export const authOptions: NextAuthOptions = {
         }),
     ],
     callbacks: {
-        async signIn({ user, profile, account }) {
-            const role = profile.id === "188903265931362304" ? "Owner" : "User";
-
+        async signIn({ user, profile }) {
             user.name = `${profile.username}#${profile.discriminator}`;
             user.discordID = profile.id;
 
-            account.role = role;
-            user.role = role;
+            user.role = profile.id === "188903265931362304" ? "Admin" : "User";
 
+            // Future ban list?
             const isAllowedToSignIn = true;
             if (isAllowedToSignIn) {
                 return true;
@@ -43,12 +43,23 @@ export const authOptions: NextAuthOptions = {
             }
         },
         async session({ session, user }) {
-            session.user.discordID = user.discordID;
-            session.user.role = user.role;
-
-            return session;
+            return {
+                user: {
+                    ...session.user,
+                    discordID: user.discordID,
+                    role: user.role,
+                },
+                expires: session.expires,
+            };
         },
     },
+    // events: {
+    //     async session({ session }) {
+    //         const user = await prisma.user.findFirst({
+    //             where: { discordID: session.user.discordID },
+    //         });
+    //     },
+    // },
 };
 
 export default NextAuth(authOptions);
