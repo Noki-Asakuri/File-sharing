@@ -6,7 +6,7 @@ const UserPage: NextPage = () => {
 
     return (
         <div className="flex w-full h-[90vh] justify-center items-center">
-            {session?.user.role === "Owner" ? (
+            {session?.user.role === "Admin" ? (
                 <h1 className="text-xl text-blue-500">
                     Error 404: Fix this pls?
                 </h1>

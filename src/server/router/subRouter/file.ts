@@ -27,7 +27,7 @@ export const fileRouter = createRouter()
             const files = await ctx.prisma.file.findMany({
                 where: {
                     authorID:
-                        user.role !== "Owner" ? user.discordID : undefined,
+                        user.role !== "Admin" ? user.discordID : undefined,
                     name: search?.length ? { contains: search } : undefined,
                 },
                 orderBy: { id: "desc" },
