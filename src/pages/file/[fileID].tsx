@@ -1,16 +1,24 @@
 import download from "@/utils/download";
 import type { NextPage } from "next";
 import { GetStaticPropsContext } from "next";
+import Image from "next/future/image";
 import Head from "next/head";
 import React, { useCallback, useState } from "react";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import {
+    FaArrowAltCircleDown,
+    FaEye,
+    FaEyeSlash,
+    FaIdCard,
+    FaLock,
+    FaUpload,
+} from "react-icons/fa";
 
 import SpinningCircle from "@/components/SpinningCircle";
 import { prisma } from "@/server/db/client";
 import { trpc } from "@/utils/trpc";
-import { File } from "@prisma/client";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import toast, { Toaster } from "react-hot-toast";
 
 dayjs.extend(relativeTime);
 
@@ -27,17 +35,42 @@ const PasswordForm: React.FC<{
                 setPasswordLocked(false);
             }
         },
+        onError: ({ message }) => {
+            toast.error(message, {
+                style: {
+                    borderRadius: "10px",
+                    background: "#262626",
+                    color: "#E8DCFF",
+                },
+            });
+        },
     });
 
     return (
-        <form className="relative flex flex-col items-start p-10 gap-y-7 max-w-max rounded-2xl bg-slate-800">
-            <div className="flex justify-center w-full text-2xl">Password</div>
+        <form
+            className="relative flex flex-col items-start p-10 gap-y-7 max-w-max rounded-2xl bg-slate-800"
+            onSubmit={(e) => {
+                e.preventDefault();
+
+                passwordCheck.mutate({
+                    filePassword,
+                    inputPassword: password,
+                });
+            }}
+        >
+            <div className="flex items-center justify-center w-full gap-2 text-2xl">
+                <FaLock />
+                Locked
+            </div>
             <div className="flex items-center justify-center max-w-max gap-x-4">
+                <label htmlFor="password">Password:</label>
                 <input
-                    className="px-4 py-2 bg-slate-700 rounded-2xl focus:outline-none"
+                    required
+                    className="px-4 py-2 bg-slate-700 rounded-2xl focus:outline-none placeholder:text-xs"
                     type={showPassword ? "text" : "password"}
                     name="password"
                     id="password"
+                    placeholder="Enter password to access!"
                     onChange={(e) => setPassword(e.target.value)}
                 />
                 <button
@@ -52,42 +85,33 @@ const PasswordForm: React.FC<{
                 </button>
             </div>
 
-            <button
-                className="bg-slate-700 py-2 px-4 w-full rounded-2xl h-[40px]"
-                onClick={(e) => {
-                    e.preventDefault();
-
-                    passwordCheck.mutate({
-                        filePassword,
-                        inputPassword: password,
-                    });
-                }}
-            >
-                Download
-            </button>
-            {passwordCheck.error && (
-                <div className="">
-                    <span className="text-sm text-red-600">
-                        {passwordCheck.error.message}
-                    </span>
-                </div>
-            )}
+            <input
+                className="bg-slate-700 py-2 px-4 w-full rounded-2xl h-[40px] cursor-pointer"
+                type="submit"
+                value="Download"
+            />
+            <Toaster />
         </form>
     );
 };
 
-const FileDownload: NextPage<{ fileInfo: File }> = ({ fileInfo }) => {
-    const [file] = useState<File>(fileInfo);
+type StaticProps = NonNullable<
+    Awaited<ReturnType<typeof getStaticProps>>["props"]
+>;
+
+const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
     const [passwordLocked, setPasswordLocked] = useState<boolean>(
         file.password !== null
     );
     const [isDownload, setIsDownload] = useState<boolean>(false);
 
-    const downloadMutation = trpc.useMutation(["file.update-download-count"]);
+    const { mutate: updateDownload } = trpc.useMutation([
+        "file.update-download-count",
+    ]);
 
     const downloadFile = useCallback(() => {
         download(file.url, file.name);
-        downloadMutation.mutate({ id: file.fileID });
+        updateDownload({ id: file.fileID });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [file]);
 
@@ -121,41 +145,76 @@ const FileDownload: NextPage<{ fileInfo: File }> = ({ fileInfo }) => {
                         setPasswordLocked={setPasswordLocked}
                     />
                 ) : (
-                    <div className="relative flex flex-col items-start p-10 gap-y-7 max-w-max rounded-2xl bg-slate-800">
-                        <div className="flex justify-center w-full text-2xl">
-                            Info
-                        </div>
-                        <div className="flex flex-col">
-                            <span>Name: {file.name}</span>
-                            <span>Author: {file.author}</span>
-                            <span>Download: {file.downloadCount}</span>
-                            <span>
-                                Uploaded {file.createdAt as unknown as string}
-                            </span>
-                        </div>
-                        <button
-                            className="bg-slate-700 py-2 px-4 w-full rounded-2xl h-[40px]"
-                            onClick={() => {
-                                downloadFile();
-                                setIsDownload((current) => !current);
-                                setTimeout(() => {
-                                    setIsDownload((current) => !current);
-                                }, 1000);
-                            }}
-                        >
-                            <div className="flex items-center justify-center gap-2">
-                                {isDownload ? (
-                                    <>
-                                        <span>Downloading</span>
-                                        <div className="flex items-center justify-center">
-                                            <SpinningCircle />
-                                        </div>
-                                    </>
-                                ) : (
-                                    <span>Click to download</span>
-                                )}
+                    <div className="relative flex flex-col items-start rounded-2xl bg-gray-800 bg-opacity-75 w-[600px] h-max">
+                        <div className="flex items-center justify-between w-full pt-7 px-7">
+                            <div className="flex flex-col justify-center">
+                                <Image
+                                    className="rounded-full w-[120px] h-[120px]"
+                                    src={author.image as string}
+                                    alt="Author discord avatar"
+                                />
+                                <div className="pt-3 pb-2 text-lg">
+                                    <span className="font-bold text-white">
+                                        {author.name}
+                                    </span>
+                                    <span className="text-gray-400">
+                                        {author.discriminator}
+                                    </span>
+                                </div>
                             </div>
-                        </button>
+                            <div>
+                                <button
+                                    className="bg-green-700 py-2 px-4 w-[170px] rounded-md h-[40px]"
+                                    onClick={() => {
+                                        setIsDownload(true);
+                                        downloadFile();
+                                        setTimeout(() => {
+                                            setIsDownload(false);
+                                        }, 1000);
+                                    }}
+                                >
+                                    <div className="flex items-center justify-center gap-2">
+                                        {isDownload ? (
+                                            <>
+                                                <span>Downloading</span>
+                                                <div className="flex items-center justify-center">
+                                                    <SpinningCircle />
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <span>Download</span>
+                                        )}
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="w-full h-full">
+                            <div className="py-2 border-b-2 border-b-white mx-7 w-max">
+                                File Info
+                            </div>
+                            <div className="w-full border-t-2 border-t-gray-600 opacity-60" />
+                            <div className="flex flex-col gap-3 p-7 max-w-max">
+                                <span className="flex items-center justify-start gap-2">
+                                    <FaIdCard />
+                                    Name: {file.name}
+                                </span>
+                                <span className="flex items-center justify-start gap-2">
+                                    <FaArrowAltCircleDown />
+                                    Downloaded: {file.downloadCount}
+                                </span>
+                                <div className="relative group max-w-max">
+                                    <span className="flex items-center justify-start gap-2">
+                                        <FaUpload />
+                                        Uploaded {file.relativeTime}
+                                    </span>
+                                    <span className="absolute -top-2 left-[110%] scale-0 text-sm group-hover:scale-100 w-max bg-[#18191c] py-2 px-3 rounded-md transition-all">
+                                        <div className="absolute w-2 h-2 bg-inherit arrow top-[40%] -left-2" />
+                                        {file.createdAt}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>
@@ -166,17 +225,34 @@ const FileDownload: NextPage<{ fileInfo: File }> = ({ fileInfo }) => {
 export default FileDownload;
 
 export async function getStaticProps(ctx: GetStaticPropsContext) {
+    if (!ctx.params || typeof ctx.params.fileID !== "string") {
+        return { notFound: true };
+    }
+
     const file = await prisma.file.findFirst({
-        where: { fileID: ctx.params?.fileID as string },
+        where: { fileID: ctx.params.fileID },
     });
 
     if (!file) {
         return { notFound: true };
     }
 
+    const author = await prisma.user.findFirstOrThrow({
+        where: { discordID: file.authorID },
+    });
+
     return {
         props: {
-            fileInfo: { ...file, createdAt: dayjs(file.createdAt).fromNow() },
+            file: {
+                ...file,
+                relativeTime: dayjs(file.createdAt).fromNow(),
+                createdAt: dayjs(file.createdAt).format("M-D-YYYY, hh:mm:ss A"),
+            },
+            author: {
+                name: author.name?.split("#")[0] as string,
+                discriminator: ("#" + author.name?.split("#")[1]) as string,
+                image: author.image as string,
+            },
         },
         revalidate: 60,
     };
