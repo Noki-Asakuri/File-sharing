@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 
-import { MutableRefObject, Reducer, useReducer, useRef } from "react";
+import { Reducer, RefObject, useReducer, useRef } from "react";
 
 import useStorage from "@/server/hooks/useStorage";
 import { useSession } from "next-auth/react";
@@ -23,7 +23,7 @@ export interface ActionType {
 
 export interface State {
     file: File | null;
-    password: MutableRefObject<string>;
+    password: RefObject<HTMLInputElement>;
     error: string | null;
     isUploading: boolean;
 }
@@ -38,25 +38,13 @@ const reducer = (state: State, action: ActionType): State => {
             }
 
             if (payload.size < 52428800) {
-                return {
-                    ...state,
-                    file: payload,
-                    error: null,
-                };
+                return { ...state, file: payload, error: null };
             }
             return {
                 ...state,
                 file: null,
                 error: "File size over 50MB limit!",
             };
-
-        case "PASSWORD":
-            if (!payload || typeof payload !== "string") {
-                return state;
-            }
-
-            state.password.current = payload;
-            return state;
 
         case "SUBMIT":
             if (!state.file) {
@@ -70,7 +58,10 @@ const reducer = (state: State, action: ActionType): State => {
             return { ...state, isUploading: true, error: null };
 
         case "UPLOADED":
-            return { ...state, isUploading: false };
+            state.isUploading = false;
+            state.password.current!.value = "";
+
+            return state;
 
         case "ERROR":
             if (typeof payload !== "string") {
@@ -87,7 +78,7 @@ const reducer = (state: State, action: ActionType): State => {
 const Home: NextPage = () => {
     const { data: session } = useSession();
 
-    const passwordRef = useRef("");
+    const passwordRef = useRef<HTMLInputElement>(null);
 
     const [state, dispatch] = useReducer<Reducer<State, ActionType>>(reducer, {
         file: null,
@@ -124,10 +115,10 @@ const Home: NextPage = () => {
                     <div className="flex flex-wrap justify-around gap-10 pt-20">
                         <div className="relative flex flex-col items-start p-10 gap-y-7 max-w-max rounded-2xl bg-slate-800">
                             <span className="flex justify-center w-full text-2xl">
-                                Error
+                                Error:
                             </span>
                             <span>
-                                You need to login before you can share file.
+                                You need to login before you can upload file.
                             </span>
                         </div>
                     </div>
@@ -148,8 +139,20 @@ const Home: NextPage = () => {
                     </Suspense>
                 )}
 
-                <footer className="relative bottom-0 flex items-center justify-center my-20">
-                    <span>Made by Asakuri#8323</span>
+                <footer className="relative bottom-0 flex flex-col items-center justify-center mt-20 mb-10 gap-y-5">
+                    <span className="text-2xl font-bold tracking-wide text-center text-transparent underline bg-rainbow-text bg-clip-text animate-rainbow">
+                        Made by Asakuri#8323
+                    </span>
+                    {session && (
+                        <span className="text-sm text-gray-400 w-96">
+                            <span className="text-red-500">Note:</span> For
+                            security reasons, this will only store the encrypted
+                            password, so if you forgot the password then you
+                            have to upload a new one, so store it somewhere
+                            secure because I ain&apos;t gonna make a forgot
+                            password.
+                        </span>
+                    )}
                 </footer>
             </div>
         </>
