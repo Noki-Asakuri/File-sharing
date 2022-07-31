@@ -1,9 +1,9 @@
-import download from "@/utils/download";
+import createDownload from "@/utils/download";
 import type { NextPage } from "next";
 import { GetStaticPropsContext } from "next";
 import Image from "next/future/image";
 import Head from "next/head";
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 import {
     FaArrowAltCircleDown,
     FaEye,
@@ -23,16 +23,29 @@ import toast, { Toaster } from "react-hot-toast";
 dayjs.extend(relativeTime);
 
 const PasswordForm: React.FC<{
-    filePassword: string;
-    setPasswordLocked: React.Dispatch<React.SetStateAction<boolean>>;
-}> = ({ filePassword, setPasswordLocked }) => {
-    const [password, setPassword] = useState<string>("");
+    password: string;
+    setLocked: React.Dispatch<React.SetStateAction<boolean>>;
+}> = ({ password, setLocked }) => {
+    const [inputPassword, setInputPassword] = useState<string>("");
     const [showPassword, setShowPassword] = useState<boolean>(false);
 
-    const passwordCheck = trpc.useMutation(["check.password"], {
+    const { mutate: checkPass } = trpc.useMutation(["check.password"], {
         onSuccess: ({ download }) => {
             if (download) {
-                setPasswordLocked(false);
+                setLocked(false);
+
+                toast.success("Access granted!", {
+                    duration: 2000,
+                    style: {
+                        borderRadius: "10px",
+                        background: "#262626",
+                        color: "#E8DCFF",
+                    },
+                    iconTheme: {
+                        primary: "#15803d",
+                        secondary: "#262626",
+                    },
+                });
             }
         },
         onError: ({ message }) => {
@@ -48,49 +61,42 @@ const PasswordForm: React.FC<{
 
     return (
         <form
-            className="relative flex flex-col items-start p-10 gap-y-7 max-w-max rounded-2xl bg-slate-800"
+            className="relative flex flex-col items-start p-10 gap-y-7 max-w-max rounded-2xl bg-gradient-to-tl from-slate-800 to-slate-900"
             onSubmit={(e) => {
                 e.preventDefault();
-
-                passwordCheck.mutate({
-                    filePassword,
-                    inputPassword: password,
-                });
+                checkPass({ password, inputPassword });
             }}
         >
             <div className="flex items-center justify-center w-full gap-2 text-2xl">
-                <FaLock />
-                Locked
+                <FaLock /> Locked
             </div>
-            <div className="flex items-center justify-center max-w-max gap-x-4">
+            <div className="flex items-center justify-center max-w-max gap-x-2">
                 <label htmlFor="password">Password:</label>
-                <input
-                    required
-                    className="px-4 py-2 bg-slate-700 rounded-2xl focus:outline-none placeholder:text-xs"
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    id="password"
-                    placeholder="Enter password to access!"
-                    onChange={(e) => setPassword(e.target.value)}
-                />
-                <button
-                    className="p-3 bg-slate-700 rounded-xl"
-                    aria-label="toggle password display"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        setShowPassword((current) => !current);
-                    }}
-                >
-                    {showPassword ? <FaEye /> : <FaEyeSlash />}
-                </button>
+                <div className="flex items-center justify-center bg-slate-700 rounded-2xl">
+                    <input
+                        className="py-2 ml-4 bg-inherit focus:outline-none placeholder:text-xs"
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        id="password"
+                        placeholder="Enter password to access!"
+                        onChange={(e) => setInputPassword(e.target.value)}
+                    />
+                    <button
+                        className="px-4"
+                        aria-label="toggle password display"
+                        type="button"
+                        onClick={() => setShowPassword((current) => !current)}
+                    >
+                        {showPassword ? <FaEye /> : <FaEyeSlash />}
+                    </button>
+                </div>
             </div>
 
             <input
-                className="bg-slate-700 py-2 px-4 w-full rounded-2xl h-[40px] cursor-pointer"
+                className="bg-slate-700 py-2 px-4 w-full rounded-2xl h-[40px] cursor-pointer drop-shadow-lg"
                 type="submit"
                 value="Download"
             />
-            <Toaster />
         </form>
     );
 };
@@ -100,29 +106,24 @@ type StaticProps = NonNullable<
 >;
 
 const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
-    const [passwordLocked, setPasswordLocked] = useState<boolean>(
-        file.password !== null
-    );
+    const [Locked, setLocked] = useState<boolean>(!!file.password);
     const [isDownload, setIsDownload] = useState<boolean>(false);
 
-    const { mutate: updateDownload } = trpc.useMutation([
-        "file.update-download-count",
-    ]);
-
-    const downloadFile = useCallback(() => {
-        download(file.url, file.name);
-        updateDownload({ id: file.fileID });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [file]);
+    const { mutate: download } = trpc.useMutation(["file.download-file"], {
+        onMutate: () => {
+            setIsDownload(true);
+        },
+        onSuccess: () => {
+            createDownload(file.name, file.url);
+            setIsDownload(false);
+        },
+    });
 
     return (
         <>
             <Head>
                 <title>{`File: ${file && file.name}`}</title>
-                <meta
-                    property="og:title"
-                    content={`File Sharing.`}
-                />
+                <meta property="og:title" content={`File Sharing.`} />
                 <meta
                     property="og:site_name"
                     content={`Author: ${file.author}`}
@@ -139,13 +140,15 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
                 />
             </Head>
             <div className="flex justify-center items-center h-[90vh]">
-                {passwordLocked ? (
+                {Locked && file.password && (
                     <PasswordForm
-                        filePassword={file.password as string}
-                        setPasswordLocked={setPasswordLocked}
+                        password={file.password}
+                        setLocked={setLocked}
                     />
-                ) : (
-                    <div className="relative flex flex-col items-start rounded-2xl bg-gray-800 bg-opacity-75 w-[600px] h-max">
+                )}
+
+                {!Locked && (
+                    <div className="relative flex flex-col items-start rounded-2xl bg-opacity-75 w-[600px] h-max bg-gradient-to-tl from-slate-800 to-slate-900 drop-shadow-lg">
                         <div className="flex items-center justify-between w-full pt-7 px-7">
                             <div className="flex flex-col justify-center">
                                 <Image
@@ -164,27 +167,18 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
                             </div>
                             <div>
                                 <button
-                                    className="bg-green-700 py-2 px-4 w-[170px] rounded-md h-[40px]"
-                                    onClick={() => {
-                                        setIsDownload(true);
-                                        downloadFile();
-                                        setTimeout(() => {
-                                            setIsDownload(false);
-                                        }, 1000);
-                                    }}
+                                    className="bg-gradient-to-tl from-green-700 to-green-800 drop-shadow-lg py-2 px-4 w-[170px] rounded-md h-[40px]"
+                                    onClick={() =>
+                                        download({ fileID: file.fileID })
+                                    }
                                 >
-                                    <div className="flex items-center justify-center gap-2">
-                                        {isDownload ? (
-                                            <>
-                                                <span>Downloading</span>
-                                                <div className="flex items-center justify-center">
-                                                    <SpinningCircle />
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <span>Download</span>
-                                        )}
-                                    </div>
+                                    {isDownload ? (
+                                        <span className="flex items-center justify-start gap-2">
+                                            Downloading <SpinningCircle />
+                                        </span>
+                                    ) : (
+                                        <span>Download</span>
+                                    )}
                                 </button>
                             </div>
                         </div>
@@ -217,6 +211,7 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
                         </div>
                     </div>
                 )}
+                <Toaster />
             </div>
         </>
     );
@@ -246,7 +241,9 @@ export async function getStaticProps(ctx: GetStaticPropsContext) {
             file: {
                 ...file,
                 relativeTime: dayjs(file.createdAt).fromNow(),
-                createdAt: dayjs(file.createdAt).format("M-D-YYYY, hh:mm:ss A"),
+                createdAt: dayjs(file.createdAt).format(
+                    "MM-DD-YYYY, hh:mm:ss A"
+                ),
             },
             author: {
                 name: author.name?.split("#")[0] as string,
