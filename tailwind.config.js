@@ -14,29 +14,35 @@ module.exports = {
                     "0%": { opacity: 1, transform: "translateY(0)" },
                     "100%": { opacity: 0, transform: "translateY(-20px)" },
                 },
-                "toast-hide": {
-                    "0%": { opacity: 1 },
-                    "100%": { opacity: 0 },
-                },
-                "toast-slide-in-right": {
-                    "0%": { transform: `translateX(calc(100% + 1rem))` },
-                    "100%": { transform: "translateX(0)" },
-                },
                 spin: {
                     from: { transform: "rotate(0deg)" },
                     to: { transform: "rotate(360deg)" },
+                },
+                "rainbow-animation": {
+                    "0%, 100%": {
+                        "background-position": "0 0",
+                    },
+
+                    "50%": {
+                        "background-position": "100% 0",
+                    },
                 },
             },
             animation: {
                 fadeIn: "fadeIn 0.2s linear forwards",
                 fadeOut: "fadeOut 0.2s linear forwards",
-                "toast-hide": "toast-hide 100ms ease-in forwards",
-                "toast-slide-in-right":
-                    "toast-slide-in-right 150ms cubic-bezier(0.16, 1, 0.3, 1)",
                 refetchSpin: "spin 0.5s linear infinite",
+                rainbow: "rainbow-animation 6s ease-in-out infinite",
             },
             screens: {
                 dashboard: { max: "1380px" },
+            },
+            backgroundImage: {
+                "rainbow-text":
+                    "linear-gradient(to right,#6666ff, #0099ff, #00ff00, #ff3399, #6666ff)",
+            },
+            backgroundSize: {
+                "rainbow-text": "400% 100%",
             },
         },
     },
