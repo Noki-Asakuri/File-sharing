@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { createRouter } from "../context";
 
-import * as bcrypt from "bcrypt";
 import { TRPCError } from "@trpc/server";
 
 export const fileRouter = createRouter()
@@ -43,32 +42,6 @@ export const fileRouter = createRouter()
             return { totalPage, pages, totalFiles: files.length };
         },
     })
-    .mutation("update-download-count", {
-        input: z.object({
-            id: z.string(),
-        }),
-        resolve: async ({ input, ctx }) => {
-            const file = await ctx.prisma.file.findFirst({
-                where: { fileID: input.id },
-            });
-
-            if (!file) {
-                throw new TRPCError({
-                    message: "No file found with provided id",
-                    code: "NOT_FOUND",
-                });
-            }
-
-            await ctx.prisma.file.update({
-                where: { id: file.id },
-                data: { downloadCount: file.downloadCount + 1 },
-            });
-
-            return {
-                status: "Success",
-            };
-        },
-    })
     .mutation("delete-file-by-id", {
         input: z.object({
             fileID: z.string(),
@@ -101,8 +74,23 @@ export const fileRouter = createRouter()
                 });
             }
 
-            return {
-                status: "Success",
-            };
+            return { status: "Success" };
+        },
+    })
+    .mutation("download-file", {
+        input: z.object({
+            fileID: z.string(),
+        }),
+        resolve: async ({ input, ctx }) => {
+            const { prisma } = ctx;
+
+            const file = await prisma.file.findFirstOrThrow({
+                where: { fileID: input.fileID },
+            });
+
+            await prisma.file.update({
+                where: { id: file.id },
+                data: { downloadCount: file.downloadCount + 1 },
+            });
         },
     });
