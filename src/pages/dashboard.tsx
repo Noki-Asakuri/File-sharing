@@ -8,7 +8,9 @@ import {
     FaAngleDoubleLeft,
     FaAngleDoubleRight,
     FaAngleLeft,
-    FaAngleRight, FaRedo, FaSearch
+    FaAngleRight,
+    FaRedo,
+    FaSearch
 } from "react-icons/fa";
 
 import dynamic from "next/dynamic";
@@ -100,25 +102,27 @@ const Dashboard: NextPage = ({}) => {
 
     return (
         <div className="flex w-full h-[90vh] justify-center items-center">
-            <div className="bg-slate-700 p-2 rounded-2xl h-[70vh] w-[50%] min-w-[620px] flex flex-col justify-start items-center relative">
+            <div className="bg-gradient-to-t from-slate-800 to-slate-900 p-2 rounded-2xl h-[70vh] w-[50%] min-w-[620px] flex flex-col justify-start items-center relative">
                 <div className="relative flex items-center justify-between w-full px-5">
-                    <div className="absolute flex items-center justify-center px-3 rounded-lg group bg-slate-600">
-                        <FaSearch
-                            className={`absolute w-4 h-4 transition-all group-focus-within:right-3 ${
-                                searchText.length && "right-3"
-                            }`}
-                        />
-                        <input
-                            className={`bg-transparent group-focus-within:outline-none px-2 z-50 py-1 group-focus-within:w-40 transition-[width] placeholder:text-sm ${
-                                searchText.length ? "w-40 pl-2 pr-5" : "w-2"
-                            }`}
-                            type="text"
-                            name="search-file"
-                            id="search-file"
-                            placeholder="Search by name"
-                            onChange={(e) => setSearchText(e.target.value)}
-                        />
-                    </div>
+                    {data && data.totalFiles > 0 && (
+                        <div className="absolute flex items-center justify-center px-3 rounded-lg group bg-slate-600">
+                            <FaSearch
+                                className={`absolute w-4 h-4 transition-all group-focus-within:right-3 ${
+                                    searchText.length && "right-3"
+                                }`}
+                            />
+                            <input
+                                className={`bg-transparent group-focus-within:outline-none px-2 z-50 py-1 group-focus-within:w-40 transition-[width] placeholder:text-sm ${
+                                    searchText.length ? "w-40 pl-2 pr-5" : "w-2"
+                                }`}
+                                type="text"
+                                name="search-file"
+                                id="search-file"
+                                placeholder="Search by name"
+                                onChange={(e) => setSearchText(e.target.value)}
+                            />
+                        </div>
+                    )}
 
                     <span className="flex items-center justify-center w-full p-2 text-2xl">
                         Dashboard
