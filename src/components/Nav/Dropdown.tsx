@@ -22,7 +22,7 @@ const Dropdown: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <DropdownMenu.Trigger asChild className="rounded-full">{children}</DropdownMenu.Trigger>
 
             <DropdownMenu.Content
-                className="bg-slate-700 min-w-[170px] p-4 rounded-lg radix-state-open:animate-fadeIn radix-state-closed:animate-fadeOut"
+                className="bg-gradient-to-t from-slate-800 to-slate-900 min-w-[170px] p-4 rounded-lg radix-state-open:animate-fadeIn radix-state-closed:animate-fadeOut drop-shadow-lg"
                 sideOffset={5}
                 loop
             >

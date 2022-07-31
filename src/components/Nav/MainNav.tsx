@@ -1,8 +1,8 @@
-import React from "react";
-import { FaGithub, FaSignInAlt, FaSignOutAlt } from "react-icons/fa";
-import { useSession, signIn, signOut } from "next-auth/react";
-import Link from "next/link";
+import { signIn, useSession } from "next-auth/react";
 import Image from "next/future/image";
+import Link from "next/link";
+import React from "react";
+import { FaGithub, FaSignInAlt } from "react-icons/fa";
 import Dropdown from "./Dropdown";
 
 const LoginProfile: React.FC<{}> = ({}) => {
@@ -37,7 +37,7 @@ const LoginProfile: React.FC<{}> = ({}) => {
 
 const Navbar: React.FC<{}> = ({}) => {
     return (
-        <nav className="font-normal bg-slate-800">
+        <nav className="font-normal bg-opacity-75 bg-slate-800">
             <div className="flex justify-between px-4 py-2 mx-auto my-0 max-w-7xl">
                 <div className="flex items-center justify-center text-3xl tracking-wider text-blue-500">
                     <Link href={"/"}>File sharing</Link>

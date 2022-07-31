@@ -33,7 +33,7 @@ const DashboardFile: React.FC<{
     );
 
     return (
-        <div className="relative flex items-center justify-between max-w-full px-5 py-2 mx-3 rounded-lg bg-slate-800">
+        <div className="relative flex items-center justify-between max-w-full px-5 py-2 mx-3 rounded-lg bg-slate-800 drop-shadow-xl">
             <ul className="grid grid-cols-[minxmax(200px,1fr)_1fr_1fr] gap-x-10 w-[80%]">
                 <li className="col-span-4">
                     <div className="flex items-center justify-start gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
