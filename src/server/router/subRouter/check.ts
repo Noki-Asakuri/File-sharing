@@ -6,13 +6,15 @@ import { TRPCError } from "@trpc/server";
 
 export const checkRouter = createRouter().mutation("password", {
     input: z.object({
-        filePassword: z.string(),
+        password: z.string(),
         inputPassword: z.string(),
     }),
     resolve: async ({ input }) => {
-        if (!(await bcrypt.compare(input.inputPassword, input.filePassword))) {
+        const { inputPassword, password } = input;
+
+        if (!(await bcrypt.compare(inputPassword, password))) {
             throw new TRPCError({
-                message: "Wrong password!",
+                message: "Incorrect password!",
                 code: "BAD_REQUEST",
             });
         }
