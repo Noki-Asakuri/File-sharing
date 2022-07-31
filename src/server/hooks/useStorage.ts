@@ -12,7 +12,11 @@ const useStorage = ({
     dispatch: Dispatch<ActionType>;
 }) => {
     const uploadPassword = useRef<string | null>(null);
-    const fileMutation = trpc.useMutation(["upload.file"], {
+    const {
+        mutateAsync: uploadFile,
+        data: uploadedFile,
+        isSuccess,
+    } = trpc.useMutation(["upload.file"], {
         onError: ({ message }) => {
             dispatch({ type: "ERROR", payload: message });
         },
@@ -25,24 +29,20 @@ const useStorage = ({
             const fileInfo = genID(file.name);
 
             const uploadFileToStorage = async () => {
-                const fileBuffer = await file.arrayBuffer();
-
                 await supabase.storage
                     .from("files")
-                    .upload(fileInfo.file, fileBuffer, {
-                        contentType: file.type,
-                    });
+                    .upload(fileInfo.file, file, { contentType: file.type });
 
-                await fileMutation.mutateAsync({
+                await uploadFile({
                     fileID: fileInfo.fileID,
                     path: fileInfo.file,
                     name: file.name,
                     type: file.type,
-                    password: password.current,
+                    password: password.current!.value,
                 });
 
-                uploadPassword.current = password.current.length
-                    ? password.current
+                uploadPassword.current = password.current!.value.length
+                    ? password.current!.value
                     : null;
 
                 dispatch({ type: "UPLOADED" });
@@ -53,8 +53,8 @@ const useStorage = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isUploading]);
 
-    if (fileMutation.isSuccess) {
-        return { ...fileMutation.data, uploadPassword: uploadPassword.current };
+    if (isSuccess) {
+        return { ...uploadedFile, password: uploadPassword.current };
     }
 };
 
