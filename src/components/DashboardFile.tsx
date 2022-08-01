@@ -15,7 +15,7 @@ import {
     FaTimesCircle,
     FaTrash,
     FaUpload,
-    FaUserAlt
+    FaUserAlt,
 } from "react-icons/fa";
 import SpinningCircle from "./SpinningCircle";
 
@@ -33,8 +33,8 @@ const DashboardFile: React.FC<{
     );
 
     return (
-        <div className="relative flex items-center justify-between max-w-full px-5 py-2 mx-3 rounded-lg bg-slate-800 drop-shadow-xl">
-            <ul className="grid grid-cols-[minxmax(200px,1fr)_1fr_1fr] gap-x-10 w-[80%]">
+        <div className="relative flex items-center justify-between max-w-full px-5 py-2 mx-3 border rounded-lg bg-slate-800 border-slate-700 dashboard:h-64">
+            <ul className="grid grid-cols-[minxmax(200px,1fr)_1fr_1fr] gap-x-10 w-4/5 text-lg dashboard:text-base">
                 <li className="col-span-4">
                     <div className="flex items-center justify-start gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
                         <FaIdCard />
@@ -48,10 +48,16 @@ const DashboardFile: React.FC<{
                     </div>
                 </li>
                 <li className="col-span-2">
-                    <div>
+                    <div className="relative group max-w-max">
                         <span className="flex items-center justify-start gap-2">
                             <FaUpload />
                             Uploaded {dayjs(file.createdAt).fromNow()}
+                        </span>
+                        <span className="absolute -top-10 left-10 scale-0 text-sm group-hover:scale-100 w-max bg-[#18191c] py-2 px-3 rounded-md transition-all">
+                            <div className="absolute w-2 h-2 -rotate-90 left-2/4 -bottom-2 bg-inherit arrow" />
+                            {dayjs(file.createdAt).format(
+                                "MM-DD-YYYY, hh:mm:ss A"
+                            )}
                         </span>
                     </div>
                 </li>
