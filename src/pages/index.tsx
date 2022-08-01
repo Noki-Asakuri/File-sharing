@@ -9,6 +9,9 @@ import Image from "next/future/image";
 import Head from "next/head";
 import { Suspense } from "react";
 
+import { Toaster } from "react-hot-toast";
+import { FaExclamationTriangle } from "react-icons/fa";
+
 const UploadedFile = dynamic(() => import("@/components/UploadedFile"), {
     suspense: true,
 });
@@ -100,9 +103,13 @@ const Home: NextPage = () => {
                 />
                 <meta property="og:image" content="/favicon.svg" />
             </Head>
-            <div className="mx-auto my-0 max-w-7xl h-max">
-                <header>
-                    <h2 className="mt-16 text-4xl text-center">File Sharing</h2>
+            <div
+                className={`container ${
+                    session ? "h-full" : "h-screen"
+                } mx-auto lg:h-screen`}
+            >
+                <header className="pt-28">
+                    <h2 className="text-4xl text-center ">File Sharing</h2>
                     <p className="max-w-2xl pt-5 m-auto text-center">
                         A simple file-sharing website so I don&apos;t need to
                         fucking host the fucking file on fucking google drive
@@ -112,12 +119,13 @@ const Home: NextPage = () => {
                 </header>
 
                 {!session && (
-                    <div className="flex flex-wrap justify-around gap-10 pt-20">
-                        <div className="relative flex flex-col items-start p-10 gap-y-7 max-w-max rounded-2xl bg-slate-800">
-                            <span className="flex justify-center w-full text-2xl">
-                                Error:
-                            </span>
-                            <span>
+                    <div className="flex flex-wrap justify-around gap-10 pt-20 h-80">
+                        <div className="relative flex flex-col items-start p-10 gap-y-7 max-w-max rounded-2xl bg-gradient-to-tl from-slate-800 to-slate-900 drop-shadow-lg">
+                            <h2 className="flex items-center justify-center w-full gap-2 pb-6 text-4xl text-red-500">
+                                <FaExclamationTriangle />
+                                Error 401
+                            </h2>
+                            <span className="flex items-center justify-center">
                                 You need to login before you can upload file.
                             </span>
                         </div>
@@ -136,23 +144,14 @@ const Home: NextPage = () => {
                             <UploadForm state={state} dispatch={dispatch} />
                             <UploadedFile uploadFile={uploadFile} />
                         </div>
+                        <Toaster />
                     </Suspense>
                 )}
 
-                <footer className="relative bottom-0 flex flex-col items-center justify-center mt-20 mb-10 gap-y-5">
-                    <span className="text-2xl font-bold tracking-wide text-center text-transparent underline bg-rainbow-text bg-clip-text animate-rainbow">
+                <footer className="relative bottom-0 flex flex-col items-center justify-center my-20 gap-y-3">
+                    <span className="text-2xl font-bold tracking-wide text-transparent bg-clip-text bg-rainbow-text animate-rainbow">
                         Made by Asakuri#8323
                     </span>
-                    {session && (
-                        <span className="text-sm text-gray-400 w-96">
-                            <span className="text-red-500">Note:</span> For
-                            security reasons, this will only store the encrypted
-                            password, so if you forgot the password then you
-                            have to upload a new one, so store it somewhere
-                            secure because I ain&apos;t gonna make a forgot
-                            password.
-                        </span>
-                    )}
                 </footer>
             </div>
         </>
