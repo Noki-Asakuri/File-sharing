@@ -3,14 +3,18 @@ import type { NextPage } from "next";
 import { GetStaticPropsContext } from "next";
 import Image from "next/future/image";
 import Head from "next/head";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
     FaArrowAltCircleDown,
+    FaCheckCircle,
     FaEye,
     FaEyeSlash,
     FaIdCard,
     FaLock,
+    FaSignInAlt,
+    FaTimesCircle,
     FaUpload,
+    FaUserTie,
 } from "react-icons/fa";
 
 import SpinningCircle from "@/components/SpinningCircle";
@@ -29,35 +33,38 @@ const PasswordForm: React.FC<{
     const [inputPassword, setInputPassword] = useState<string>("");
     const [showPassword, setShowPassword] = useState<boolean>(false);
 
-    const { mutate: checkPass } = trpc.useMutation(["check.password"], {
-        onSuccess: ({ download }) => {
-            if (download) {
-                setLocked(false);
+    const { mutate: checkPass, isLoading } = trpc.useMutation(
+        ["check.password"],
+        {
+            onSuccess: ({ download }) => {
+                if (download) {
+                    setLocked(false);
 
-                toast.success("Access granted!", {
-                    duration: 2000,
+                    toast.success("Access granted!", {
+                        duration: 2000,
+                        style: {
+                            borderRadius: "10px",
+                            background: "#262626",
+                            color: "#E8DCFF",
+                        },
+                        iconTheme: {
+                            primary: "#15803d",
+                            secondary: "#262626",
+                        },
+                    });
+                }
+            },
+            onError: ({ message }) => {
+                toast.error(message, {
                     style: {
                         borderRadius: "10px",
                         background: "#262626",
                         color: "#E8DCFF",
                     },
-                    iconTheme: {
-                        primary: "#15803d",
-                        secondary: "#262626",
-                    },
                 });
-            }
-        },
-        onError: ({ message }) => {
-            toast.error(message, {
-                style: {
-                    borderRadius: "10px",
-                    background: "#262626",
-                    color: "#E8DCFF",
-                },
-            });
-        },
-    });
+            },
+        }
+    );
 
     return (
         <form
@@ -92,11 +99,12 @@ const PasswordForm: React.FC<{
                 </div>
             </div>
 
-            <input
-                className="bg-slate-700 py-2 px-4 w-full rounded-2xl h-[40px] cursor-pointer drop-shadow-lg"
+            <button
+                className="flex items-center justify-center w-full h-10 px-4 py-2 cursor-pointer bg-slate-700 rounded-2xl drop-shadow-lg"
                 type="submit"
-                value="Download"
-            />
+            >
+                {!isLoading ? "Submit" : <SpinningCircle />}
+            </button>
         </form>
     );
 };
@@ -108,13 +116,32 @@ type StaticProps = NonNullable<
 const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
     const [Locked, setLocked] = useState<boolean>(!!file.password);
     const [isDownload, setIsDownload] = useState<boolean>(false);
+    const [activeTab, setActiveTab] = useState<{
+        page: string;
+        tab: "File" | "User";
+    }>({
+        page: "0px",
+        tab: "File",
+    });
+
+    const updateTab = (tab: "File" | "User") => {
+        let page: number;
+
+        if (tab === "File") {
+            page = 0;
+        } else {
+            page = 96;
+        }
+
+        return setActiveTab({ tab, page: page + "px" });
+    };
 
     const { mutate: download } = trpc.useMutation(["file.download-file"], {
         onMutate: () => {
             setIsDownload(true);
         },
-        onSuccess: () => {
-            createDownload(file.name, file.url);
+        onSuccess: ({ downloadUrl }) => {
+            createDownload(file.name, downloadUrl);
             setIsDownload(false);
         },
     });
@@ -139,7 +166,7 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
                     }
                 />
             </Head>
-            <div className="flex justify-center items-center h-[90vh]">
+            <div className="flex items-center justify-center h-screen">
                 {Locked && file.password && (
                     <PasswordForm
                         password={file.password}
@@ -148,7 +175,7 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
                 )}
 
                 {!Locked && (
-                    <div className="relative flex flex-col items-start rounded-2xl bg-opacity-75 w-[600px] h-max bg-gradient-to-tl from-slate-800 to-slate-900 drop-shadow-lg">
+                    <div className="relative flex flex-col items-start rounded-2xl bg-opacity-75 w-[600px] h-[400px] bg-gradient-to-tl from-slate-800 to-slate-900 drop-shadow-lg">
                         <div className="flex items-center justify-between w-full pt-7 px-7">
                             <div className="flex flex-col justify-center">
                                 <Image
@@ -184,28 +211,76 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
                         </div>
 
                         <div className="w-full h-full">
-                            <div className="py-2 border-b-2 border-b-white mx-7 w-max">
-                                File Info
-                            </div>
-                            <div className="w-full border-t-2 border-t-gray-600 opacity-60" />
-                            <div className="flex flex-col gap-3 p-7 max-w-max">
-                                <span className="flex items-center justify-start gap-2">
-                                    <FaIdCard />
-                                    Name: {file.name}
-                                </span>
-                                <span className="flex items-center justify-start gap-2">
-                                    <FaArrowAltCircleDown />
-                                    Downloaded: {file.downloadCount}
-                                </span>
-                                <div className="relative group max-w-max">
-                                    <span className="flex items-center justify-start gap-2">
-                                        <FaUpload />
-                                        Uploaded {file.relativeTime}
-                                    </span>
-                                    <span className="absolute -top-2 left-[110%] scale-0 text-sm group-hover:scale-100 w-max bg-[#18191c] py-2 px-3 rounded-md transition-all">
-                                        <div className="absolute w-2 h-2 bg-inherit arrow top-[40%] -left-2" />
-                                        {file.createdAt}
-                                    </span>
+                            <div>
+                                <div className="relative flex px-7 gap-7">
+                                    <button
+                                        className="w-24 py-2"
+                                        onClick={() => updateTab("File")}
+                                    >
+                                        File Info
+                                    </button>
+                                    <button
+                                        className="w-24 py-2"
+                                        onClick={() => updateTab("User")}
+                                    >
+                                        User Info
+                                    </button>
+                                    <div
+                                        className={`absolute bottom-0 w-24 border-b-2 border-white translate-x-[calc(${activeTab.page}+28px)] transition-transform`}
+                                    />
+                                </div>
+
+                                <div className="w-full border-t-2 border-t-gray-600 opacity-60" />
+                                <div>
+                                    {activeTab.tab === "File" && (
+                                        <div className="flex flex-col gap-3 p-7 max-w-max">
+                                            <span className="flex items-center justify-start gap-2">
+                                                <FaIdCard />
+                                                Name: {file.name}
+                                            </span>
+                                            <span className="flex items-center justify-start gap-2">
+                                                <FaArrowAltCircleDown />
+                                                Downloaded: {file.downloadCount}
+                                            </span>
+                                            <div className="relative group max-w-max">
+                                                <span className="flex items-center justify-start gap-2">
+                                                    <FaUpload />
+                                                    Uploaded {file.relativeTime}
+                                                </span>
+                                                <span className="absolute -top-2 left-[110%] scale-0 text-sm group-hover:scale-100 w-max bg-[#18191c] py-2 px-3 rounded-md transition-all">
+                                                    <div className="absolute w-2 h-2 bg-inherit arrow top-[40%] -left-2" />
+                                                    {file.createdAt}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {activeTab.tab === "User" && (
+                                        <div className="flex flex-col gap-3 p-7 max-w-max">
+                                            <span className="flex items-center justify-start gap-2">
+                                                <FaIdCard />
+                                                Name: {author.fullName}
+                                            </span>
+                                            <span className="flex items-center justify-start gap-2">
+                                                <FaUserTie />
+                                                Admin:{" "}
+                                                {author.isAdmin ? (
+                                                    <FaCheckCircle className="text-green-500" />
+                                                ) : (
+                                                    <FaTimesCircle className="text-red-500" />
+                                                )}
+                                            </span>
+                                            <div className="relative group max-w-max">
+                                                <span className="flex items-center justify-start gap-2">
+                                                    <FaSignInAlt />
+                                                    Joined {author.relativeTime}
+                                                </span>
+                                                <span className="absolute -top-2 left-[110%] scale-0 text-sm group-hover:scale-100 w-max bg-[#18191c] py-2 px-3 rounded-md transition-all">
+                                                    <div className="absolute w-2 h-2 bg-inherit arrow top-[40%] -left-2" />
+                                                    {author.joinDate}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -246,9 +321,15 @@ export async function getStaticProps(ctx: GetStaticPropsContext) {
                 ),
             },
             author: {
+                ...author,
+                fullName: author.name,
                 name: author.name?.split("#")[0] as string,
                 discriminator: ("#" + author.name?.split("#")[1]) as string,
                 image: author.image as string,
+                relativeTime: dayjs(author.joinDate).fromNow(),
+                joinDate: dayjs(author.joinDate).format(
+                    "MM-DD-YYYY, hh:mm:ss A"
+                ),
             },
         },
         revalidate: 60,
