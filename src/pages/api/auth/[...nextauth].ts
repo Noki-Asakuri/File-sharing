@@ -29,7 +29,7 @@ export const authOptions: NextAuthOptions = {
             user.name = `${profile.username}#${profile.discriminator}`;
             user.discordID = profile.id;
 
-            user.role = profile.id === "188903265931362304" ? "Admin" : "User";
+            user.isAdmin = profile.id === "188903265931362304";
 
             // Future ban list?
             const isAllowedToSignIn = true;
@@ -47,7 +47,7 @@ export const authOptions: NextAuthOptions = {
                 user: {
                     ...session.user,
                     discordID: user.discordID,
-                    role: user.role,
+                    isAdmin: user.isAdmin,
                 },
                 expires: session.expires,
             };

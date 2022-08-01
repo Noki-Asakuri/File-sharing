@@ -25,8 +25,7 @@ export const fileRouter = createRouter()
 
             const files = await ctx.prisma.file.findMany({
                 where: {
-                    authorID:
-                        user.role !== "Admin" ? user.discordID : undefined,
+                    authorID: user.isAdmin ? undefined : user.discordID,
                     name: search?.length ? { contains: search } : undefined,
                 },
                 orderBy: { id: "desc" },
@@ -48,9 +47,7 @@ export const fileRouter = createRouter()
         }),
         resolve: async ({ input, ctx }) => {
             const file = await ctx.prisma.file.findFirst({
-                where: {
-                    fileID: input.fileID,
-                },
+                where: { fileID: input.fileID },
             });
 
             if (!file) {
@@ -82,7 +79,7 @@ export const fileRouter = createRouter()
             fileID: z.string(),
         }),
         resolve: async ({ input, ctx }) => {
-            const { prisma } = ctx;
+            const { prisma, supabase } = ctx;
 
             const file = await prisma.file.findFirstOrThrow({
                 where: { fileID: input.fileID },
@@ -92,5 +89,13 @@ export const fileRouter = createRouter()
                 where: { id: file.id },
                 data: { downloadCount: file.downloadCount + 1 },
             });
+
+            return {
+                downloadUrl: (
+                    await supabase.storage
+                        .from("files")
+                        .createSignedUrl(file.path, 60)
+                ).signedURL!,
+            };
         },
     });

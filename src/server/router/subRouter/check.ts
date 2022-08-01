@@ -12,7 +12,7 @@ export const checkRouter = createRouter().mutation("password", {
     resolve: async ({ input }) => {
         const { inputPassword, password } = input;
 
-        if (!(await bcrypt.compare(inputPassword, password))) {
+        if (!bcrypt.compareSync(inputPassword, password)) {
             throw new TRPCError({
                 message: "Incorrect password!",
                 code: "BAD_REQUEST",

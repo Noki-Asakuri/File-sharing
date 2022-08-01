@@ -14,7 +14,6 @@ model File {
     id            Int      @id @default(autoincrement())
     name          String
     fileID        String   @unique
-    url           String   @db.VarChar(1000)
     path          String
     downloadCount Int      @default(0)
     password      String?
@@ -61,7 +60,8 @@ model User {
     email         String?   @unique
     emailVerified DateTime?
     image         String?
-    role          String
+    isAdmin       Boolean   @default(false)
+    joinDate      DateTime  @default(now())
 
     accounts Account[]
     sessions Session[]

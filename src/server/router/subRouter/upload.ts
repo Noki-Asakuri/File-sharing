@@ -22,10 +22,6 @@ export const uploadRouter = createRouter().mutation("file", {
             });
         }
 
-        const { publicURL } = ctx.supabase.storage
-            .from("files")
-            .getPublicUrl(path);
-
         const data = await ctx.prisma.file.create({
             data: {
                 fileID: fileID,
@@ -34,8 +30,7 @@ export const uploadRouter = createRouter().mutation("file", {
                 path: path,
                 author: ctx.session.user.name as string,
                 authorID: ctx.session.user.discordID,
-                url: publicURL as string,
-                password: password ? await bcrypt.hash(password, 10) : null,
+                password: password ? bcrypt.hashSync(password, 10) : null,
             },
         });
 

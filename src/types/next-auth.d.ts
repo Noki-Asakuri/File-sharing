@@ -12,13 +12,13 @@ declare module "next-auth" {
     interface Session {
         user: {
             discordID: string;
-            role: "Admin" | "User";
+            isAdmin: boolean;
         } & DefaultSession["user"];
     }
 
     interface User extends DefaultUser {
         discordID: string;
-        role: "Admin" | "User";
+        isAdmin: boolean;
     }
 
     interface Profile extends DefaultProfile {
