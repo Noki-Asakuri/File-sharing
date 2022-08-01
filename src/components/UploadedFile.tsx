@@ -82,7 +82,7 @@ const UploadedFile: React.FC<{
                         {uploadFile.password && (
                             <li className="relative">
                                 <span className="flex items-center justify-start gap-2">
-                                    <FaLock /> Password:
+                                    <FaLock /> Password:{" "}
                                     {"*".repeat(uploadFile.password.length)}
                                 </span>
 
