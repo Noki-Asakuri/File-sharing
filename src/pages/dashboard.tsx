@@ -10,7 +10,7 @@ import {
     FaAngleLeft,
     FaAngleRight,
     FaRedo,
-    FaSearch
+    FaSearch,
 } from "react-icons/fa";
 
 import dynamic from "next/dynamic";
@@ -68,14 +68,14 @@ const reducer = (state: State, action: ActionType) => {
                 return state;
             }
 
-            return { ...state, totalPages: payload };
+            return { ...state, totalPages: payload, currentPage: 1 };
 
         default:
             return state;
     }
 };
 
-const Dashboard: NextPage = ({}) => {
+const Dashboard: NextPage = () => {
     const [limit, setLimit] = useState<5 | 10 | 25>(5);
 
     const [searchText, setSearchText] = useState<string>("");
@@ -101,8 +101,8 @@ const Dashboard: NextPage = ({}) => {
     });
 
     return (
-        <div className="flex w-full h-[90vh] justify-center items-center">
-            <div className="bg-gradient-to-t from-slate-800 to-slate-900 p-2 rounded-2xl h-[70vh] w-[50%] min-w-[620px] flex flex-col justify-start items-center relative">
+        <div className="flex items-center justify-center w-full h-screen">
+            <div className="bg-gradient-to-t from-slate-800 to-slate-900 p-2 rounded-2xl h-[70vh] w-1/2 min-w-[620px] flex flex-col justify-start items-center relative">
                 <div className="relative flex items-center justify-between w-full px-5">
                     {data && data.totalFiles > 0 && (
                         <div className="absolute flex items-center justify-center px-3 rounded-lg group bg-slate-600">
@@ -193,7 +193,7 @@ const Dashboard: NextPage = ({}) => {
 
                 {!isLoading && data && (
                     <>
-                        <div className="flex flex-col gap-y-4 w-full h-[82%] pt-2 overflow-scroll">
+                        <div className="flex flex-col w-full h-full pt-2 overflow-scroll gap-y-3">
                             {data.pages[state.currentPage - 1]?.map((file) => {
                                 return (
                                     <DashboardFile
@@ -211,7 +211,7 @@ const Dashboard: NextPage = ({}) => {
                         </div>
 
                         {data.totalPage > 0 && (
-                            <div className="absolute flex items-center justify-center w-full gap-x-3 bottom-5">
+                            <div className="absolute flex items-center justify-center px-5 pt-2 pb-5 top-full rounded-b-2xl gap-x-3 bg-slate-800">
                                 <button
                                     className="flex items-center justify-center w-10 h-10 px-3 py-2 rounded-lg bg-slate-600"
                                     onClick={() => dispatch({ type: "FIRST" })}
@@ -224,8 +224,14 @@ const Dashboard: NextPage = ({}) => {
                                 >
                                     <FaAngleLeft />
                                 </button>
-                                <div className="flex items-center justify-center w-10 h-10 px-6 py-2 rounded-lg bg-slate-600">
-                                    {state.currentPage}/{state.totalPages}
+                                <div className="flex items-center justify-center h-10 px-4 py-2 rounded-lg w-max bg-slate-600">
+                                    {(state.currentPage - 1) * limit + 1}-{state.currentPage * limit <=
+                                    data.totalFiles
+                                        ? state.currentPage * limit
+                                        : state.currentPage * limit -
+                                          (state.currentPage * limit -
+                                              data.totalFiles)}
+                                    /{data.totalFiles}
                                 </div>
                                 <button
                                     className="flex items-center justify-center w-10 h-10 px-3 py-2 rounded-lg bg-slate-600"
@@ -239,9 +245,6 @@ const Dashboard: NextPage = ({}) => {
                                 >
                                     <FaAngleDoubleRight />
                                 </button>
-                                <span className="absolute right-10">
-                                    Total: {data.totalFiles}
-                                </span>
                             </div>
                         )}
                     </>
