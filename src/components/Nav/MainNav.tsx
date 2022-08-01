@@ -37,25 +37,27 @@ const LoginProfile: React.FC<{}> = ({}) => {
 
 const Navbar: React.FC<{}> = ({}) => {
     return (
-        <nav className="font-normal bg-opacity-75 bg-slate-800">
-            <div className="flex justify-between px-4 py-2 mx-auto my-0 max-w-7xl">
-                <div className="flex items-center justify-center text-3xl tracking-wider text-blue-500">
-                    <Link href={"/"}>File sharing</Link>
-                </div>
-                <div className="flex items-center justify-center gap-x-5">
-                    <div>
-                        <a
-                            className="flex justify-center items-center gap-x-2 w-max h-max relative text-[0px]"
-                            href="https://github.com/iahacker123/File-sharing"
-                            target="_blank"
-                            rel="noreferrer"
-                        >
-                            <span className="absolute">Github</span>
-                            <FaGithub className="relative z-50 transition-colors rounded-full w-11 h-11 hover:text-sky-700" />
-                        </a>
+        <nav className="absolute top-0 w-full">
+            <div className="font-normal bg-opacity-75 bg-slate-800">
+                <div className="flex justify-between px-4 py-2 mx-auto my-0 max-w-7xl">
+                    <div className="flex items-center justify-center text-3xl tracking-wider text-blue-500">
+                        <Link href={"/"}>File sharing</Link>
                     </div>
+                    <div className="flex items-center justify-center gap-x-5">
+                        <div>
+                            <a
+                                className="flex justify-center items-center gap-x-2 w-max h-max relative text-[0px]"
+                                href="https://github.com/iahacker123/File-sharing"
+                                target="_blank"
+                                rel="noreferrer"
+                            >
+                                <span className="absolute">Github</span>
+                                <FaGithub className="relative z-50 transition-colors rounded-full w-11 h-11 hover:text-sky-700" />
+                            </a>
+                        </div>
 
-                    <LoginProfile />
+                        <LoginProfile />
+                    </div>
                 </div>
             </div>
         </nav>
