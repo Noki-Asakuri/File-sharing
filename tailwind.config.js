@@ -19,12 +19,11 @@ module.exports = {
                     to: { transform: "rotate(360deg)" },
                 },
                 "rainbow-animation": {
-                    "0%, 100%": {
+                    "0%": {
                         "background-position": "0 0",
                     },
-
-                    "50%": {
-                        "background-position": "100% 0",
+                    "0%": {
+                        "background-position": "500% 0",
                     },
                 },
             },
@@ -32,7 +31,7 @@ module.exports = {
                 fadeIn: "fadeIn 0.2s linear forwards",
                 fadeOut: "fadeOut 0.2s linear forwards",
                 refetchSpin: "spin 0.5s linear infinite",
-                rainbow: "rainbow-animation 6s ease-in-out infinite",
+                rainbow: "rainbow-animation 20s linear infinite",
             },
             screens: {
                 dashboard: { max: "1380px" },
@@ -42,7 +41,7 @@ module.exports = {
                     "linear-gradient(to right,#6666ff, #0099ff, #00ff00, #ff3399, #6666ff)",
             },
             backgroundSize: {
-                "rainbow-text": "400% 100%",
+                "rainbow-text": "500%",
             },
         },
     },
