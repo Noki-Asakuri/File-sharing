@@ -85,14 +85,11 @@ const Dashboard: NextPage = () => {
 
     useDebounce(() => setSearch(searchText), 500, [searchText]);
 
-    const { data, isLoading, refetch } = trpc.useQuery(
-        ["file.get-file-by-id", { limit, search }],
-        {
-            onSuccess: ({ totalPage }) => {
-                dispatch({ type: "UPDATE", payload: totalPage });
-            },
-        }
-    );
+    const { data, isLoading, refetch } = trpc.useQuery(["file.get-file-by-id", { limit, search }], {
+        onSuccess: ({ totalPage }) => {
+            dispatch({ type: "UPDATE", payload: totalPage });
+        },
+    });
 
     const [state, dispatch] = useReducer<Reducer<State, ActionType>>(reducer, {
         currentPage: 1,
@@ -169,13 +166,7 @@ const Dashboard: NextPage = () => {
                                 }, 1000);
                             }}
                         >
-                            <FaRedo
-                                className={
-                                    isRefetching
-                                        ? "animate-refetchSpin"
-                                        : undefined
-                                }
-                            />
+                            <FaRedo className={isRefetching ? "animate-refetchSpin" : undefined} />
                         </button>
                     </div>
                 </div>
@@ -225,12 +216,11 @@ const Dashboard: NextPage = () => {
                                     <FaAngleLeft />
                                 </button>
                                 <div className="flex items-center justify-center h-10 px-4 py-2 rounded-lg w-max bg-slate-600">
-                                    {(state.currentPage - 1) * limit + 1}-{state.currentPage * limit <=
-                                    data.totalFiles
+                                    {(state.currentPage - 1) * limit + 1}-
+                                    {state.currentPage * limit <= data.totalFiles
                                         ? state.currentPage * limit
                                         : state.currentPage * limit -
-                                          (state.currentPage * limit -
-                                              data.totalFiles)}
+                                          (state.currentPage * limit - data.totalFiles)}
                                     /{data.totalFiles}
                                 </div>
                                 <button

@@ -13,7 +13,7 @@ const AuthWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
         <>
             {status === "loading" && (
-                <div className="flex justify-center items-center absolute top-0 left-0 w-full h-full bg-[#333] z-50">
+                <div className="absolute top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-gradient-to-br from-[#5b6367] to-[#323240]">
                     <Image
                         width="100px"
                         height="100px"

@@ -25,9 +25,7 @@ const UploadedFile: React.FC<{
 
             const setPopup = type === "url" ? setPopupUrl : setPopupPass;
             navigator.clipboard.writeText(
-                type === "url"
-                    ? uploadFile.fullUrl
-                    : (uploadFile.password as string)
+                type === "url" ? uploadFile.fullUrl : (uploadFile.password as string)
             );
 
             setPopup(true);
@@ -82,30 +80,21 @@ const UploadedFile: React.FC<{
                         {uploadFile.password && (
                             <li className="relative">
                                 <span className="flex items-center justify-start gap-2">
-                                    <FaLock /> Password:{" "}
-                                    {"*".repeat(uploadFile.password.length)}
+                                    <FaLock /> Password: {"*".repeat(uploadFile.password.length)}
                                 </span>
 
                                 <button
                                     className="absolute right-0 p-3 transition-all duration-500 -top-2 rounded-xl hover:bg-slate-700"
                                     onClick={() => createToast("pass")}
                                 >
-                                    {!popupPass ? (
-                                        <FaClipboard />
-                                    ) : (
-                                        <FaClipboardCheck />
-                                    )}
+                                    {!popupPass ? <FaClipboard /> : <FaClipboardCheck />}
                                 </button>
                             </li>
                         )}
                         <li className="relative">
                             <span className="text-ellipsis whitespace-nowrap overflow-hidden max-w-[350px] gap-2 flex justify-start items-center">
                                 <FaCloudDownloadAlt /> Url:
-                                <a
-                                    href={uploadFile.url}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                >
+                                <a href={uploadFile.url} target="_blank" rel="noreferrer">
                                     {uploadFile.url || "None"}
                                 </a>
                             </span>
@@ -114,11 +103,7 @@ const UploadedFile: React.FC<{
                                 className="absolute right-0 p-3 transition-all duration-500 -top-2 rounded-xl hover:bg-slate-700"
                                 onClick={() => createToast("url")}
                             >
-                                {!popupUrl ? (
-                                    <FaClipboard />
-                                ) : (
-                                    <FaClipboardCheck />
-                                )}
+                                {!popupUrl ? <FaClipboard /> : <FaClipboardCheck />}
                             </button>
                         </li>
                     </ul>

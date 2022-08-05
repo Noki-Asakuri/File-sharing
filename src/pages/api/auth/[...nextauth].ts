@@ -33,6 +33,7 @@ export const authOptions: NextAuthOptions = {
 
             // Future ban list?
             const isAllowedToSignIn = true;
+
             if (isAllowedToSignIn) {
                 return true;
             } else {
@@ -53,13 +54,6 @@ export const authOptions: NextAuthOptions = {
             };
         },
     },
-    // events: {
-    //     async session({ session }) {
-    //         const user = await prisma.user.findFirst({
-    //             where: { discordID: session.user.discordID },
-    //         });
-    //     },
-    // },
 };
 
 export default NextAuth(authOptions);

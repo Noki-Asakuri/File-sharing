@@ -4,7 +4,4 @@ import { appRouter } from "@/server/router";
 import { createContext } from "@/server/router/context";
 
 // export API handler
-export default createNextApiHandler({
-    router: appRouter,
-    createContext: createContext,
-});
+export default createNextApiHandler({ router: appRouter, createContext });

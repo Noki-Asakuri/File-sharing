@@ -28,9 +28,7 @@ const DashboardFile: React.FC<{
     const [deleting, setDeleting] = useState<boolean>(false);
 
     const fileUrl = useRef<string>(getBaseUrl() + "/file/" + file.fileID);
-    const { mutateAsync: deleteFile, error } = trpc.useMutation(
-        "file.delete-file-by-id"
-    );
+    const { mutateAsync: deleteFile, error } = trpc.useMutation("file.delete-file-by-id");
 
     return (
         <div className="relative flex items-center justify-between max-w-full px-5 py-2 mx-3 border rounded-lg bg-slate-800 border-slate-700 dashboard:h-64">
@@ -55,20 +53,14 @@ const DashboardFile: React.FC<{
                         </span>
                         <span className="absolute -top-10 left-10 scale-0 text-sm group-hover:scale-100 w-max bg-[#18191c] py-2 px-3 rounded-md transition-all">
                             <div className="absolute w-2 h-2 -rotate-90 left-2/4 -bottom-2 bg-inherit arrow" />
-                            {dayjs(file.createdAt).format(
-                                "MM-DD-YYYY, hh:mm:ss A"
-                            )}
+                            {dayjs(file.createdAt).format("MM-DD-YYYY, hh:mm:ss A")}
                         </span>
                     </div>
                 </li>
                 <li className="col-span-2">
                     <span className="flex items-center justify-start gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
                         <FaCloudDownloadAlt /> Url:{" "}
-                        <a
-                            href={fileUrl.current}
-                            target="_blank"
-                            rel="noreferrer"
-                        >
+                        <a href={fileUrl.current} target="_blank" rel="noreferrer">
                             {fileUrl.current}
                         </a>
                     </span>
