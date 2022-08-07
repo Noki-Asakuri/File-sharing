@@ -86,7 +86,7 @@ const PasswordForm: React.FC<PasswordFormType> = ({ password, setLocked }) => {
                 </div>
             </div>
 
-            <button className="flex py-2 just-center bg-slate-700 rounded-2xl" type="submit">
+            <button className="flex justify-center py-2 bg-slate-700 rounded-2xl" type="submit">
                 {!isLoading ? "Submit" : <SpinningCircle />}
             </button>
         </form>

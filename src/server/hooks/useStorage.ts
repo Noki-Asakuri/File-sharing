@@ -18,6 +18,9 @@ const useStorage = ({ state, dispatch }: storageType) => {
         onError: ({ message }) => {
             dispatch({ type: "ERROR", payload: message });
         },
+        onSuccess: () => {
+            dispatch({ type: "UPLOADED" });
+        },
     });
     const { isUploading, file, password } = state;
 
@@ -37,8 +40,6 @@ const useStorage = ({ state, dispatch }: storageType) => {
             ]);
 
             uploadPassword.current = password.current?.value.length ? password.current.value : null;
-
-            dispatch({ type: "UPLOADED" });
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [file],
