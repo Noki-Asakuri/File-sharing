@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 
 export default function useUpdateEffect(
     callback: React.EffectCallback,
-    dependencies?: React.DependencyList | undefined
+    dependencies?: React.DependencyList | undefined,
 ) {
     const firstRenderRef = useRef(true);
 

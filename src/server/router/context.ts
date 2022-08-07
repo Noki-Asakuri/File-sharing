@@ -6,15 +6,11 @@ import { prisma } from "../db/client";
 import supabase from "../db/supabase";
 import { authOptions as nextAuthOptions } from "./../../pages/api/auth/[...nextauth]";
 
-export const createContext = async (
-    opts?: trpcNext.CreateNextContextOptions
-) => {
+export const createContext = async (opts?: trpcNext.CreateNextContextOptions) => {
     const req = opts?.req;
     const res = opts?.res;
 
-    const session =
-        req && res && (await getServerSession(req, res, nextAuthOptions));
-
+    const session = req && res && (await getServerSession(req, res, nextAuthOptions));
     return { req, res, session, prisma, supabase };
 };
 

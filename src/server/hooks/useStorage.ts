@@ -4,13 +4,7 @@ import genID from "@/utils/genID";
 import { trpc } from "@/utils/trpc";
 import { Dispatch, useEffect, useRef } from "react";
 
-const useStorage = ({
-    state,
-    dispatch,
-}: {
-    state: State;
-    dispatch: Dispatch<ActionType>;
-}) => {
+const useStorage = ({ state, dispatch }: { state: State; dispatch: Dispatch<ActionType> }) => {
     const uploadPassword = useRef<string | null>(null);
     const {
         mutateAsync: uploadFile,

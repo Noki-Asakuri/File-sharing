@@ -13,11 +13,11 @@ const LoginProfile: React.FC<{}> = ({}) => {
             <Dropdown>
                 <button className="flex">
                     <Image
-                        className="rounded-full"
+                        className="overflow-hidden rounded-full w-11 h-11"
                         src={session.user.image as string}
                         alt={"Discord profile image"}
-                        width={"44px"}
-                        height={"44px"}
+                        width="44"
+                        height="44"
                     />
                 </button>
             </Dropdown>
@@ -38,10 +38,10 @@ const LoginProfile: React.FC<{}> = ({}) => {
 const Navbar: React.FC<{}> = ({}) => {
     return (
         <nav className="absolute top-0 w-full">
-            <div className="font-normal bg-opacity-75 bg-slate-800">
+            <div className="font-normal bg-opacity-75 bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800">
                 <div className="flex justify-between px-4 py-2 mx-auto my-0 max-w-7xl">
                     <div className="flex items-center justify-center text-3xl tracking-wider text-blue-500">
-                        <Link href={"/"}>File sharing</Link>
+                        <Link href={"/"}>Home</Link>
                     </div>
                     <div className="flex items-center justify-center gap-x-5">
                         <div>

@@ -103,18 +103,13 @@ const Home: NextPage = () => {
                 />
                 <meta property="og:image" content="/favicon.svg" />
             </Head>
-            <div
-                className={`container ${
-                    session ? "h-full" : "h-screen"
-                } mx-auto lg:h-screen`}
-            >
+            <div className={`container ${session ? "h-full" : "h-screen"} mx-auto lg:h-screen`}>
                 <header className="pt-28">
                     <h2 className="text-4xl text-center ">File Sharing</h2>
                     <p className="max-w-2xl pt-5 m-auto text-center">
-                        A simple file-sharing website so I don&apos;t need to
-                        fucking host the fucking file on fucking google drive
-                        each time I need to fucking share a file through discord
-                        without a bullshit 8MB limit.
+                        A simple file-sharing website so I don&apos;t need to fucking host the
+                        fucking file on fucking google drive each time I need to fucking share a
+                        file through discord without a bullshit 8MB limit.
                     </p>
                 </header>
 
@@ -136,7 +131,12 @@ const Home: NextPage = () => {
                     <Suspense
                         fallback={
                             <div className="flex justify-center items-center h-[300px] w-full">
-                                <Image width="100px" height="100px" src={"/loading.svg"} alt={"Loading image"} />
+                                <Image
+                                    width="100"
+                                    height="100"
+                                    src={"/loading.svg"}
+                                    alt={"Loading image"}
+                                />
                             </div>
                         }
                     >

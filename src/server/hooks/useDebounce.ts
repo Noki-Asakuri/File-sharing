@@ -4,7 +4,7 @@ import useTimeout from "./useTimeout";
 export default function useDebounce(
     callback: (...args: any[]) => any,
     delay: number,
-    dependencies: DependencyList
+    dependencies: DependencyList,
 ) {
     const { reset, clear } = useTimeout(callback, delay);
     useEffect(reset, [...dependencies, reset]);

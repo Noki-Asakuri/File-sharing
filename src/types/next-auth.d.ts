@@ -1,9 +1,4 @@
-import NextAuth, {
-    DefaultUser,
-    DefaultSession,
-    DefaultProfile,
-    DefaultAccount,
-} from "next-auth";
+import NextAuth, { DefaultUser, DefaultSession, DefaultProfile, DefaultAccount } from "next-auth";
 
 declare module "next-auth" {
     /**
@@ -40,7 +35,5 @@ declare module "next-auth" {
         verified: boolean;
     }
 
-    interface Account extends DefaultAccount {
-        role: string;
-    }
+    interface Account extends DefaultAccount {}
 }

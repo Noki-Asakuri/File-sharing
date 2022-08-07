@@ -14,10 +14,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 <link rel="icon" href="/favicon.svg" />
                 <meta name="description" content="Free file sharing website!" />
                 <meta name="author" content="Asakuri#8323" />
-                <meta
-                    name="viewport"
-                    content="width=device-width, initial-scale=1.0"
-                />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                 <meta name="theme-color" content="#2f3136" />
             </Head>
             <Suspense fallback={"Loading ..."}>

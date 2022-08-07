@@ -14,10 +14,7 @@
 }
 
 body {
-    background-color: #5b6367;
-    background-image: linear-gradient(135deg, #5b6367 0%, #323240 100%);
     font-family: "Firecode", Courier, monospace;
-    color: white;
 }
 
 @layer utilities {
@@ -25,4 +22,3 @@ body {
         clip-path: polygon(0 50%, 100% 100%, 100% 0);
     }
 }
-

@@ -12,10 +12,7 @@ import getBaseUrl from "@/utils/getBaseUrl";
 
 import "../styles/globals.css";
 
-const MyApp: AppType = ({
-    Component,
-    pageProps: { session, ...pageProps },
-}) => {
+const MyApp: AppType = ({ Component, pageProps: { session, ...pageProps } }) => {
     return (
         <SessionProvider session={session}>
             <MainLayout>

@@ -23,7 +23,7 @@ model File {
     author   String
     authorID String
 
-    user User @relation(fields: [authorID], references: [discordID])
+    user User @relation(fields: [authorID], references: [discordID], onDelete: Cascade)
 }
 
 model Account {

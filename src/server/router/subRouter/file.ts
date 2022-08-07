@@ -91,11 +91,8 @@ export const fileRouter = createRouter()
             });
 
             return {
-                downloadUrl: (
-                    await supabase.storage
-                        .from("files")
-                        .createSignedUrl(file.path, 60)
-                ).signedURL!,
+                downloadUrl: (await supabase.storage.from("files").createSignedUrl(file.path, 60))
+                    .signedURL!,
             };
         },
     });

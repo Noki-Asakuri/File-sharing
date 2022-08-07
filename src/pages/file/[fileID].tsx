@@ -3,7 +3,7 @@ import type { NextPage } from "next";
 import { GetStaticPropsContext } from "next";
 import Image from "next/future/image";
 import Head from "next/head";
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 import {
     FaArrowAltCircleDown,
     FaCheckCircle,
@@ -33,38 +33,35 @@ const PasswordForm: React.FC<{
     const [inputPassword, setInputPassword] = useState<string>("");
     const [showPassword, setShowPassword] = useState<boolean>(false);
 
-    const { mutate: checkPass, isLoading } = trpc.useMutation(
-        ["check.password"],
-        {
-            onSuccess: ({ download }) => {
-                if (download) {
-                    setLocked(false);
+    const { mutate: checkPass, isLoading } = trpc.useMutation(["check.password"], {
+        onSuccess: ({ download }) => {
+            if (download) {
+                setLocked(false);
 
-                    toast.success("Access granted!", {
-                        duration: 2000,
-                        style: {
-                            borderRadius: "10px",
-                            background: "#262626",
-                            color: "#E8DCFF",
-                        },
-                        iconTheme: {
-                            primary: "#15803d",
-                            secondary: "#262626",
-                        },
-                    });
-                }
-            },
-            onError: ({ message }) => {
-                toast.error(message, {
+                toast.success("Access granted!", {
+                    duration: 2000,
                     style: {
                         borderRadius: "10px",
                         background: "#262626",
                         color: "#E8DCFF",
                     },
+                    iconTheme: {
+                        primary: "#15803d",
+                        secondary: "#262626",
+                    },
                 });
-            },
-        }
-    );
+            }
+        },
+        onError: ({ message }) => {
+            toast.error(message, {
+                style: {
+                    borderRadius: "10px",
+                    background: "#262626",
+                    color: "#E8DCFF",
+                },
+            });
+        },
+    });
 
     return (
         <form
@@ -109,9 +106,7 @@ const PasswordForm: React.FC<{
     );
 };
 
-type StaticProps = NonNullable<
-    Awaited<ReturnType<typeof getStaticProps>>["props"]
->;
+type StaticProps = NonNullable<Awaited<ReturnType<typeof getStaticProps>>["props"]>;
 
 const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
     const [Locked, setLocked] = useState<boolean>(!!file.password);
@@ -125,15 +120,15 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
     });
 
     const updateTab = (tab: "File" | "User") => {
-        let page: number;
+        let page: string;
 
         if (tab === "File") {
-            page = 0;
+            page = "translate-x-0";
         } else {
-            page = 96;
+            page = "translate-x-[126px]";
         }
 
-        return setActiveTab({ tab, page: page + "px" });
+        return setActiveTab({ tab, page });
     };
 
     const { mutate: download } = trpc.useMutation(["file.download-file"], {
@@ -151,10 +146,7 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
             <Head>
                 <title>{`File: ${file && file.name}`}</title>
                 <meta property="og:title" content={`File Sharing.`} />
-                <meta
-                    property="og:site_name"
-                    content={`Author: ${file.author}`}
-                />
+                <meta property="og:site_name" content={`Author: ${file.author}`} />
                 <meta
                     property="og:description"
                     content={`Files: ${file.name}\nDownload: ${file.downloadCount}\nUpload ${file.createdAt}`}
@@ -168,10 +160,7 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
             </Head>
             <div className="flex items-center justify-center h-screen">
                 {Locked && file.password && (
-                    <PasswordForm
-                        password={file.password}
-                        setLocked={setLocked}
-                    />
+                    <PasswordForm password={file.password} setLocked={setLocked} />
                 )}
 
                 {!Locked && (
@@ -179,25 +168,21 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
                         <div className="flex items-center justify-between w-full pt-7 px-7">
                             <div className="flex flex-col justify-center">
                                 <Image
-                                    className="rounded-full w-[120px] h-[120px]"
-                                    src={author.image as string}
+                                    className="rounded-full"
+                                    src={author.image}
                                     alt="Author discord avatar"
+                                    width="120"
+                                    height="120"
                                 />
                                 <div className="pt-3 pb-2 text-lg">
-                                    <span className="font-bold text-white">
-                                        {author.name}
-                                    </span>
-                                    <span className="text-gray-400">
-                                        {author.discriminator}
-                                    </span>
+                                    <span className="font-bold text-white">{author.name}</span>
+                                    <span className="text-gray-400">{author.discriminator}</span>
                                 </div>
                             </div>
                             <div>
                                 <button
                                     className="bg-gradient-to-tl from-green-700 to-green-800 drop-shadow-lg py-2 px-4 w-[170px] rounded-md h-[40px]"
-                                    onClick={() =>
-                                        download({ fileID: file.fileID })
-                                    }
+                                    onClick={() => download({ fileID: file.fileID })}
                                 >
                                     {isDownload ? (
                                         <span className="flex items-center justify-start gap-2">
@@ -213,20 +198,14 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
                         <div className="w-full h-full">
                             <div>
                                 <div className="relative flex px-7 gap-7">
-                                    <button
-                                        className="w-24 py-2"
-                                        onClick={() => updateTab("File")}
-                                    >
+                                    <button className="w-24 py-2" onClick={() => updateTab("File")}>
                                         File Info
                                     </button>
-                                    <button
-                                        className="w-24 py-2"
-                                        onClick={() => updateTab("User")}
-                                    >
+                                    <button className="w-24 py-2" onClick={() => updateTab("User")}>
                                         User Info
                                     </button>
                                     <div
-                                        className={`absolute bottom-0 w-24 border-b-2 border-white translate-x-[calc(${activeTab.page}+28px)] transition-transform`}
+                                        className={`absolute bottom-0 w-24 border-b-2 border-white transition-transform ${activeTab.page}`}
                                     />
                                 </div>
 
@@ -316,9 +295,7 @@ export async function getStaticProps(ctx: GetStaticPropsContext) {
             file: {
                 ...file,
                 relativeTime: dayjs(file.createdAt).fromNow(),
-                createdAt: dayjs(file.createdAt).format(
-                    "MM-DD-YYYY, hh:mm:ss A"
-                ),
+                createdAt: dayjs(file.createdAt).format("MM-DD-YYYY, hh:mm:ss A"),
             },
             author: {
                 ...author,
@@ -327,9 +304,7 @@ export async function getStaticProps(ctx: GetStaticPropsContext) {
                 discriminator: ("#" + author.name?.split("#")[1]) as string,
                 image: author.image as string,
                 relativeTime: dayjs(author.joinDate).fromNow(),
-                joinDate: dayjs(author.joinDate).format(
-                    "MM-DD-YYYY, hh:mm:ss A"
-                ),
+                joinDate: dayjs(author.joinDate).format("MM-DD-YYYY, hh:mm:ss A"),
             },
         },
         revalidate: 60,
@@ -338,7 +313,6 @@ export async function getStaticProps(ctx: GetStaticPropsContext) {
 
 export async function getStaticPaths() {
     const file = await prisma.file.findMany();
-
     const paths = file.map((f) => ({ params: { fileID: f.fileID } }));
 
     return { paths, fallback: "blocking" };

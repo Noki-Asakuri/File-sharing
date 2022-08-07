@@ -3,9 +3,7 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 
-const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
-    children,
-}) => {
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { push: redirect } = useRouter();
     const { status } = useSession();
     const [myTimeout, setMyTimeout] = useState<NodeJS.Timeout | null>(null);

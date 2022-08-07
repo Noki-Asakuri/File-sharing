@@ -21,10 +21,7 @@ const UploadForm: React.FC<{
                 <FaUpload />
                 Upload File
             </span>
-            <label
-                htmlFor="file"
-                className="flex items-center justify-center gap-2"
-            >
+            <label htmlFor="file" className="flex items-center justify-center gap-2">
                 <FaFile />
                 File:
                 <span className="px-4 py-2 bg-slate-700 rounded-2xl">
@@ -36,15 +33,10 @@ const UploadForm: React.FC<{
                 type="file"
                 id="file"
                 name="file"
-                onChange={(e) =>
-                    dispatch({ type: "CHANGE", payload: e.target.files![0] })
-                }
+                onChange={(e) => dispatch({ type: "CHANGE", payload: e.target.files![0] })}
             />
             <div className="flex items-center justify-center max-w-max gap-x-4">
-                <label
-                    htmlFor="password"
-                    className="flex items-center justify-center gap-2"
-                >
+                <label htmlFor="password" className="flex items-center justify-center gap-2">
                     <FaLock /> Password:
                 </label>
 
