@@ -14,10 +14,9 @@ import {
     FaRedo,
     FaSearch,
 } from "react-icons/fa";
+import { Toaster } from "react-hot-toast";
 
-const DashboardFile = dynamic(() => import("@/components/DashboardFile"), {
-    suspense: true,
-});
+const DashboardFile = dynamic(() => import("@/components/DashboardFile"), { ssr: false });
 
 export interface ActionType {
     type: "FIRST" | "PREV" | "NEXT" | "LAST" | "SET" | "UPDATE" | "DELETE";
@@ -162,9 +161,7 @@ const Dashboard: NextPage = () => {
                                 setFetching(true);
                                 refetch();
 
-                                setTimeout(() => {
-                                    setFetching(false);
-                                }, 1000);
+                                setTimeout(() => setFetching(false), 1000);
                             }}
                         >
                             <FaRedo className={isRefetching ? "animate-refetchSpin" : undefined} />
@@ -238,6 +235,7 @@ const Dashboard: NextPage = () => {
                                 </button>
                             </div>
                         )}
+                        <Toaster />
                     </>
                 )}
             </div>

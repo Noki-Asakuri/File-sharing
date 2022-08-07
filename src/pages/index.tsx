@@ -12,24 +12,37 @@ import { Suspense } from "react";
 import { Toaster } from "react-hot-toast";
 import { FaExclamationTriangle } from "react-icons/fa";
 
-const UploadedFile = dynamic(() => import("@/components/UploadedFile"), {
-    suspense: true,
-});
-const UploadForm = dynamic(() => import("@/components/UploadForm"), {
-    suspense: true,
-});
+const UploadInfo = dynamic(() => import("@/components/UploadInfo"), { suspense: true, ssr: false });
+const UploadForm = dynamic(() => import("@/components/UploadForm"), { suspense: true, ssr: false });
 
 export interface ActionType {
     type: "SUBMIT" | "PASSWORD" | "CHANGE" | "UPLOADED" | "ERROR";
-    payload?: File | string | null | undefined;
+    payload?: File | string | null;
 }
 
-export interface State {
-    file: File | null;
+interface BaseState {
     password: RefObject<HTMLInputElement>;
     error: string | null;
     isUploading: boolean;
+    file: File | null;
 }
+
+interface ChangeState extends BaseState {
+    isUploading: false;
+    file: File;
+}
+
+interface UploadState extends BaseState {
+    isUploading: false;
+    file: null;
+}
+
+interface UploadedState extends BaseState {
+    isUploading: true;
+    file: File;
+}
+
+export type State = ChangeState | UploadState | UploadedState;
 
 const reducer = (state: State, action: ActionType): State => {
     const { type, payload } = action;
@@ -45,6 +58,7 @@ const reducer = (state: State, action: ActionType): State => {
             }
             return {
                 ...state,
+                isUploading: false,
                 file: null,
                 error: "File size over 50MB limit!",
             };
@@ -142,7 +156,7 @@ const Home: NextPage = () => {
                     >
                         <div className="flex flex-wrap justify-around gap-10 pt-20">
                             <UploadForm state={state} dispatch={dispatch} />
-                            <UploadedFile uploadFile={uploadFile} />
+                            <UploadInfo uploadFile={uploadFile} />
                         </div>
                         <Toaster />
                     </Suspense>

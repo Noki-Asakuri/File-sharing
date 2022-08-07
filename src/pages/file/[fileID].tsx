@@ -1,9 +1,8 @@
-import createDownload from "@/utils/download";
 import type { NextPage } from "next";
-import { GetStaticPropsContext } from "next";
-import Image from "next/future/image";
 import Head from "next/head";
-import React, { useState } from "react";
+import Image from "next/future/image";
+import React, { useState, useRef } from "react";
+import { GetStaticPropsContext } from "next";
 import {
     FaArrowAltCircleDown,
     FaCheckCircle,
@@ -19,6 +18,7 @@ import {
 
 import SpinningCircle from "@/components/SpinningCircle";
 import { prisma } from "@/server/db/client";
+import createDownload from "@/utils/download";
 import { trpc } from "@/utils/trpc";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -26,49 +26,39 @@ import toast, { Toaster } from "react-hot-toast";
 
 dayjs.extend(relativeTime);
 
-const PasswordForm: React.FC<{
+interface PasswordFormType {
     password: string;
-    setLocked: React.Dispatch<React.SetStateAction<boolean>>;
-}> = ({ password, setLocked }) => {
-    const [inputPassword, setInputPassword] = useState<string>("");
+    setLocked: (value: boolean) => void;
+}
+
+const PasswordForm: React.FC<PasswordFormType> = ({ password, setLocked }) => {
+    const inputPasswordRef = useRef<HTMLInputElement>(null);
     const [showPassword, setShowPassword] = useState<boolean>(false);
 
     const { mutate: checkPass, isLoading } = trpc.useMutation(["check.password"], {
         onSuccess: ({ download }) => {
             if (download) {
                 setLocked(false);
-
                 toast.success("Access granted!", {
                     duration: 2000,
-                    style: {
-                        borderRadius: "10px",
-                        background: "#262626",
-                        color: "#E8DCFF",
-                    },
-                    iconTheme: {
-                        primary: "#15803d",
-                        secondary: "#262626",
-                    },
+                    style: { borderRadius: "10px", background: "#262626", color: "#E8DCFF" },
+                    iconTheme: { primary: "#15803d", secondary: "#262626" },
                 });
             }
         },
         onError: ({ message }) => {
             toast.error(message, {
-                style: {
-                    borderRadius: "10px",
-                    background: "#262626",
-                    color: "#E8DCFF",
-                },
+                style: { borderRadius: "10px", background: "#262626", color: "#E8DCFF" },
             });
         },
     });
 
     return (
         <form
-            className="relative flex flex-col items-start p-10 gap-y-7 max-w-max rounded-2xl bg-gradient-to-tl from-slate-800 to-slate-900"
+            className="flex flex-col p-10 gap-y-7 rounded-2xl bg-gradient-to-tl from-slate-800 to-slate-900"
             onSubmit={(e) => {
                 e.preventDefault();
-                checkPass({ password, inputPassword });
+                checkPass({ password, inputPassword: inputPasswordRef.current!.value });
             }}
         >
             <div className="flex items-center justify-center w-full gap-2 text-2xl">
@@ -83,7 +73,7 @@ const PasswordForm: React.FC<{
                         name="password"
                         id="password"
                         placeholder="Enter password to access!"
-                        onChange={(e) => setInputPassword(e.target.value)}
+                        ref={inputPasswordRef}
                     />
                     <button
                         className="px-4"
@@ -96,10 +86,7 @@ const PasswordForm: React.FC<{
                 </div>
             </div>
 
-            <button
-                className="flex items-center justify-center w-full h-10 px-4 py-2 cursor-pointer bg-slate-700 rounded-2xl drop-shadow-lg"
-                type="submit"
-            >
+            <button className="flex py-2 just-center bg-slate-700 rounded-2xl" type="submit">
                 {!isLoading ? "Submit" : <SpinningCircle />}
             </button>
         </form>
@@ -111,19 +98,16 @@ type StaticProps = NonNullable<Awaited<ReturnType<typeof getStaticProps>>["props
 const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
     const [Locked, setLocked] = useState<boolean>(!!file.password);
     const [isDownload, setIsDownload] = useState<boolean>(false);
-    const [activeTab, setActiveTab] = useState<{
-        page: string;
-        tab: "File" | "User";
-    }>({
-        page: "0px",
+    const [activeTab, setActiveTab] = useState<{ tab: "File" | "User"; page: string }>({
         tab: "File",
+        page: "",
     });
 
     const updateTab = (tab: "File" | "User") => {
         let page: string;
 
         if (tab === "File") {
-            page = "translate-x-0";
+            page = "";
         } else {
             page = "translate-x-[126px]";
         }
@@ -144,9 +128,9 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
     return (
         <>
             <Head>
-                <title>{`File: ${file && file.name}`}</title>
+                <title>{file.name}</title>
                 <meta property="og:title" content={`File Sharing.`} />
-                <meta property="og:site_name" content={`Author: ${file.author}`} />
+                <meta property="og:site_name" content={file.author} />
                 <meta
                     property="og:description"
                     content={`Files: ${file.name}\nDownload: ${file.downloadCount}\nUpload ${file.createdAt}`}
@@ -164,28 +148,28 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
                 )}
 
                 {!Locked && (
-                    <div className="relative flex flex-col items-start rounded-2xl bg-opacity-75 w-[600px] h-[400px] bg-gradient-to-tl from-slate-800 to-slate-900 drop-shadow-lg">
+                    <div className="rounded-2xl bg-gradient-to-br from-gray-700 to-slate-900 w-[600px] h-[400px]">
                         <div className="flex items-center justify-between w-full pt-7 px-7">
                             <div className="flex flex-col justify-center">
                                 <Image
                                     className="rounded-full"
                                     src={author.image}
-                                    alt="Author discord avatar"
-                                    width="120"
-                                    height="120"
+                                    alt="Discord Avatar"
+                                    width="130"
+                                    height="130"
                                 />
-                                <div className="pt-3 pb-2 text-lg">
+                                <div className="py-2 text-lg">
                                     <span className="font-bold text-white">{author.name}</span>
                                     <span className="text-gray-400">{author.discriminator}</span>
                                 </div>
                             </div>
                             <div>
                                 <button
-                                    className="bg-gradient-to-tl from-green-700 to-green-800 drop-shadow-lg py-2 px-4 w-[170px] rounded-md h-[40px]"
+                                    className="px-4 py-2 rounded-md bg-gradient-to-bl from-green-600 to-green-800 w-44 h-11"
                                     onClick={() => download({ fileID: file.fileID })}
                                 >
                                     {isDownload ? (
-                                        <span className="flex items-center justify-start gap-2">
+                                        <span className="flex items-center gap-2">
                                             Downloading <SpinningCircle />
                                         </span>
                                     ) : (
@@ -195,7 +179,7 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
                             </div>
                         </div>
 
-                        <div className="w-full h-full">
+                        <div>
                             <div>
                                 <div className="relative flex px-7 gap-7">
                                     <button className="w-24 py-2" onClick={() => updateTab("File")}>
@@ -234,7 +218,7 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
                                         </div>
                                     )}
                                     {activeTab.tab === "User" && (
-                                        <div className="flex flex-col gap-3 p-7 max-w-max">
+                                        <div className="flex flex-col gap-3 p-7">
                                             <span className="flex items-center justify-start gap-2">
                                                 <FaIdCard />
                                                 Name: {author.fullName}
@@ -248,7 +232,7 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
                                                     <FaTimesCircle className="text-red-500" />
                                                 )}
                                             </span>
-                                            <div className="relative group max-w-max">
+                                            <div className="relative group w-max">
                                                 <span className="flex items-center justify-start gap-2">
                                                     <FaSignInAlt />
                                                     Joined {author.relativeTime}
@@ -280,6 +264,15 @@ export async function getStaticProps(ctx: GetStaticPropsContext) {
 
     const file = await prisma.file.findFirst({
         where: { fileID: ctx.params.fileID },
+        select: {
+            createdAt: true,
+            authorID: true,
+            downloadCount: true,
+            name: true,
+            fileID: true,
+            password: true,
+            author: true,
+        },
     });
 
     if (!file) {
@@ -288,6 +281,7 @@ export async function getStaticProps(ctx: GetStaticPropsContext) {
 
     const author = await prisma.user.findFirstOrThrow({
         where: { discordID: file.authorID },
+        select: { name: true, joinDate: true, image: true, isAdmin: true },
     });
 
     return {
@@ -298,11 +292,11 @@ export async function getStaticProps(ctx: GetStaticPropsContext) {
                 createdAt: dayjs(file.createdAt).format("MM-DD-YYYY, hh:mm:ss A"),
             },
             author: {
-                ...author,
-                fullName: author.name,
                 name: author.name?.split("#")[0] as string,
                 discriminator: ("#" + author.name?.split("#")[1]) as string,
+                fullName: author.name,
                 image: author.image as string,
+                isAdmin: author.isAdmin,
                 relativeTime: dayjs(author.joinDate).fromNow(),
                 joinDate: dayjs(author.joinDate).format("MM-DD-YYYY, hh:mm:ss A"),
             },
@@ -312,7 +306,7 @@ export async function getStaticProps(ctx: GetStaticPropsContext) {
 }
 
 export async function getStaticPaths() {
-    const file = await prisma.file.findMany();
+    const file = await prisma.file.findMany({ select: { fileID: true } });
     const paths = file.map((f) => ({ params: { fileID: f.fileID } }));
 
     return { paths, fallback: "blocking" };
