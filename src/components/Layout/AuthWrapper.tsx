@@ -14,12 +14,7 @@ const AuthWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <>
             {status === "loading" && (
                 <div className="absolute top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-gradient-to-br from-[#5b6367] to-[#323240]">
-                    <Image
-                        width="100px"
-                        height="100px"
-                        src={"/loading.svg"}
-                        alt={"Loading image"}
-                    />
+                    <Image width="100" height="100" src={"/loading.svg"} alt={"Loading image"} />
                 </div>
             )}
             {protectedRoute.includes(router.pathname) ? (

@@ -3,7 +3,7 @@ import type { NextPage } from "next";
 import { GetStaticPropsContext } from "next";
 import Image from "next/future/image";
 import Head from "next/head";
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 import {
     FaArrowAltCircleDown,
     FaCheckCircle,
@@ -168,9 +168,11 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
                         <div className="flex items-center justify-between w-full pt-7 px-7">
                             <div className="flex flex-col justify-center">
                                 <Image
-                                    className="rounded-full w-[120px] h-[120px]"
-                                    src={author.image as string}
+                                    className="rounded-full"
+                                    src={author.image}
                                     alt="Author discord avatar"
+                                    width="120"
+                                    height="120"
                                 />
                                 <div className="pt-3 pb-2 text-lg">
                                     <span className="font-bold text-white">{author.name}</span>
@@ -311,7 +313,6 @@ export async function getStaticProps(ctx: GetStaticPropsContext) {
 
 export async function getStaticPaths() {
     const file = await prisma.file.findMany();
-
     const paths = file.map((f) => ({ params: { fileID: f.fileID } }));
 
     return { paths, fallback: "blocking" };

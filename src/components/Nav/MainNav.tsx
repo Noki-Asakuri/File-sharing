@@ -13,11 +13,11 @@ const LoginProfile: React.FC<{}> = ({}) => {
             <Dropdown>
                 <button className="flex">
                     <Image
-                        className="rounded-full"
+                        className="overflow-hidden rounded-full w-11 h-11"
                         src={session.user.image as string}
                         alt={"Discord profile image"}
-                        width={"44px"}
-                        height={"44px"}
+                        width="44"
+                        height="44"
                     />
                 </button>
             </Dropdown>

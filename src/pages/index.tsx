@@ -132,8 +132,8 @@ const Home: NextPage = () => {
                         fallback={
                             <div className="flex justify-center items-center h-[300px] w-full">
                                 <Image
-                                    width="100px"
-                                    height="100px"
+                                    width="100"
+                                    height="100"
                                     src={"/loading.svg"}
                                     alt={"Loading image"}
                                 />
