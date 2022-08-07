@@ -116,7 +116,7 @@ const DashboardFile: React.FC<{
                                     primary: "#E8DCFF",
                                     secondary: "#262626",
                                 },
-                            }
+                            },
                         );
                     }
                 }}

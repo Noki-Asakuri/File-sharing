@@ -5,9 +5,7 @@ const nextConfig = {
         domains: ["cdn.discordapp.com"],
     },
     experimental: {
-        images: {
-            allowFutureImage: true,
-        },
+        images: { allowFutureImage: true },
     },
 };
 

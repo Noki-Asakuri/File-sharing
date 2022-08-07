@@ -25,7 +25,7 @@ const UploadedFile: React.FC<{
 
             const setPopup = type === "url" ? setPopupUrl : setPopupPass;
             navigator.clipboard.writeText(
-                type === "url" ? uploadFile.fullUrl : (uploadFile.password as string)
+                type === "url" ? uploadFile.fullUrl : (uploadFile.password as string),
             );
 
             setPopup(true);
@@ -45,7 +45,7 @@ const UploadedFile: React.FC<{
                 },
             });
         },
-        [uploadFile]
+        [uploadFile],
     );
 
     return (

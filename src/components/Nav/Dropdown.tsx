@@ -4,9 +4,7 @@ import Link from "next/link";
 import React from "react";
 import { FaSignOutAlt, FaHome, FaUserCog, FaCogs } from "react-icons/fa";
 
-const DropdownItem: React.FC<{ children: React.ReactNode }> = ({
-    children,
-}) => {
+const DropdownItem: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
         <DropdownMenu.Item className="transition-colors rounded-md focus:bg-slate-800 focus:outline-none">
             {children}
@@ -19,7 +17,9 @@ const Dropdown: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
     return (
         <DropdownMenu.Root>
-            <DropdownMenu.Trigger asChild className="rounded-full">{children}</DropdownMenu.Trigger>
+            <DropdownMenu.Trigger asChild className="rounded-full">
+                {children}
+            </DropdownMenu.Trigger>
 
             <DropdownMenu.Content
                 className="bg-gradient-to-t from-slate-800 to-slate-900 min-w-[170px] p-4 rounded-lg radix-state-open:animate-fadeIn radix-state-closed:animate-fadeOut drop-shadow-lg"
@@ -58,7 +58,7 @@ const Dropdown: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                     </Link>
                 </DropdownItem>
                 <DropdownItem>
-                    <button className="w-full" onClick={() => signOut({ callbackUrl: "/"})}>
+                    <button className="w-full" onClick={() => signOut({ callbackUrl: "/" })}>
                         <span className="flex items-center justify-between p-2 gap-x-2">
                             Logout <FaSignOutAlt />
                         </span>
