@@ -1,10 +1,14 @@
+import { Dispatch, useCallback, useEffect, useRef } from "react";
+
+import { supabase } from "@/server/db/supabase";
 import { ActionType, State } from "@/pages";
-import supabase from "@/server/db/supabase";
+
 import genID from "@/utils/genID";
 import { trpc } from "@/utils/trpc";
-import { Dispatch, useEffect, useRef } from "react";
 
-const useStorage = ({ state, dispatch }: { state: State; dispatch: Dispatch<ActionType> }) => {
+type storageType = { state: State; dispatch: Dispatch<ActionType> };
+
+const useStorage = ({ state, dispatch }: storageType) => {
     const uploadPassword = useRef<string | null>(null);
     const {
         mutateAsync: uploadFile,
@@ -15,34 +19,34 @@ const useStorage = ({ state, dispatch }: { state: State; dispatch: Dispatch<Acti
             dispatch({ type: "ERROR", payload: message });
         },
     });
-
     const { isUploading, file, password } = state;
 
-    useEffect(() => {
-        if (isUploading && file) {
-            const fileInfo = genID(file.name);
+    const uploadFileToStorage = useCallback(
+        async (file: File) => {
+            const { fileID, path } = genID(file.name);
 
-            const uploadFileToStorage = async () => {
-                await supabase.storage
-                    .from("files")
-                    .upload(fileInfo.file, file, { contentType: file.type });
-
-                await uploadFile({
-                    fileID: fileInfo.fileID,
-                    path: fileInfo.file,
+            await Promise.all([
+                supabase.upload(path, file, { contentType: file.type, cacheControl: "3600" }),
+                uploadFile({
+                    fileID: fileID,
+                    path: path,
                     name: file.name,
                     type: file.type,
                     password: password.current!.value,
-                });
+                }),
+            ]);
 
-                uploadPassword.current = password.current!.value.length
-                    ? password.current!.value
-                    : null;
+            uploadPassword.current = password.current?.value.length ? password.current.value : null;
 
-                dispatch({ type: "UPLOADED" });
-            };
+            dispatch({ type: "UPLOADED" });
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [file],
+    );
 
-            uploadFileToStorage();
+    useEffect(() => {
+        if (isUploading) {
+            uploadFileToStorage(file);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isUploading]);

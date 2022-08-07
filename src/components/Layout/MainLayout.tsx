@@ -4,7 +4,7 @@ import React, { Suspense } from "react";
 
 import AuthWrapper from "./AuthWrapper";
 
-const Navbar = dynamic(() => import("../Nav/MainNav"), { suspense: true });
+const Navbar = dynamic(() => import("../Nav/MainNav"), { ssr: false });
 
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
@@ -17,9 +17,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                 <meta name="theme-color" content="#2f3136" />
             </Head>
-            <Suspense fallback={"Loading ..."}>
-                <Navbar />
-            </Suspense>
+            <Navbar />
             <AuthWrapper>{children}</AuthWrapper>
         </>
     );

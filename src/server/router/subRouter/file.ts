@@ -46,9 +46,7 @@ export const fileRouter = createRouter()
             fileID: z.string(),
         }),
         resolve: async ({ input, ctx }) => {
-            const file = await ctx.prisma.file.findFirst({
-                where: { fileID: input.fileID },
-            });
+            const file = await ctx.prisma.file.findFirst({ where: { fileID: input.fileID } });
 
             if (!file) {
                 throw new TRPCError({
@@ -57,10 +55,8 @@ export const fileRouter = createRouter()
                 });
             }
 
-            await ctx.supabase.storage.from("files").remove([file.path]);
-            await ctx.prisma.file.delete({
-                where: { id: file.id },
-            });
+            await ctx.supabase.remove([file.path]);
+            await ctx.prisma.file.delete({ where: { id: file.id } });
 
             try {
                 ctx.res?.revalidate(`/file/${input.fileID}`);
@@ -91,8 +87,7 @@ export const fileRouter = createRouter()
             });
 
             return {
-                downloadUrl: (await supabase.storage.from("files").createSignedUrl(file.path, 60))
-                    .signedURL!,
+                downloadUrl: (await supabase.createSignedUrl(file.path, 60)).signedURL!,
             };
         },
     });

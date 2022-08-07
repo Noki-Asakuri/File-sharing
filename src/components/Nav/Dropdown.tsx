@@ -1,4 +1,12 @@
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import {
+    Root,
+    Item,
+    Trigger,
+    Label,
+    Separator,
+    Arrow,
+    Content,
+} from "@radix-ui/react-dropdown-menu";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import React from "react";
@@ -6,9 +14,9 @@ import { FaSignOutAlt, FaHome, FaUserCog, FaCogs } from "react-icons/fa";
 
 const DropdownItem: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
-        <DropdownMenu.Item className="transition-colors rounded-md focus:bg-slate-800 focus:outline-none">
+        <Item className="transition-colors rounded-md focus:bg-slate-800 focus:outline-none">
             {children}
-        </DropdownMenu.Item>
+        </Item>
     );
 };
 
@@ -16,20 +24,20 @@ const Dropdown: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { data: session } = useSession();
 
     return (
-        <DropdownMenu.Root>
-            <DropdownMenu.Trigger asChild className="rounded-full">
+        <Root>
+            <Trigger asChild className="rounded-full">
                 {children}
-            </DropdownMenu.Trigger>
+            </Trigger>
 
-            <DropdownMenu.Content
+            <Content
                 className="bg-gradient-to-t from-slate-800 to-slate-900 min-w-[170px] p-4 rounded-lg radix-state-open:animate-fadeIn radix-state-closed:animate-fadeOut drop-shadow-lg"
                 sideOffset={5}
                 loop
             >
-                <DropdownMenu.Label className="flex items-center justify-center px-2 pb-2">
+                <Label className="flex items-center justify-center px-2 pb-2">
                     {session?.user?.name}
-                </DropdownMenu.Label>
-                <DropdownMenu.Separator className="h-px my-1 bg-white" />
+                </Label>
+                <Separator className="h-px my-1 bg-white" />
                 <DropdownItem>
                     <Link href={"/"} passHref>
                         <a className="w-full">
@@ -64,9 +72,9 @@ const Dropdown: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                         </span>
                     </button>
                 </DropdownItem>
-                <DropdownMenu.Arrow className="fill-slate-700" offset={12} />
-            </DropdownMenu.Content>
-        </DropdownMenu.Root>
+                <Arrow className="fill-slate-700" offset={12} />
+            </Content>
+        </Root>
     );
 };
 

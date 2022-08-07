@@ -1,10 +1,12 @@
 // src/server/router/context.ts
 import * as trpc from "@trpc/server";
 import * as trpcNext from "@trpc/server/adapters/next";
-import { unstable_getServerSession as getServerSession } from "next-auth";
+
 import { prisma } from "../db/client";
-import supabase from "../db/supabase";
-import { authOptions as nextAuthOptions } from "./../../pages/api/auth/[...nextauth]";
+import { supabase } from "../db/supabase";
+
+import { unstable_getServerSession as getServerSession } from "next-auth";
+import { authOptions as nextAuthOptions } from "src/pages/api/auth/[...nextauth]";
 
 export const createContext = async (opts?: trpcNext.CreateNextContextOptions) => {
     const req = opts?.req;

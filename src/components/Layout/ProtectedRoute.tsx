@@ -1,16 +1,15 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { push: redirect } = useRouter();
     const { status } = useSession();
-    const [myTimeout, setMyTimeout] = useState<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         if (status === "unauthenticated") {
-            setMyTimeout(setTimeout(() => redirect("/"), 3000));
+            setTimeout(() => redirect("/"), 3000);
         }
     }, [redirect, status]);
 

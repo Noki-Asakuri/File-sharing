@@ -14,6 +14,6 @@ export default function genID(fileName: string, length: number = 10) {
 
     return {
         fileID: result,
-        file: `${file}-${result}${ext}`,
+        path: `${file}-${result}${ext}`,
     };
 }

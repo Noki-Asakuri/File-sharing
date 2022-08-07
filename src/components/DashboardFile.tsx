@@ -5,7 +5,7 @@ import { File } from "@prisma/client";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import React, { Dispatch, useRef, useState } from "react";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import {
     FaArrowAltCircleDown,
     FaCheckCircle,
@@ -133,7 +133,6 @@ const DashboardFile: React.FC<{
                     <span>{error.message}</span>
                 </div>
             )}
-            <Toaster />
         </div>
     );
 };

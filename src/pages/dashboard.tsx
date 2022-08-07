@@ -1,8 +1,10 @@
-import useDebounce from "@/server/hooks/useDebounce";
-import { trpc } from "@/utils/trpc";
 import type { NextPage } from "next";
+import dynamic from "next/dynamic";
 import Image from "next/future/image";
 import { Reducer, useReducer, useState } from "react";
+
+import useDebounce from "@/server/hooks/useDebounce";
+import { trpc } from "@/utils/trpc";
 
 import {
     FaAngleDoubleLeft,
@@ -12,11 +14,9 @@ import {
     FaRedo,
     FaSearch,
 } from "react-icons/fa";
+import { Toaster } from "react-hot-toast";
 
-import dynamic from "next/dynamic";
-const DashboardFile = dynamic(() => import("@/components/DashboardFile"), {
-    suspense: true,
-});
+const DashboardFile = dynamic(() => import("@/components/DashboardFile"), { ssr: false });
 
 export interface ActionType {
     type: "FIRST" | "PREV" | "NEXT" | "LAST" | "SET" | "UPDATE" | "DELETE";
@@ -161,9 +161,7 @@ const Dashboard: NextPage = () => {
                                 setFetching(true);
                                 refetch();
 
-                                setTimeout(() => {
-                                    setFetching(false);
-                                }, 1000);
+                                setTimeout(() => setFetching(false), 1000);
                             }}
                         >
                             <FaRedo className={isRefetching ? "animate-refetchSpin" : undefined} />
@@ -174,8 +172,8 @@ const Dashboard: NextPage = () => {
                 {isLoading && (
                     <div className="flex items-center justify-center w-full h-full">
                         <Image
-                            width="100px"
-                            height="100px"
+                            width="100"
+                            height="100"
                             src={"/loading.svg"}
                             alt={"Loading image"}
                         />
@@ -237,6 +235,7 @@ const Dashboard: NextPage = () => {
                                 </button>
                             </div>
                         )}
+                        <Toaster />
                     </>
                 )}
             </div>
