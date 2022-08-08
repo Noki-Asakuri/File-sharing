@@ -6,6 +6,7 @@
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
+        "build/start": "pnpm build && pnpm start",
         "lint": "next lint",
         "format": "prettier --write --plugin-search-dir=. .",
         "postinstall": "prisma generate"
