@@ -1,12 +1,12 @@
-import { Dispatch, useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
-import { supabase } from "@/server/db/supabase";
 import { ActionType, State } from "@/pages";
+import { supabase } from "@/server/db/supabase";
 
 import genID from "@/utils/genID";
 import { trpc } from "@/utils/trpc";
 
-type storageType = { state: State; dispatch: Dispatch<ActionType> };
+type storageType = { state: State; dispatch: ({}: ActionType) => void };
 
 const useStorage = ({ state, dispatch }: storageType) => {
     const uploadPassword = useRef<string | null>(null);
@@ -19,6 +19,7 @@ const useStorage = ({ state, dispatch }: storageType) => {
             dispatch({ type: "ERROR", payload: message });
         },
         onSuccess: () => {
+            uploadPassword.current = password.current?.value.length ? password.current.value : null;
             dispatch({ type: "UPLOADED" });
         },
     });
@@ -38,8 +39,6 @@ const useStorage = ({ state, dispatch }: storageType) => {
                     password: password.current!.value,
                 }),
             ]);
-
-            uploadPassword.current = password.current?.value.length ? password.current.value : null;
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [file],
