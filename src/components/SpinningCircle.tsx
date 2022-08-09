@@ -1,7 +1,7 @@
-const SpinningCircle: React.FC = () => {
+const SpinningCircle: React.FC<{className?: string}> = ({ className }) => {
     return (
         <svg
-            className={`animate-spin w-6 h-6 text-white`}
+            className={`animate-spin text-white ${className ? className : "w-6 h-6"}`}
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
