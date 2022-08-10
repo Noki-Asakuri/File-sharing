@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createRouter } from "../context";
 
-import * as bcrypt from "bcrypt";
+import { hashSync } from "bcrypt";
 import { TRPCError } from "@trpc/server";
 
 export const uploadRouter = createRouter()
@@ -34,7 +34,7 @@ export const uploadRouter = createRouter()
                     path: path,
                     author: ctx.session.user.name as string,
                     authorID: ctx.session.user.discordID,
-                    password: password ? bcrypt.hashSync(password, 10) : null,
+                    password: password ? hashSync(password, 10) : null,
                     unlockedUser: [ctx.session.user.discordID],
                 },
             });

@@ -3,7 +3,7 @@ import { trpc } from "@/utils/trpc";
 import { File } from "@prisma/client";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import React, { Dispatch, useRef, useState } from "react";
+import React, { Dispatch, useState } from "react";
 import toast from "react-hot-toast";
 import {
     FaArrowAltCircleDown,
@@ -15,8 +15,10 @@ import {
     FaTrash,
     FaUpload,
     FaUserAlt,
+    FaEdit,
 } from "react-icons/fa";
-import SpinningCircle from "./SpinningCircle";
+import SpinningCircle from "../SpinningCircle";
+import ResetModal from "./ResetModal";
 
 dayjs.extend(relativeTime);
 
@@ -34,13 +36,13 @@ const DashboardFile: React.FC<{
                     background: "#262626",
                     color: "#E8DCFF",
                 },
-                iconTheme: { primary: "#E8DCFF", secondary: "#262626" },
+                iconTheme: { primary: "#e06c75", secondary: "#262626" },
                 duration: 2000,
             });
         },
-        onSettled: (a) => {
-            setDeleting(false)
-        }
+        onSettled: () => {
+            setDeleting(false);
+        },
     });
 
     return (
@@ -100,6 +102,13 @@ const DashboardFile: React.FC<{
                     </div>
                 </li>
             </ul>
+
+            <ResetModal file={{ authorID: file.authorID, fileID: file.fileID }}>
+                <button className="absolute p-3 duration-500 rounded-full hover:text-blue-500 bg-slate-700 top-2 right-14">
+                    <FaEdit className="w-4 h-4" />
+                </button>
+            </ResetModal>
+
             <button
                 className="absolute p-3 duration-500 rounded-full hover:text-red-500 bg-slate-700 top-2 right-2"
                 onClick={() => {

@@ -118,6 +118,8 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
         },
         onSuccess: ({ downloadUrl }) => {
             createDownload(file.name, downloadUrl);
+        },
+        onSettled: () => {
             setIsDownload(false);
         },
     });
@@ -138,29 +140,13 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
                 <meta property="og:site_name" content={file.author} />
                 <meta
                     property="og:description"
-                    content={`Files: ${file.name}\nDownload: ${file.downloadCount}\nUpload ${file.createdAt}`}
+                    content={`File: ${file.name}\nDownload: ${file.downloadCount}\nUpload ${file.createdAt}`}
                 />
-                <meta
-                    property="og:image"
-                    content={
-                        "https://cdn.discordapp.com/app-icons/995449385955635291/85c876d481eac600c58b1d3848b18f68.png?size=4096"
-                    }
-                />
+                <meta property="og:image" content={author.image} />
             </Head>
-            {status === "loading" && (
-                <div className="absolute top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-gradient-to-br from-[#5b6367] to-[#323240]">
-                    <Image
-                        width="100"
-                        height="100"
-                        src={"/loading.svg"}
-                        alt={"Loading image"}
-                        unoptimized
-                    />
-                </div>
-            )}
 
             {status !== "loading" && (
-                <div className="flex items-center justify-center h-screen">
+                <article className="flex items-center justify-center h-screen">
                     {Locked && file.password && (
                         <PasswordForm
                             password={file.password}
@@ -170,7 +156,7 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
                     )}
 
                     {!Locked && (
-                        <div className="rounded-2xl bg-gradient-to-br from-gray-700 to-slate-900 w-[600px] h-[400px]">
+                        <div className="rounded-2xl bg-gradient-to-br from-gray-700 to-slate-900 w-[500px] h-[400px]">
                             <div className="flex items-center justify-between w-full pt-7 px-7">
                                 <div className="flex flex-col justify-center">
                                     <Image
@@ -185,6 +171,11 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
                                         <span className="text-gray-400">
                                             {author.discriminator}
                                         </span>
+                                        {session?.user.discordID === author.discordID && (
+                                            <span className="text-xs text-gray-500">
+                                                {" (You)"}
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
                                 <div>
@@ -204,83 +195,75 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
                             </div>
 
                             <div>
-                                <div>
-                                    <div className="relative flex px-7 gap-7">
-                                        <button
-                                            className="w-24 py-2"
-                                            onClick={() => updateTab("File")}
-                                        >
-                                            File Info
-                                        </button>
-                                        <button
-                                            className="w-24 py-2"
-                                            onClick={() => updateTab("User")}
-                                        >
-                                            User Info
-                                        </button>
-                                        <div
-                                            className={`absolute bottom-0 w-24 border-b-2 border-white transition-transform ${activeTab.page}`}
-                                        />
-                                    </div>
+                                <div className="relative flex px-7 gap-7">
+                                    <button className="w-24 py-2" onClick={() => updateTab("File")}>
+                                        File Info
+                                    </button>
+                                    <button className="w-24 py-2" onClick={() => updateTab("User")}>
+                                        User Info
+                                    </button>
+                                    <div
+                                        className={`absolute bottom-0 w-24 border-b-2 border-white transition-transform ${activeTab.page}`}
+                                    />
+                                </div>
 
-                                    <div className="w-full border-t-2 border-t-gray-600 opacity-60" />
-                                    <div>
-                                        {activeTab.tab === "File" && (
-                                            <div className="flex flex-col gap-3 p-7 max-w-max">
+                                <div className="w-full border-t-2 border-t-gray-600 opacity-60" />
+                                <div>
+                                    {activeTab.tab === "File" && (
+                                        <div className="flex flex-col gap-3 p-7 max-w-max">
+                                            <span className="flex items-center justify-start gap-2">
+                                                <FaIdCard />
+                                                Name: {file.name}
+                                            </span>
+                                            <span className="flex items-center justify-start gap-2">
+                                                <FaArrowAltCircleDown />
+                                                Downloaded: {file.downloadCount}
+                                            </span>
+                                            <div className="relative group max-w-max">
                                                 <span className="flex items-center justify-start gap-2">
-                                                    <FaIdCard />
-                                                    Name: {file.name}
+                                                    <FaUpload />
+                                                    Uploaded {file.relativeTime}
                                                 </span>
-                                                <span className="flex items-center justify-start gap-2">
-                                                    <FaArrowAltCircleDown />
-                                                    Downloaded: {file.downloadCount}
+                                                <span className="absolute -top-2 left-[110%] scale-0 text-sm group-hover:scale-100 w-max bg-[#18191c] py-2 px-3 rounded-md transition-all">
+                                                    <div className="absolute w-2 h-2 bg-inherit arrow top-[40%] -left-2" />
+                                                    {file.createdAt}
                                                 </span>
-                                                <div className="relative group max-w-max">
-                                                    <span className="flex items-center justify-start gap-2">
-                                                        <FaUpload />
-                                                        Uploaded {file.relativeTime}
-                                                    </span>
-                                                    <span className="absolute -top-2 left-[110%] scale-0 text-sm group-hover:scale-100 w-max bg-[#18191c] py-2 px-3 rounded-md transition-all">
-                                                        <div className="absolute w-2 h-2 bg-inherit arrow top-[40%] -left-2" />
-                                                        {file.createdAt}
-                                                    </span>
-                                                </div>
                                             </div>
-                                        )}
-                                        {activeTab.tab === "User" && (
-                                            <div className="flex flex-col gap-3 p-7">
+                                        </div>
+                                    )}
+                                    {activeTab.tab === "User" && (
+                                        <div className="flex flex-col gap-3 p-7">
+                                            <span className="flex items-center justify-start gap-2">
+                                                <FaIdCard />
+                                                Name: {author.fullName}
+                                            </span>
+                                            <span className="flex items-center justify-start gap-2">
+                                                <FaUserTie />
+                                                Admin:{" "}
+                                                {author.isAdmin ? (
+                                                    <FaCheckCircle className="text-green-500" />
+                                                ) : (
+                                                    <FaTimesCircle className="text-red-500" />
+                                                )}
+                                            </span>
+                                            <div className="relative group w-max">
                                                 <span className="flex items-center justify-start gap-2">
-                                                    <FaIdCard />
-                                                    Name: {author.fullName}
+                                                    <FaSignInAlt />
+                                                    Joined {author.relativeTime}
                                                 </span>
-                                                <span className="flex items-center justify-start gap-2">
-                                                    <FaUserTie />
-                                                    Admin:{" "}
-                                                    {author.isAdmin ? (
-                                                        <FaCheckCircle className="text-green-500" />
-                                                    ) : (
-                                                        <FaTimesCircle className="text-red-500" />
-                                                    )}
+                                                <span className="absolute -top-2 left-[110%] scale-0 text-sm group-hover:scale-100 w-max bg-[#18191c] py-2 px-3 rounded-md transition-all">
+                                                    <div className="absolute w-2 h-2 bg-inherit arrow top-[40%] -left-2" />
+                                                    {author.joinDate}
                                                 </span>
-                                                <div className="relative group w-max">
-                                                    <span className="flex items-center justify-start gap-2">
-                                                        <FaSignInAlt />
-                                                        Joined {author.relativeTime}
-                                                    </span>
-                                                    <span className="absolute -top-2 left-[110%] scale-0 text-sm group-hover:scale-100 w-max bg-[#18191c] py-2 px-3 rounded-md transition-all">
-                                                        <div className="absolute w-2 h-2 bg-inherit arrow top-[40%] -left-2" />
-                                                        {author.joinDate}
-                                                    </span>
-                                                </div>
                                             </div>
-                                        )}
-                                    </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
                     )}
                     <Toaster />
-                </div>
+                </article>
             )}
         </>
     );
@@ -324,11 +307,11 @@ export async function getStaticProps(ctx: GetStaticPropsContext) {
                 createdAt: dayjs(file.createdAt).format("MM-DD-YYYY, hh:mm:ss A"),
             },
             author: {
-                name: author.name?.split("#")[0] as string,
-                discriminator: ("#" + author.name?.split("#")[1]) as string,
-                fullName: author.name,
-                discordID: author.discordID,
-                image: author.image as string,
+                name: author.name?.split("#")[0]!,
+                discriminator: "#" + author.name?.split("#")[1]!,
+                fullName: author.name!,
+                discordID: author.discordID!,
+                image: author.image!,
                 isAdmin: author.isAdmin,
                 relativeTime: dayjs(author.joinDate).fromNow(),
                 joinDate: dayjs(author.joinDate).format("MM-DD-YYYY, hh:mm:ss A"),
@@ -340,7 +323,7 @@ export async function getStaticProps(ctx: GetStaticPropsContext) {
 
 export async function getStaticPaths() {
     const file = await prisma.file.findMany({ select: { fileID: true } });
-    const paths = file.map((f) => ({ params: { fileID: f.fileID } }));
+    const paths = file.map(({ fileID }) => ({ params: { fileID } }));
 
     return { paths, fallback: "blocking" };
 }

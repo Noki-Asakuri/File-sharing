@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createRouter } from "../context";
 
+import { hashSync } from "bcrypt";
 import { TRPCError } from "@trpc/server";
 
 export const fileRouter = createRouter()
@@ -89,5 +90,21 @@ export const fileRouter = createRouter()
             return {
                 downloadUrl: (await supabase.createSignedUrl(file.path, 60)).signedURL!,
             };
+        },
+    })
+    .mutation("update-pass", {
+        input: z.object({ fileID: z.string(), authorID: z.string(), newPassword: z.string() }),
+        resolve: async ({ ctx, input }) => {
+            const { prisma, res } = ctx;
+            const { fileID, authorID, newPassword } = input;
+
+            await prisma.file.update({
+                where: { fileID },
+                data: {
+                    password: hashSync(newPassword, 10),
+                    unlockedUser: [authorID],
+                },
+            });
+            await res?.revalidate(`/file/${fileID}`);
         },
     });

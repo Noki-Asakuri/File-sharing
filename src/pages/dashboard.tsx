@@ -16,7 +16,7 @@ import {
 } from "react-icons/fa";
 import { Toaster } from "react-hot-toast";
 
-const DashboardFile = dynamic(() => import("@/components/DashboardFile"), { ssr: false });
+const DashboardFile = dynamic(() => import("@/components/Dashboard/DashboardFile"), { ssr: false });
 
 export interface ActionType {
     type: "FIRST" | "PREV" | "NEXT" | "LAST" | "SET" | "UPDATE" | "DELETE";
