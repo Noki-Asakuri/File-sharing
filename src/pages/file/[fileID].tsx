@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/future/image";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { GetStaticPropsContext } from "next";
 import {
     FaArrowAltCircleDown,
@@ -23,15 +23,17 @@ import { trpc } from "@/utils/trpc";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import toast, { Toaster } from "react-hot-toast";
+import { useSession } from "next-auth/react";
 
 dayjs.extend(relativeTime);
 
 interface PasswordFormType {
+    fileID: string;
     password: string;
     setLocked: (value: boolean) => void;
 }
 
-const PasswordForm: React.FC<PasswordFormType> = ({ password, setLocked }) => {
+const PasswordForm: React.FC<PasswordFormType> = ({ fileID, password, setLocked }) => {
     const inputPasswordRef = useRef<HTMLInputElement>(null);
     const [showPassword, setShowPassword] = useState<boolean>(false);
 
@@ -58,7 +60,7 @@ const PasswordForm: React.FC<PasswordFormType> = ({ password, setLocked }) => {
             className="flex flex-col p-10 gap-y-7 rounded-2xl bg-gradient-to-tl from-slate-800 to-slate-900"
             onSubmit={(e) => {
                 e.preventDefault();
-                checkPass({ password, inputPassword: inputPasswordRef.current!.value });
+                checkPass({ fileID, password, inputPassword: inputPasswordRef.current!.value });
             }}
         >
             <div className="flex items-center justify-center w-full gap-2 text-2xl">
@@ -96,21 +98,16 @@ const PasswordForm: React.FC<PasswordFormType> = ({ password, setLocked }) => {
 type StaticProps = NonNullable<Awaited<ReturnType<typeof getStaticProps>>["props"]>;
 
 const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
-    const [Locked, setLocked] = useState<boolean>(!!file.password);
+    const { data: session, status } = useSession();
+
+    const [Locked, setLocked] = useState<boolean>(true);
     const [isDownload, setIsDownload] = useState<boolean>(false);
-    const [activeTab, setActiveTab] = useState<{ tab: "File" | "User"; page: string }>({
+    const [activeTab, setActiveTab] = useState<{ tab: "File" | "User"; page?: string }>({
         tab: "File",
-        page: "",
     });
 
     const updateTab = (tab: "File" | "User") => {
-        let page: string;
-
-        if (tab === "File") {
-            page = "";
-        } else {
-            page = "translate-x-[126px]";
-        }
+        let page = tab === "File" ? "" : "translate-x-[126px]";
 
         return setActiveTab({ tab, page });
     };
@@ -121,9 +118,19 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
         },
         onSuccess: ({ downloadUrl }) => {
             createDownload(file.name, downloadUrl);
+        },
+        onSettled: () => {
             setIsDownload(false);
         },
     });
+
+    useEffect(() => {
+        if (status !== "loading" && session) {
+            setLocked(!!file.password && !file.unlockedUser.includes(session.user.discordID!));
+        }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [status, session]);
 
     return (
         <>
@@ -133,53 +140,60 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
                 <meta property="og:site_name" content={file.author} />
                 <meta
                     property="og:description"
-                    content={`Files: ${file.name}\nDownload: ${file.downloadCount}\nUpload ${file.createdAt}`}
+                    content={`File: ${file.name}\nDownload: ${file.downloadCount}\nUpload ${file.createdAt}`}
                 />
-                <meta
-                    property="og:image"
-                    content={
-                        "https://cdn.discordapp.com/app-icons/995449385955635291/85c876d481eac600c58b1d3848b18f68.png?size=256"
-                    }
-                />
+                <meta property="og:image" content={author.image} />
             </Head>
-            <div className="flex items-center justify-center h-screen">
-                {Locked && file.password && (
-                    <PasswordForm password={file.password} setLocked={setLocked} />
-                )}
 
-                {!Locked && (
-                    <div className="rounded-2xl bg-gradient-to-br from-gray-700 to-slate-900 w-[600px] h-[400px]">
-                        <div className="flex items-center justify-between w-full pt-7 px-7">
-                            <div className="flex flex-col justify-center">
-                                <Image
-                                    className="rounded-full"
-                                    src={author.image}
-                                    alt="Discord Avatar"
-                                    width="130"
-                                    height="130"
-                                />
-                                <div className="py-2 text-lg">
-                                    <span className="font-bold text-white">{author.name}</span>
-                                    <span className="text-gray-400">{author.discriminator}</span>
+            {status !== "loading" && (
+                <article className="flex items-center justify-center h-screen">
+                    {Locked && file.password && (
+                        <PasswordForm
+                            password={file.password}
+                            setLocked={setLocked}
+                            fileID={file.fileID}
+                        />
+                    )}
+
+                    {!Locked && (
+                        <div className="rounded-2xl bg-gradient-to-br from-gray-700 to-slate-900 w-[500px] h-[400px]">
+                            <div className="flex items-center justify-between w-full pt-7 px-7">
+                                <div className="flex flex-col justify-center">
+                                    <Image
+                                        className="rounded-full"
+                                        src={`${author.image}?size=4096`}
+                                        alt="Discord Avatar"
+                                        width="130"
+                                        height="130"
+                                    />
+                                    <div className="py-2 text-lg">
+                                        <span className="font-bold text-white">{author.name}</span>
+                                        <span className="text-gray-400">
+                                            {author.discriminator}
+                                        </span>
+                                        {session?.user.discordID === author.discordID && (
+                                            <span className="text-xs text-gray-500">
+                                                {" (You)"}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                                <div>
+                                    <button
+                                        className="px-4 py-2 rounded-md bg-gradient-to-bl from-green-600 to-green-800 w-44 h-11"
+                                        onClick={() => download({ fileID: file.fileID })}
+                                    >
+                                        {isDownload ? (
+                                            <span className="flex items-center gap-2">
+                                                Downloading <SpinningCircle />
+                                            </span>
+                                        ) : (
+                                            <span>Download</span>
+                                        )}
+                                    </button>
                                 </div>
                             </div>
-                            <div>
-                                <button
-                                    className="px-4 py-2 rounded-md bg-gradient-to-bl from-green-600 to-green-800 w-44 h-11"
-                                    onClick={() => download({ fileID: file.fileID })}
-                                >
-                                    {isDownload ? (
-                                        <span className="flex items-center gap-2">
-                                            Downloading <SpinningCircle />
-                                        </span>
-                                    ) : (
-                                        <span>Download</span>
-                                    )}
-                                </button>
-                            </div>
-                        </div>
 
-                        <div>
                             <div>
                                 <div className="relative flex px-7 gap-7">
                                     <button className="w-24 py-2" onClick={() => updateTab("File")}>
@@ -247,10 +261,10 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
                                 </div>
                             </div>
                         </div>
-                    </div>
-                )}
-                <Toaster />
-            </div>
+                    )}
+                    <Toaster />
+                </article>
+            )}
         </>
     );
 };
@@ -272,6 +286,7 @@ export async function getStaticProps(ctx: GetStaticPropsContext) {
             fileID: true,
             password: true,
             author: true,
+            unlockedUser: true,
         },
     });
 
@@ -281,7 +296,7 @@ export async function getStaticProps(ctx: GetStaticPropsContext) {
 
     const author = await prisma.user.findFirstOrThrow({
         where: { discordID: file.authorID },
-        select: { name: true, joinDate: true, image: true, isAdmin: true },
+        select: { name: true, joinDate: true, image: true, isAdmin: true, discordID: true },
     });
 
     return {
@@ -292,10 +307,11 @@ export async function getStaticProps(ctx: GetStaticPropsContext) {
                 createdAt: dayjs(file.createdAt).format("MM-DD-YYYY, hh:mm:ss A"),
             },
             author: {
-                name: author.name?.split("#")[0] as string,
-                discriminator: ("#" + author.name?.split("#")[1]) as string,
-                fullName: author.name,
-                image: author.image as string,
+                name: author.name?.split("#")[0]!,
+                discriminator: "#" + author.name?.split("#")[1]!,
+                fullName: author.name!,
+                discordID: author.discordID!,
+                image: author.image!,
                 isAdmin: author.isAdmin,
                 relativeTime: dayjs(author.joinDate).fromNow(),
                 joinDate: dayjs(author.joinDate).format("MM-DD-YYYY, hh:mm:ss A"),
@@ -307,7 +323,7 @@ export async function getStaticProps(ctx: GetStaticPropsContext) {
 
 export async function getStaticPaths() {
     const file = await prisma.file.findMany({ select: { fileID: true } });
-    const paths = file.map((f) => ({ params: { fileID: f.fileID } }));
+    const paths = file.map(({ fileID }) => ({ params: { fileID } }));
 
     return { paths, fallback: "blocking" };
 }

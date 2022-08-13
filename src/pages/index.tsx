@@ -117,7 +117,11 @@ const Home: NextPage = () => {
                 />
                 <meta property="og:image" content="/favicon.svg" />
             </Head>
-            <div className={`container ${session ? "h-full" : "h-screen"} mx-auto lg:h-screen`}>
+            <div
+                className={`container ${
+                    session ? "h-full" : "h-screen"
+                } mx-auto md:h-full 2xl:h-screen`}
+            >
                 <header className="pt-28">
                     <h2 className="text-4xl text-center ">File Sharing</h2>
                     <p className="max-w-2xl pt-5 m-auto text-center">

@@ -23,6 +23,8 @@ model File {
     author   String
     authorID String
 
+    unlockedUser String[] @default([])
+
     user User @relation(fields: [authorID], references: [discordID], onDelete: Cascade)
 }
 

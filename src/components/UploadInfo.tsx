@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from "react";
 
 import toast from "react-hot-toast";
+import * as copy from "copy-to-clipboard";
 import {
     FaClipboard,
     FaClipboardCheck,
@@ -24,9 +25,11 @@ const UploadedFile: React.FC<{
             if (!uploadFile) return;
 
             const setPopup = type === "url" ? setPopupUrl : setPopupPass;
-            navigator.clipboard.writeText(
-                type === "url" ? uploadFile.fullUrl : (uploadFile.password as string),
-            );
+            // navigator.clipboard.writeText(
+            //     type === "url" ? uploadFile.fullUrl : (uploadFile.password as string),
+            // );
+            const copyText = type === "url" ? uploadFile.fullUrl : uploadFile.password!;
+            copy.default(copyText);
 
             setPopup(true);
             setTimeout(() => setPopup(false), 2000);
@@ -49,65 +52,60 @@ const UploadedFile: React.FC<{
     );
 
     return (
-        <div className="flex flex-col gap-y-7 items-start p-10 rounded-2xl bg-gradient-to-tr from-slate-800 to-slate-900 w-[455px] h-[300px] drop-shadow-lg">
+        <div className="flex flex-col items-start p-10 gap-y-7 rounded-2xl bg-gradient-to-tr from-slate-800 to-slate-900 drop-shadow-lg w-[455px] h-[300px]">
             <span className="flex items-center justify-center w-full gap-2 text-2xl ">
-                <FaInfoCircle />
-                File Info
+                <FaInfoCircle /> File Info
             </span>
             {!uploadFile && (
-                <>
-                    <div className="flex items-center justify-center w-full h-[60%]">
-                        <span>Upload a file to access the file info!</span>
-                    </div>
-                </>
+                <div className="flex items-center justify-center w-full h-3/5">
+                    <span>Upload a file to access the file info!</span>
+                </div>
             )}
 
             {uploadFile && (
-                <>
-                    <ul className="flex flex-col w-full gap-y-3">
-                        <li>
+                <div className="flex flex-col w-full gap-y-3">
+                    <div>
+                        <span className="flex items-center justify-start gap-2">
+                            <FaIdCard />
+                            ID: {uploadFile.fileID}
+                        </span>
+                    </div>
+                    <div>
+                        <span className="flex items-center justify-start gap-2">
+                            <FaUserAlt />
+                            Name: {uploadFile.name}
+                        </span>
+                    </div>
+                    {uploadFile.password && (
+                        <div className="relative">
                             <span className="flex items-center justify-start gap-2">
-                                <FaIdCard />
-                                ID: {uploadFile.fileID}
-                            </span>
-                        </li>
-                        <li>
-                            <span className="flex items-center justify-start gap-2">
-                                <FaUserAlt />
-                                Name: {uploadFile.name}
-                            </span>
-                        </li>
-                        {uploadFile.password && (
-                            <li className="relative">
-                                <span className="flex items-center justify-start gap-2">
-                                    <FaLock /> Password: {"*".repeat(uploadFile.password.length)}
-                                </span>
-
-                                <button
-                                    className="absolute right-0 p-3 transition-all duration-500 -top-2 rounded-xl hover:bg-slate-700"
-                                    onClick={() => createToast("pass")}
-                                >
-                                    {!popupPass ? <FaClipboard /> : <FaClipboardCheck />}
-                                </button>
-                            </li>
-                        )}
-                        <li className="relative">
-                            <span className="text-ellipsis whitespace-nowrap overflow-hidden max-w-[350px] gap-2 flex justify-start items-center">
-                                <FaCloudDownloadAlt /> Url:
-                                <a href={uploadFile.url} target="_blank" rel="noreferrer">
-                                    {uploadFile.url || "None"}
-                                </a>
+                                <FaLock /> Password: {"*".repeat(uploadFile.password.length)}
                             </span>
 
                             <button
                                 className="absolute right-0 p-3 transition-all duration-500 -top-2 rounded-xl hover:bg-slate-700"
-                                onClick={() => createToast("url")}
+                                onClick={() => createToast("pass")}
                             >
-                                {!popupUrl ? <FaClipboard /> : <FaClipboardCheck />}
+                                {!popupPass ? <FaClipboard /> : <FaClipboardCheck />}
                             </button>
-                        </li>
-                    </ul>
-                </>
+                        </div>
+                    )}
+                    <div className="relative">
+                        <span className="text-ellipsis whitespace-nowrap overflow-hidden max-w-[350px] gap-2 flex justify-start items-center">
+                            <FaCloudDownloadAlt /> Url:
+                            <a href={uploadFile.url} target="_blank" rel="noreferrer">
+                                {uploadFile.url}
+                            </a>
+                        </span>
+
+                        <button
+                            className="absolute right-0 p-3 transition-all duration-500 -top-2 rounded-xl hover:bg-slate-700"
+                            onClick={() => createToast("url")}
+                        >
+                            {!popupUrl ? <FaClipboard /> : <FaClipboardCheck />}
+                        </button>
+                    </div>
+                </div>
             )}
         </div>
     );

@@ -1,10 +1,9 @@
 import { ActionType } from "@/pages/dashboard";
-import getBaseUrl from "@/utils/getBaseUrl";
 import { trpc } from "@/utils/trpc";
 import { File } from "@prisma/client";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import React, { Dispatch, useRef, useState } from "react";
+import React, { Dispatch, useState } from "react";
 import toast from "react-hot-toast";
 import {
     FaArrowAltCircleDown,
@@ -16,8 +15,10 @@ import {
     FaTrash,
     FaUpload,
     FaUserAlt,
+    FaEdit,
 } from "react-icons/fa";
-import SpinningCircle from "./SpinningCircle";
+import SpinningCircle from "../SpinningCircle";
+import ResetModal from "./ResetModal";
 
 dayjs.extend(relativeTime);
 
@@ -27,12 +28,26 @@ const DashboardFile: React.FC<{
 }> = ({ file, dispatch }) => {
     const [deleting, setDeleting] = useState<boolean>(false);
 
-    const fileUrl = useRef<string>(getBaseUrl() + "/file/" + file.fileID);
-    const { mutateAsync: deleteFile, error } = trpc.useMutation("file.delete-file-by-id");
+    const { mutate: deleteFile } = trpc.useMutation("file.delete-file-by-id", {
+        onError: ({ message }) => {
+            toast.error(message, {
+                style: {
+                    borderRadius: "10px",
+                    background: "#262626",
+                    color: "#E8DCFF",
+                },
+                iconTheme: { primary: "#e06c75", secondary: "#262626" },
+                duration: 2000,
+            });
+        },
+        onSettled: () => {
+            setDeleting(false);
+        },
+    });
 
     return (
         <div className="relative flex items-center justify-between max-w-full px-5 py-2 mx-3 border rounded-lg bg-slate-800 border-slate-700 dashboard:h-64">
-            <ul className="grid grid-cols-[minxmax(200px,1fr)_1fr_1fr] gap-x-10 w-4/5 text-lg dashboard:text-base">
+            <ul className="grid grid-cols-[minxmax(200px,1fr)_1fr_1fr] gap-x-10 w-4/5 text-base">
                 <li className="col-span-4">
                     <div className="flex items-center justify-start gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
                         <FaIdCard />
@@ -60,8 +75,8 @@ const DashboardFile: React.FC<{
                 <li className="col-span-2">
                     <span className="flex items-center justify-start gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
                         <FaCloudDownloadAlt /> Url:{" "}
-                        <a href={fileUrl.current} target="_blank" rel="noreferrer">
-                            {fileUrl.current}
+                        <a href={`file/${file.fileID}`} target="_blank" rel="noreferrer">
+                            {`file/${file.fileID}`}
                         </a>
                     </span>
                 </li>
@@ -87,52 +102,26 @@ const DashboardFile: React.FC<{
                     </div>
                 </li>
             </ul>
-            <button
-                className="p-3 duration-500 rounded-full hover:text-red-500 bg-slate-700 dashboard:absolute dashboard:top-2 dashboard:right-2"
-                onClick={() => {
-                    const deleteFunc = async () => {
-                        await deleteFile({ fileID: file.fileID });
-                        dispatch({ type: "DELETE", payload: file.fileID });
-                    };
 
-                    if (window.innerWidth > 1400) {
-                        setDeleting(true);
-                        deleteFunc().then(() => setDeleting(false));
-                    } else {
-                        toast.promise(
-                            deleteFunc(),
-                            {
-                                loading: <b>Deleting...</b>,
-                                success: <b>Deleted file.</b>,
-                                error: <b>Could not delete file.</b>,
-                            },
-                            {
-                                style: {
-                                    borderRadius: "10px",
-                                    background: "#262626",
-                                    color: "#E8DCFF",
-                                },
-                                iconTheme: {
-                                    primary: "#E8DCFF",
-                                    secondary: "#262626",
-                                },
-                            },
-                        );
-                    }
+            <ResetModal file={{ authorID: file.authorID, fileID: file.fileID }}>
+                <button className="absolute p-3 duration-500 rounded-full hover:text-blue-500 bg-slate-700 top-2 right-14">
+                    <FaEdit className="w-4 h-4" />
+                </button>
+            </ResetModal>
+
+            <button
+                className="absolute p-3 duration-500 rounded-full hover:text-red-500 bg-slate-700 top-2 right-2"
+                onClick={() => {
+                    deleteFile({ fileID: file.fileID });
+                    dispatch({ type: "DELETE", payload: file.fileID });
                 }}
             >
                 {deleting ? (
-                    <SpinningCircle />
+                    <SpinningCircle className="w-4 h-4" />
                 ) : (
-                    <FaTrash className="w-6 h-6 dashboard:w-4 dashboard:h-4" />
+                    <FaTrash className="w-4 h-4" />
                 )}
             </button>
-
-            {error && (
-                <div className="text-red-500">
-                    <span>{error.message}</span>
-                </div>
-            )}
         </div>
     );
 };

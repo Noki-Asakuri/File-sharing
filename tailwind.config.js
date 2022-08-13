@@ -35,7 +35,7 @@ module.exports = {
                 rainbow: "rainbow-animation 20s linear infinite",
             },
             screens: {
-                dashboard: { max: "1380px" },
+                dashboard: { min: "1380px" },
             },
             backgroundImage: {
                 "rainbow-text":
