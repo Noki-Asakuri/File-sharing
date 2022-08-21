@@ -1,7 +1,8 @@
-import { ActionType, State } from "@/pages";
+import type { ActionType, State } from "./";
+
 import React, { useState } from "react";
 import { FaEye, FaEyeSlash, FaFile, FaLock, FaUpload } from "react-icons/fa";
-import SpinningCircle from "./SpinningCircle";
+import SpinningCircle from "../Svg/SpinningCircle";
 
 const UploadForm: React.FC<{
     state: State;
@@ -11,20 +12,20 @@ const UploadForm: React.FC<{
 
     return (
         <form
-            className="flex flex-col gap-y-6 items-start relative max-w-max p-10 rounded-2xl bg-gradient-to-tl from-slate-800 to-slate-900 h-[300px] drop-shadow-lg"
+            className="relative flex h-[300px] max-w-max flex-col items-start gap-y-6 rounded-2xl bg-gradient-to-tl from-slate-800 to-slate-900 p-10 drop-shadow-lg"
             onSubmit={(e) => {
                 e.preventDefault();
                 dispatch({ type: "SUBMIT" });
             }}
         >
-            <span className="flex items-center justify-center w-full gap-2 text-2xl">
+            <span className="flex w-full items-center justify-center gap-2 text-2xl">
                 <FaUpload />
                 Upload File
             </span>
             <label htmlFor="file" className="flex items-center justify-center gap-2">
                 <FaFile />
                 File:
-                <span className="px-4 py-2 bg-slate-700 rounded-2xl">
+                <span className="rounded-2xl bg-slate-700 px-4 py-2">
                     {state.file?.name || "None"}
                 </span>
             </label>
@@ -35,14 +36,14 @@ const UploadForm: React.FC<{
                 name="file"
                 onChange={(e) => dispatch({ type: "CHANGE", payload: e.target.files![0] })}
             />
-            <div className="flex items-center justify-center max-w-max gap-x-4">
+            <div className="flex max-w-max items-center justify-center gap-x-4">
                 <label htmlFor="password" className="flex items-center justify-center gap-2">
                     <FaLock /> Password:
                 </label>
 
-                <div className="flex items-center justify-center bg-slate-700 rounded-2xl">
+                <div className="flex items-center justify-center rounded-2xl bg-slate-700">
                     <input
-                        className="py-2 ml-4 bg-inherit focus:outline-none"
+                        className="ml-4 bg-inherit py-2 focus:outline-none"
                         type={showPassword ? "password" : "text"}
                         name="password"
                         id="password"
@@ -60,13 +61,13 @@ const UploadForm: React.FC<{
             </div>
 
             <button
-                className="bg-slate-700 py-2 w-full rounded-2xl h-[40px] drop-shadow-lg"
+                className="h-[40px] w-full rounded-2xl bg-slate-700 py-2 drop-shadow-lg"
                 type="submit"
             >
                 {!state.isUploading ? (
                     "Submit"
                 ) : (
-                    <div className="flex items-center justify-center w-full">
+                    <div className="flex w-full items-center justify-center">
                         <SpinningCircle />
                     </div>
                 )}

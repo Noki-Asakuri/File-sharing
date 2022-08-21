@@ -1,8 +1,10 @@
-import type { NextPage } from "next";
-import Head from "next/head";
+import type { GetStaticPropsContext, NextPage } from "next";
 import Image from "next/future/image";
-import React, { useState, useRef, useEffect } from "react";
-import { GetStaticPropsContext } from "next";
+import Head from "next/head";
+import { useEffect, useRef, useState } from "react";
+
+import { useSession } from "next-auth/react";
+import toast, { Toaster } from "react-hot-toast";
 import {
     FaArrowAltCircleDown,
     FaCheckCircle,
@@ -16,15 +18,13 @@ import {
     FaUserTie,
 } from "react-icons/fa";
 
-import SpinningCircle from "@/components/SpinningCircle";
+import SpinningCircle from "@/components/Svg/SpinningCircle";
 import { prisma } from "@/server/db/client";
-import createDownload from "@/utils/download";
 import { trpc } from "@/utils/trpc";
+import createDownload from "@/utils/download";
+
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import toast, { Toaster } from "react-hot-toast";
-import { useSession } from "next-auth/react";
-
 dayjs.extend(relativeTime);
 
 interface PasswordFormType {
@@ -57,20 +57,20 @@ const PasswordForm: React.FC<PasswordFormType> = ({ fileID, password, setLocked 
 
     return (
         <form
-            className="flex flex-col p-10 gap-y-7 rounded-2xl bg-gradient-to-tl from-slate-800 to-slate-900"
+            className="flex flex-col gap-y-7 rounded-2xl bg-gradient-to-tl from-slate-800 to-slate-900 p-10"
             onSubmit={(e) => {
                 e.preventDefault();
                 checkPass({ fileID, password, inputPassword: inputPasswordRef.current!.value });
             }}
         >
-            <div className="flex items-center justify-center w-full gap-2 text-2xl">
+            <div className="flex w-full items-center justify-center gap-2 text-2xl">
                 <FaLock /> Locked
             </div>
-            <div className="flex items-center justify-center max-w-max gap-x-2">
+            <div className="flex max-w-max items-center justify-center gap-x-2">
                 <label htmlFor="password">Password:</label>
-                <div className="flex items-center justify-center bg-slate-700 rounded-2xl">
+                <div className="flex items-center justify-center rounded-2xl bg-slate-700">
                     <input
-                        className="py-2 ml-4 bg-inherit focus:outline-none placeholder:text-xs"
+                        className="ml-4 bg-inherit py-2 placeholder:text-xs focus:outline-none"
                         type={showPassword ? "text" : "password"}
                         name="password"
                         id="password"
@@ -88,7 +88,7 @@ const PasswordForm: React.FC<PasswordFormType> = ({ fileID, password, setLocked 
                 </div>
             </div>
 
-            <button className="flex justify-center py-2 bg-slate-700 rounded-2xl" type="submit">
+            <button className="flex justify-center rounded-2xl bg-slate-700 py-2" type="submit">
                 {!isLoading ? "Submit" : <SpinningCircle />}
             </button>
         </form>
@@ -146,7 +146,7 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
             </Head>
 
             {status !== "loading" && (
-                <article className="flex items-center justify-center h-screen">
+                <article className="flex h-screen items-center justify-center">
                     {Locked && file.password && (
                         <PasswordForm
                             password={file.password}
@@ -156,12 +156,12 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
                     )}
 
                     {!Locked && (
-                        <div className="rounded-2xl bg-gradient-to-br from-gray-700 to-slate-900 w-[500px] h-[400px]">
-                            <div className="flex items-center justify-between w-full pt-7 px-7">
+                        <div className="h-[400px] w-[500px] rounded-2xl bg-gradient-to-br from-gray-700 to-slate-900">
+                            <div className="flex w-full items-center justify-between px-7 pt-7">
                                 <div className="flex flex-col justify-center">
                                     <Image
                                         className="rounded-full"
-                                        src={`${author.image}?size=4096`}
+                                        src={`${author.image}?size=1024`}
                                         alt="Discord Avatar"
                                         width="130"
                                         height="130"
@@ -180,7 +180,7 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
                                 </div>
                                 <div>
                                     <button
-                                        className="px-4 py-2 rounded-md bg-gradient-to-bl from-green-600 to-green-800 w-44 h-11"
+                                        className="h-11 w-44 rounded-md bg-gradient-to-bl from-green-600 to-green-800 px-4 py-2"
                                         onClick={() => download({ fileID: file.fileID })}
                                     >
                                         {isDownload ? (
@@ -195,7 +195,7 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
                             </div>
 
                             <div>
-                                <div className="relative flex px-7 gap-7">
+                                <div className="relative flex gap-7 px-7">
                                     <button className="w-24 py-2" onClick={() => updateTab("File")}>
                                         File Info
                                     </button>
@@ -210,7 +210,7 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
                                 <div className="w-full border-t-2 border-t-gray-600 opacity-60" />
                                 <div>
                                     {activeTab.tab === "File" && (
-                                        <div className="flex flex-col gap-3 p-7 max-w-max">
+                                        <div className="flex max-w-max flex-col gap-3 p-7">
                                             <span className="flex items-center justify-start gap-2">
                                                 <FaIdCard />
                                                 Name: {file.name}
@@ -219,13 +219,13 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
                                                 <FaArrowAltCircleDown />
                                                 Downloaded: {file.downloadCount}
                                             </span>
-                                            <div className="relative group max-w-max">
+                                            <div className="group relative max-w-max">
                                                 <span className="flex items-center justify-start gap-2">
                                                     <FaUpload />
                                                     Uploaded {file.relativeTime}
                                                 </span>
-                                                <span className="absolute -top-2 left-[110%] scale-0 text-sm group-hover:scale-100 w-max bg-[#18191c] py-2 px-3 rounded-md transition-all">
-                                                    <div className="absolute w-2 h-2 bg-inherit arrow top-[40%] -left-2" />
+                                                <span className="absolute -top-2 left-[110%] w-max scale-0 rounded-md bg-[#18191c] py-2 px-3 text-sm transition-all group-hover:scale-100">
+                                                    <div className="arrow absolute top-[40%] -left-2 h-2 w-2 bg-inherit" />
                                                     {file.createdAt}
                                                 </span>
                                             </div>
@@ -246,13 +246,13 @@ const FileDownload: NextPage<StaticProps> = ({ file, author }) => {
                                                     <FaTimesCircle className="text-red-500" />
                                                 )}
                                             </span>
-                                            <div className="relative group w-max">
+                                            <div className="group relative w-max">
                                                 <span className="flex items-center justify-start gap-2">
                                                     <FaSignInAlt />
                                                     Joined {author.relativeTime}
                                                 </span>
-                                                <span className="absolute -top-2 left-[110%] scale-0 text-sm group-hover:scale-100 w-max bg-[#18191c] py-2 px-3 rounded-md transition-all">
-                                                    <div className="absolute w-2 h-2 bg-inherit arrow top-[40%] -left-2" />
+                                                <span className="absolute -top-2 left-[110%] w-max scale-0 rounded-md bg-[#18191c] py-2 px-3 text-sm transition-all group-hover:scale-100">
+                                                    <div className="arrow absolute top-[40%] -left-2 h-2 w-2 bg-inherit" />
                                                     {author.joinDate}
                                                 </span>
                                             </div>
@@ -290,34 +290,35 @@ export async function getStaticProps(ctx: GetStaticPropsContext) {
         },
     });
 
-    if (!file) {
-        return { notFound: true };
-    }
+    if (!file) return { notFound: true };
 
     const author = await prisma.user.findFirstOrThrow({
         where: { discordID: file.authorID },
         select: { name: true, joinDate: true, image: true, isAdmin: true, discordID: true },
     });
 
+    const dayjsFile = dayjs(file.createdAt);
+    const dayjsAuthor = dayjs(author.joinDate);
+
     return {
         props: {
             file: {
                 ...file,
-                relativeTime: dayjs(file.createdAt).fromNow(),
-                createdAt: dayjs(file.createdAt).format("MM-DD-YYYY, hh:mm:ss A"),
+                relativeTime: dayjsFile.fromNow(),
+                createdAt: dayjsFile.format("MM-DD-YYYY, hh:mm:ss A"),
             },
             author: {
                 name: author.name?.split("#")[0]!,
                 discriminator: "#" + author.name?.split("#")[1]!,
                 fullName: author.name!,
-                discordID: author.discordID!,
+                discordID: author.discordID,
                 image: author.image!,
                 isAdmin: author.isAdmin,
-                relativeTime: dayjs(author.joinDate).fromNow(),
-                joinDate: dayjs(author.joinDate).format("MM-DD-YYYY, hh:mm:ss A"),
+                relativeTime: dayjsAuthor.fromNow(),
+                joinDate: dayjsAuthor.format("MM-DD-YYYY, hh:mm:ss A"),
             },
         },
-        revalidate: 60,
+        revalidate: 300,
     };
 }
 

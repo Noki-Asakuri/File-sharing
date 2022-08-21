@@ -1,3 +1,4 @@
+import { getNewAvatar } from "@/utils/getNewAvatar";
 import { prisma } from "@/server/db/client";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import NextAuth from "next-auth";
@@ -56,29 +57,17 @@ export const authOptions: NextAuthOptions = {
     },
     events: {
         async session({ session }) {
-            const [user, account] = await Promise.all([
-                prisma.user.findFirst({
-                    where: { discordID: session.user.discordID },
-                }),
-                prisma.account.findFirst({
-                    where: { providerAccountId: session.user.discordID },
-                }),
-            ]);
+            const { newAvatarID, user } = await getNewAvatar({ session });
 
-            const res = await fetch("https://discord.com/api/v10/users/@me", {
-                headers: { authorization: `Bearer ${account?.access_token}` },
-            });
-
-            const newAvatarID = (await res.json()).avatar;
             const currentAvatar = user?.image?.slice(user?.image.lastIndexOf("/") + 1).split(".")!;
             const currentAvatarID = currentAvatar[0];
             const currentAvatarFormat = currentAvatar[1];
 
             if (currentAvatarID !== newAvatarID) {
                 await prisma.user.update({
-                    where: { discordID: user?.discordID },
+                    where: { discordID: session.user.discordID },
                     data: {
-                        image: `https://cdn.discordapp.com/avatars/${user?.discordID}/${newAvatarID}.${currentAvatarFormat}`,
+                        image: `https://cdn.discordapp.com/avatars/${session.user.discordID}/${newAvatarID}.${currentAvatarFormat}`,
                     },
                 });
             }

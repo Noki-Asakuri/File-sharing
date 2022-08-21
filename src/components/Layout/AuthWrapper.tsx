@@ -1,7 +1,7 @@
 import { useSession } from "next-auth/react";
-import Image from "next/future/image";
 import { useRouter } from "next/router";
 import React from "react";
+import LoadingImage from "../Svg/Loading";
 import ProtectedRoute from "./ProtectedRoute";
 
 const protectedRoute: string[] = ["/dashboard", "/user"];
@@ -13,14 +13,8 @@ const AuthWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
         <>
             {status === "loading" && (
-                <div className="absolute top-0 left-0 z-50 flex items-center justify-center w-full h-full bg-gradient-to-br from-[#5b6367] to-[#323240]">
-                    <Image
-                        width="100"
-                        height="100"
-                        src={"/loading.svg"}
-                        alt={"Loading image"}
-                        unoptimized
-                    />
+                <div className="absolute top-0 left-0 z-50 flex h-full w-full items-center justify-center bg-gradient-to-br from-[#5b6367] to-[#323240]">
+                    <LoadingImage />
                 </div>
             )}
             {protectedRoute.includes(router.pathname) ? (

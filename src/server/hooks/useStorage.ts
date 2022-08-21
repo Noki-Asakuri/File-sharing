@@ -1,9 +1,9 @@
+import type { ActionType, State } from "@/components/Upload";
+
+import { supabase } from "@/server/db/supabase";
 import { useCallback, useEffect, useRef } from "react";
 
-import { ActionType, State } from "@/pages";
-import { supabase } from "@/server/db/supabase";
-
-import genID from "@/utils/genID";
+import { genID } from "@/utils/genID";
 import { trpc } from "@/utils/trpc";
 
 type storageType = { state: State; dispatch: ({}: ActionType) => void };

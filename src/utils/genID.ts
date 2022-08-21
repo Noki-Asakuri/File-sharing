@@ -1,6 +1,6 @@
 import path from "path";
 
-export default function genID(fileName: string, length: number = 10) {
+export const genID = (fileName: string, length: number = 10) => {
     let result = "";
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     const charactersLength = characters.length;
@@ -12,8 +12,5 @@ export default function genID(fileName: string, length: number = 10) {
     const file = parsedFile.name;
     const ext = parsedFile.ext;
 
-    return {
-        fileID: result,
-        path: `${file}-${result}${ext}`,
-    };
-}
+    return { fileID: result, path: `${file}-${result}${ext}` };
+};

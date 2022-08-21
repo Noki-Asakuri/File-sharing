@@ -15,9 +15,9 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
     if (status === "unauthenticated") {
         return (
-            <div className="flex items-center justify-center w-full h-screen">
-                <div className="relative flex flex-col items-center justify-center bg-opacity-75 rounded-2xl bg-gradient-to-tl from-slate-800 to-slate-900 drop-shadow-lg">
-                    <div className="p-7 w-[400px]">
+            <div className="flex h-screen w-full items-center justify-center">
+                <div className="relative flex flex-col items-center justify-center rounded-2xl bg-opacity-75 bg-gradient-to-tl from-slate-800 to-slate-900 drop-shadow-lg">
+                    <div className="w-[400px] p-7">
                         <h2 className="flex items-center justify-center gap-2 pb-6 text-4xl text-red-500">
                             <FaExclamationTriangle />
                             Error 401

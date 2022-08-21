@@ -1,12 +1,6 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+module.exports = {
     reactStrictMode: true,
-    images: {
-        domains: ["cdn.discordapp.com"],
-    },
-    experimental: {
-        images: { allowFutureImage: true },
-    },
+    images: { domains: ["cdn.discordapp.com"] },
+    experimental: { images: { allowFutureImage: true } },
 };
-
-module.exports = nextConfig;

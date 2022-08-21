@@ -21,10 +21,10 @@ const FourOhFourPage: NextPage = () => {
     }, [delay]);
 
     return (
-        <div className="flex items-center justify-center w-full h-screen">
-            <div className="flex flex-wrap justify-around gap-10 pt-20 h-80">
-                <div className="relative flex flex-col items-start p-10 gap-y-7 w-max rounded-2xl bg-gradient-to-tl from-slate-800 to-slate-900 drop-shadow-lg">
-                    <h2 className="flex items-center justify-center w-full gap-2 pb-6 text-4xl text-red-500">
+        <div className="flex h-screen w-full items-center justify-center">
+            <div className="flex h-80 flex-wrap justify-around gap-10 pt-20">
+                <div className="relative flex w-max flex-col items-start gap-y-7 rounded-2xl bg-gradient-to-tl from-slate-800 to-slate-900 p-10 drop-shadow-lg">
+                    <h2 className="flex w-full items-center justify-center gap-2 pb-6 text-4xl text-red-500">
                         <FaExclamationTriangle />
                         Error 404
                     </h2>

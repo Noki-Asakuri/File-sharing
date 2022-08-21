@@ -11,15 +11,12 @@ const LoginProfile: React.FC = () => {
     if (session) {
         return (
             <Dropdown>
-                <button>
-                    <Image
-                        className="overflow-hidden rounded-full"
-                        src={session.user.image!}
-                        alt={"Discord profile image"}
-                        width="44"
-                        height="44"
-                    />
-                </button>
+                <Image
+                    src={session.user.image!}
+                    alt={"Discord profile image"}
+                    width="44"
+                    height="44"
+                />
             </Dropdown>
         );
     }
@@ -27,7 +24,7 @@ const LoginProfile: React.FC = () => {
     return (
         <div className="rounded-lg bg-slate-600">
             <button onClick={() => signIn("discord")}>
-                <span className="flex items-center p-3 gap-x-2">
+                <span className="flex items-center gap-x-2 p-3">
                     Login <FaSignInAlt />
                 </span>
             </button>
@@ -39,20 +36,20 @@ const Navbar: React.FC = () => {
     return (
         <nav className="absolute w-full">
             <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800">
-                <div className="flex justify-between px-4 py-2 mx-auto max-w-7xl">
+                <div className="mx-auto flex max-w-7xl justify-between px-4 py-2">
                     <div className="flex items-center text-3xl tracking-wider text-blue-500">
                         <Link href={"/"}>Home</Link>
                     </div>
                     <div className="flex items-center justify-center gap-x-5">
                         <div>
                             <a
-                                className="w-max h-max relative text-[0px]"
+                                className="relative h-max w-max text-[0px]"
                                 href="https://github.com/iahacker123/File-sharing"
                                 target="_blank"
                                 rel="noreferrer"
                             >
                                 <span className="absolute">Github</span>
-                                <FaGithub className="transition-colors rounded-full w-11 h-11 hover:text-sky-500" />
+                                <FaGithub className="h-11 w-11 rounded-full transition-colors hover:text-sky-500" />
                             </a>
                         </div>
                         <LoginProfile />

@@ -1,21 +1,38 @@
 import {
-    Root,
-    Item,
-    Trigger,
-    Label,
-    Separator,
     Arrow,
     Content,
+    Item,
+    Label,
+    Root,
+    Separator,
+    Trigger,
 } from "@radix-ui/react-dropdown-menu";
+
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import React from "react";
-import { FaSignOutAlt, FaHome, FaUserCog, FaCogs } from "react-icons/fa";
+import { FaCogs, FaHome, FaSignOutAlt, FaUserCog } from "react-icons/fa";
 
-const DropdownItem: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const DropdownItem: React.FC<{ children: React.ReactNode; href?: string }> = ({
+    children,
+    href,
+}) => {
     return (
-        <Item className="transition-colors rounded-md focus:bg-slate-800 focus:outline-none">
-            {children}
+        <Item className="rounded-md transition-colors focus:bg-slate-800 focus:outline-none">
+            {href && (
+                <Link href={href}>
+                    <div className="flex cursor-pointer items-center justify-between p-2">
+                        {children}
+                    </div>
+                </Link>
+            )}
+            {!href && (
+                <button
+                    className="flex w-full items-center justify-between gap-x-2 p-2"
+                    onClick={() => signOut({ callbackUrl: "/" })}
+                >
+                    {children}
+                </button>
+            )}
         </Item>
     );
 };
@@ -25,52 +42,27 @@ const Dropdown: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
     return (
         <Root>
-            <Trigger asChild className="rounded-full">
-                {children}
-            </Trigger>
-
+            <Trigger className="overflow-hidden rounded-full">{children}</Trigger>
             <Content
-                className="bg-gradient-to-t from-slate-800 to-slate-900 min-w-[170px] p-4 rounded-lg radix-state-open:animate-fadeIn radix-state-closed:animate-fadeOut drop-shadow-lg"
+                className="min-w-[170px] rounded-xl bg-gradient-to-t from-gray-700 to-gray-800 p-4 radix-state-closed:animate-fadeOut radix-state-open:animate-fadeIn"
                 sideOffset={5}
                 loop
             >
                 <Label className="flex items-center justify-center px-2 pb-2">
                     {session?.user?.name}
                 </Label>
-                <Separator className="h-px my-1 bg-white" />
-                <DropdownItem>
-                    <Link href={"/"} passHref>
-                        <a className="w-full">
-                            <div className="flex items-center justify-between p-2">
-                                Home <FaHome />
-                            </div>
-                        </a>
-                    </Link>
+                <Separator className="my-1 h-px bg-white" />
+                <DropdownItem href={"/"}>
+                    Home <FaHome />
+                </DropdownItem>
+                <DropdownItem href={"/dashboard"}>
+                    Dashboard <FaCogs />
+                </DropdownItem>
+                <DropdownItem href={"/user"}>
+                    User <FaUserCog />
                 </DropdownItem>
                 <DropdownItem>
-                    <Link href={"/dashboard"} passHref>
-                        <a className="w-full">
-                            <div className="flex items-center justify-between p-2">
-                                Dashboard <FaCogs />
-                            </div>
-                        </a>
-                    </Link>
-                </DropdownItem>
-                <DropdownItem>
-                    <Link href={"/user"} passHref>
-                        <a className="w-full">
-                            <div className="flex items-center justify-between p-2">
-                                User <FaUserCog />
-                            </div>
-                        </a>
-                    </Link>
-                </DropdownItem>
-                <DropdownItem>
-                    <button className="w-full" onClick={() => signOut({ callbackUrl: "/" })}>
-                        <span className="flex items-center justify-between p-2 gap-x-2">
-                            Logout <FaSignOutAlt />
-                        </span>
-                    </button>
+                    Logout <FaSignOutAlt />
                 </DropdownItem>
                 <Arrow className="fill-slate-700" offset={12} />
             </Content>

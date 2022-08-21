@@ -1,11 +1,12 @@
 import type { NextPage } from "next";
 import dynamic from "next/dynamic";
-import Image from "next/future/image";
 import { Reducer, useReducer, useState } from "react";
+import LoadingImage from "@/components/Svg/Loading";
 
 import useDebounce from "@/server/hooks/useDebounce";
 import { trpc } from "@/utils/trpc";
 
+import { Toaster } from "react-hot-toast";
 import {
     FaAngleDoubleLeft,
     FaAngleDoubleRight,
@@ -14,7 +15,6 @@ import {
     FaRedo,
     FaSearch,
 } from "react-icons/fa";
-import { Toaster } from "react-hot-toast";
 
 const DashboardFile = dynamic(() => import("@/components/Dashboard/DashboardFile"), { ssr: false });
 
@@ -100,17 +100,17 @@ const Dashboard: NextPage = () => {
     });
 
     return (
-        <div className="flex items-center justify-center w-full h-screen">
-            <div className="bg-gradient-to-t from-slate-800 to-slate-900 p-2 rounded-2xl h-[70vh] w-1/2 min-w-[620px] flex flex-col justify-start items-center relative">
-                <div className="relative flex items-center justify-between w-full px-5">
-                    <div className="absolute flex items-center justify-center px-3 rounded-lg group bg-slate-600">
+        <div className="flex h-screen w-full items-center justify-center">
+            <div className="relative flex h-[70vh] w-1/2 min-w-[620px] flex-col items-center justify-start rounded-2xl bg-gradient-to-t from-slate-800 to-slate-900 p-2">
+                <div className="relative flex w-full items-center justify-between px-5">
+                    <div className="group absolute flex items-center justify-center rounded-lg bg-slate-600 px-3">
                         <FaSearch
-                            className={`absolute w-4 h-4 transition-all group-focus-within:right-3 ${
+                            className={`absolute h-4 w-4 transition-all group-focus-within:right-3 ${
                                 searchText.length && "right-3"
                             }`}
                         />
                         <input
-                            className={`bg-transparent group-focus-within:outline-none px-2 z-50 py-1 group-focus-within:w-40 transition-[width] placeholder:text-sm ${
+                            className={`z-50 bg-transparent px-2 py-1 transition-[width] placeholder:text-sm group-focus-within:w-40 group-focus-within:outline-none ${
                                 searchText.length ? "w-40 pl-2 pr-5" : "w-2"
                             }`}
                             type="text"
@@ -121,14 +121,14 @@ const Dashboard: NextPage = () => {
                         />
                     </div>
 
-                    <span className="flex items-center justify-center w-full p-2 text-2xl">
+                    <span className="flex w-full items-center justify-center p-2 text-2xl">
                         Dashboard
                     </span>
 
                     {data && data.totalPage > 0 && (
-                        <div className="absolute flex items-center justify-center gap-3 top-1 right-16">
+                        <div className="absolute top-1 right-16 flex items-center justify-center gap-3">
                             <button
-                                className={`bg-slate-600 rounded-lg transition-colors duration-500 p-2 w-10 ${
+                                className={`w-10 rounded-lg bg-slate-600 p-2 transition-colors duration-500 ${
                                     limit === 5 && "bg-sky-500"
                                 }`}
                                 onClick={() => setLimit(5)}
@@ -136,7 +136,7 @@ const Dashboard: NextPage = () => {
                                 5
                             </button>
                             <button
-                                className={`bg-slate-600 rounded-lg transition-colors duration-500 p-2 w-10 ${
+                                className={`w-10 rounded-lg bg-slate-600 p-2 transition-colors duration-500 ${
                                     limit === 10 && "bg-sky-500"
                                 }`}
                                 onClick={() => setLimit(10)}
@@ -144,7 +144,7 @@ const Dashboard: NextPage = () => {
                                 10
                             </button>
                             <button
-                                className={`bg-slate-600 rounded-lg transition-colors duration-500 p-2 w-10 ${
+                                className={`w-10 rounded-lg bg-slate-600 p-2 transition-colors duration-500 ${
                                     limit === 25 && "bg-sky-500"
                                 }`}
                                 onClick={() => setLimit(25)}
@@ -156,7 +156,7 @@ const Dashboard: NextPage = () => {
 
                     <div>
                         <button
-                            className="absolute p-3 rounded-full bg-slate-600 top-1 right-3"
+                            className="absolute top-1 right-3 rounded-full bg-slate-600 p-3"
                             onClick={() => {
                                 setFetching(true);
                                 refetch();
@@ -170,19 +170,14 @@ const Dashboard: NextPage = () => {
                 </div>
 
                 {isLoading && (
-                    <div className="flex items-center justify-center w-full h-full">
-                        <Image
-                            width="100"
-                            height="100"
-                            src={"/loading.svg"}
-                            alt={"Loading image"}
-                        />
+                    <div className="flex h-full w-full items-center justify-center">
+                        <LoadingImage />
                     </div>
                 )}
 
                 {!isLoading && data && (
                     <>
-                        <div className="flex flex-col w-full h-full pt-2 overflow-scroll gap-y-3">
+                        <div className="flex h-full w-full flex-col gap-y-3 overflow-scroll pt-2">
                             {data.pages[state.currentPage - 1]?.map((file) => {
                                 return (
                                     <DashboardFile
@@ -193,27 +188,27 @@ const Dashboard: NextPage = () => {
                                 );
                             })}
                             {!data.totalPage && (
-                                <div className="flex items-center justify-center w-full h-full">
+                                <div className="flex h-full w-full items-center justify-center">
                                     Nothing here to show!
                                 </div>
                             )}
                         </div>
 
                         {data.totalPage > 0 && (
-                            <div className="absolute flex items-center justify-center px-5 pt-2 pb-5 top-full rounded-b-2xl gap-x-3 bg-slate-800">
+                            <div className="absolute top-full flex items-center justify-center gap-x-3 rounded-b-2xl bg-slate-800 px-5 pt-2 pb-5">
                                 <button
-                                    className="flex items-center justify-center w-10 h-10 px-3 py-2 rounded-lg bg-slate-600"
+                                    className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-600 px-3 py-2"
                                     onClick={() => dispatch({ type: "FIRST" })}
                                 >
                                     <FaAngleDoubleLeft />
                                 </button>
                                 <button
-                                    className="flex items-center justify-center w-10 h-10 px-3 py-2 rounded-lg bg-slate-600"
+                                    className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-600 px-3 py-2"
                                     onClick={() => dispatch({ type: "PREV" })}
                                 >
                                     <FaAngleLeft />
                                 </button>
-                                <div className="flex items-center justify-center h-10 px-4 py-2 rounded-lg w-max bg-slate-600">
+                                <div className="flex h-10 w-max items-center justify-center rounded-lg bg-slate-600 px-4 py-2">
                                     {(state.currentPage - 1) * limit + 1}-
                                     {state.currentPage * limit <= data.totalFiles
                                         ? state.currentPage * limit
@@ -222,13 +217,13 @@ const Dashboard: NextPage = () => {
                                     /{data.totalFiles}
                                 </div>
                                 <button
-                                    className="flex items-center justify-center w-10 h-10 px-3 py-2 rounded-lg bg-slate-600"
+                                    className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-600 px-3 py-2"
                                     onClick={() => dispatch({ type: "NEXT" })}
                                 >
                                     <FaAngleRight />
                                 </button>
                                 <button
-                                    className="flex items-center justify-center w-10 h-10 px-3 py-2 rounded-lg bg-slate-600"
+                                    className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-600 px-3 py-2"
                                     onClick={() => dispatch({ type: "LAST" })}
                                 >
                                     <FaAngleDoubleRight />
