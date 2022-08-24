@@ -1,8 +1,8 @@
 import type { NextPage } from "next";
 import dynamic from "next/dynamic";
 import { Reducer, useReducer, useState } from "react";
-import LoadingImage from "@/components/Svg/Loading";
 
+import LoadingImage from "@/components/Svg/Loading";
 import useDebounce from "@/server/hooks/useDebounce";
 import { trpc } from "@/utils/trpc";
 
@@ -75,9 +75,42 @@ const reducer = (state: State, action: ActionType) => {
     }
 };
 
-const Dashboard: NextPage = () => {
-    // Todo: Make a button that can reset to new password incase user forgot!
+type LimitButtonProps = {
+    limit: 5 | 10 | 25;
+    currentLimit: number;
+    setLimit: (a: 5 | 10 | 25) => void;
+};
+type NavButtonProps = {
+    children: React.ReactNode;
+    type: ActionType["type"];
+    dispatch: ({ type, payload }: ActionType) => void;
+};
 
+const LimitButton: React.FC<LimitButtonProps> = ({ limit, setLimit, currentLimit }) => {
+    return (
+        <button
+            className={`w-10 rounded-lg bg-slate-600 p-2 transition-colors duration-500 ${
+                currentLimit === limit && "bg-sky-500"
+            }`}
+            onClick={() => setLimit(limit)}
+        >
+            {limit}
+        </button>
+    );
+};
+
+const NavButton: React.FC<NavButtonProps> = ({ dispatch, type, children }) => {
+    return (
+        <button
+            className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-600 px-3 py-2"
+            onClick={() => dispatch({ type })}
+        >
+            {children}
+        </button>
+    );
+};
+
+const Dashboard: NextPage = () => {
     const [limit, setLimit] = useState<5 | 10 | 25>(5);
 
     const [searchText, setSearchText] = useState<string>("");
@@ -87,11 +120,14 @@ const Dashboard: NextPage = () => {
 
     useDebounce(() => setSearch(searchText), 500, [searchText]);
 
-    const { data, isLoading, refetch } = trpc.useQuery(["file.get-file-by-id", { limit, search }], {
-        onSuccess: ({ totalPage }) => {
-            dispatch({ type: "UPDATE", payload: totalPage });
+    const { data, isLoading, refetch } = trpc.proxy.file.dashboard.useQuery(
+        { limit, search },
+        {
+            onSuccess: ({ totalPage }) => {
+                dispatch({ type: "UPDATE", payload: totalPage });
+            },
         },
-    });
+    );
 
     const [state, dispatch] = useReducer<Reducer<State, ActionType>>(reducer, {
         currentPage: 1,
@@ -125,34 +161,11 @@ const Dashboard: NextPage = () => {
                         Dashboard
                     </span>
 
-                    {data && data.totalPage > 0 && (
-                        <div className="absolute top-1 right-16 flex items-center justify-center gap-3">
-                            <button
-                                className={`w-10 rounded-lg bg-slate-600 p-2 transition-colors duration-500 ${
-                                    limit === 5 && "bg-sky-500"
-                                }`}
-                                onClick={() => setLimit(5)}
-                            >
-                                5
-                            </button>
-                            <button
-                                className={`w-10 rounded-lg bg-slate-600 p-2 transition-colors duration-500 ${
-                                    limit === 10 && "bg-sky-500"
-                                }`}
-                                onClick={() => setLimit(10)}
-                            >
-                                10
-                            </button>
-                            <button
-                                className={`w-10 rounded-lg bg-slate-600 p-2 transition-colors duration-500 ${
-                                    limit === 25 && "bg-sky-500"
-                                }`}
-                                onClick={() => setLimit(25)}
-                            >
-                                25
-                            </button>
-                        </div>
-                    )}
+                    <div className="absolute top-1 right-16 flex items-center justify-center gap-3">
+                        <LimitButton limit={5} setLimit={setLimit} currentLimit={limit} />
+                        <LimitButton limit={10} setLimit={setLimit} currentLimit={limit} />
+                        <LimitButton limit={25} setLimit={setLimit} currentLimit={limit} />
+                    </div>
 
                     <div>
                         <button
@@ -196,18 +209,12 @@ const Dashboard: NextPage = () => {
 
                         {data.totalPage > 0 && (
                             <div className="absolute top-full flex items-center justify-center gap-x-3 rounded-b-2xl bg-slate-800 px-5 pt-2 pb-5">
-                                <button
-                                    className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-600 px-3 py-2"
-                                    onClick={() => dispatch({ type: "FIRST" })}
-                                >
+                                <NavButton dispatch={dispatch} type="FIRST">
                                     <FaAngleDoubleLeft />
-                                </button>
-                                <button
-                                    className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-600 px-3 py-2"
-                                    onClick={() => dispatch({ type: "PREV" })}
-                                >
+                                </NavButton>
+                                <NavButton dispatch={dispatch} type="PREV">
                                     <FaAngleLeft />
-                                </button>
+                                </NavButton>
                                 <div className="flex h-10 w-max items-center justify-center rounded-lg bg-slate-600 px-4 py-2">
                                     {(state.currentPage - 1) * limit + 1}-
                                     {state.currentPage * limit <= data.totalFiles
@@ -216,18 +223,12 @@ const Dashboard: NextPage = () => {
                                           (state.currentPage * limit - data.totalFiles)}
                                     /{data.totalFiles}
                                 </div>
-                                <button
-                                    className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-600 px-3 py-2"
-                                    onClick={() => dispatch({ type: "NEXT" })}
-                                >
+                                <NavButton dispatch={dispatch} type="NEXT">
                                     <FaAngleRight />
-                                </button>
-                                <button
-                                    className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-600 px-3 py-2"
-                                    onClick={() => dispatch({ type: "LAST" })}
-                                >
+                                </NavButton>
+                                <NavButton dispatch={dispatch} type="LAST">
                                     <FaAngleDoubleRight />
-                                </button>
+                                </NavButton>
                             </div>
                         )}
                         <Toaster />
