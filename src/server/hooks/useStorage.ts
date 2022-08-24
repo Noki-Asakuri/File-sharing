@@ -11,10 +11,10 @@ type storageType = { state: State; dispatch: ({}: ActionType) => void };
 const useStorage = ({ state, dispatch }: storageType) => {
     const uploadPassword = useRef<string | null>(null);
     const {
-        mutateAsync: uploadFile,
-        data: uploadedFile,
+        mutateAsync: upload,
+        data: File,
         isSuccess,
-    } = trpc.useMutation(["upload.file"], {
+    } = trpc.proxy.upload.file.useMutation({
         onError: ({ message }) => {
             dispatch({ type: "ERROR", payload: message });
         },
@@ -31,12 +31,12 @@ const useStorage = ({ state, dispatch }: storageType) => {
 
             await Promise.all([
                 supabase.upload(path, file, { contentType: file.type, cacheControl: "3600" }),
-                uploadFile({
+                upload({
                     fileID: fileID,
                     path: path,
                     name: file.name,
                     type: file.type,
-                    password: password.current!.value,
+                    password: password.current?.value,
                 }),
             ]);
         },
@@ -52,7 +52,7 @@ const useStorage = ({ state, dispatch }: storageType) => {
     }, [isUploading]);
 
     if (isSuccess) {
-        return { ...uploadedFile, password: uploadPassword.current };
+        return { ...File, password: uploadPassword.current };
     }
 };
 

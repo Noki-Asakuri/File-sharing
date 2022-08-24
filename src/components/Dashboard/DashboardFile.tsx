@@ -1,9 +1,9 @@
-import type { ActionType } from "@/pages/dashboard";
 import type { File } from "@prisma/client";
-import { trpc } from "@/utils/trpc";
-
 import React, { useState } from "react";
 import toast from "react-hot-toast";
+
+import type { ActionType } from "@/pages/dashboard";
+import { trpc } from "@/utils/trpc";
 
 import {
     FaArrowAltCircleDown,
@@ -25,13 +25,12 @@ import relativeTime from "dayjs/plugin/relativeTime";
 
 dayjs.extend(relativeTime);
 
-const DashboardFile: React.FC<{
-    file: File;
-    dispatch: ({ type, payload }: ActionType) => void;
-}> = ({ file, dispatch }) => {
+type DashboardFileProps = { file: File; dispatch: ({ type, payload }: ActionType) => void };
+
+const DashboardFile: React.FC<DashboardFileProps> = ({ file, dispatch }) => {
     const [deleting, setDeleting] = useState<boolean>(false);
 
-    const { mutate: deleteFile } = trpc.useMutation("file.delete-file-by-id", {
+    const { mutate: deleteFile } = trpc.proxy.file.delete_by_id.useMutation({
         onError: ({ message }) => {
             toast.error(message, {
                 style: {
@@ -43,9 +42,8 @@ const DashboardFile: React.FC<{
                 duration: 2000,
             });
         },
-        onSettled: () => {
-            setDeleting(false);
-        },
+        onMutate: () => setDeleting(true),
+        onSettled: () => setDeleting(false),
     });
 
     return (
@@ -114,6 +112,7 @@ const DashboardFile: React.FC<{
 
             <button
                 className="absolute top-2 right-2 rounded-full bg-slate-700 p-3 duration-500 hover:text-red-500"
+                disabled={deleting}
                 onClick={() => {
                     deleteFile({ fileID: file.fileID });
                     dispatch({ type: "DELETE", payload: file.fileID });
