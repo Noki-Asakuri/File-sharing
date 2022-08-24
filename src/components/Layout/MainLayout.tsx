@@ -1,12 +1,19 @@
 import dynamic from "next/dynamic";
 import Head from "next/head";
 import React from "react";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 import AuthWrapper from "./AuthWrapper";
 
 const Navbar = dynamic(() => import("../Nav/MainNav"), { ssr: false });
 
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const [parentAnimation] = useAutoAnimate<HTMLDivElement>({
+        disrespectUserMotionPreference: true,
+        duration: 100,
+        easing: "linear",
+    });
+
     return (
         <>
             <Head>
@@ -18,7 +25,9 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 <meta name="theme-color" content="#2f3136" />
             </Head>
             <Navbar />
-            <AuthWrapper>{children}</AuthWrapper>
+            <div ref={parentAnimation}>
+                <AuthWrapper>{children}</AuthWrapper>
+            </div>
         </>
     );
 };
