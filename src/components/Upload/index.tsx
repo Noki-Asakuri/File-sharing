@@ -68,8 +68,10 @@ const reducer = (state: State, action: ActionType): State => {
             return { ...state, isUploading: true, error: null };
 
         case "UPLOADED":
+            if (!state.password.current) return state;
+
             state.isUploading = false;
-            state.password.current!.value = "";
+            state.password.current.value = "";
 
             return state;
 

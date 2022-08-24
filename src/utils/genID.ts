@@ -1,6 +1,6 @@
 import path from "path";
 
-export const genID = (fileName: string, length: number = 10) => {
+export const genID = (fileName: string, length = 10) => {
     let result = "";
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     const charactersLength = characters.length;

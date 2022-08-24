@@ -1,5 +1,5 @@
 import type { NextPage } from "next";
-import { signIn, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { FaExclamationTriangle } from "react-icons/fa";
 
 const UserPage: NextPage = () => {

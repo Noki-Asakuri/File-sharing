@@ -1,4 +1,4 @@
-import { prisma } from "@/server/db/client";
+import { prisma } from "@/server/db/prisma";
 import type { Session } from "next-auth";
 
 type RefreshRes = {
@@ -44,7 +44,7 @@ export const getNewAvatar = async ({ session }: { session: Session }) => {
                 headers: { authorization: `Bearer ${access_token}` },
             }),
             prisma.account.update({
-                where: { id: account?.id! },
+                where: { id: account?.id },
                 data: { access_token, expires_at: expires_in, refresh_token },
             }),
         ]);

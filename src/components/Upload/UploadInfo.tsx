@@ -24,7 +24,7 @@ const UploadedFile: React.FC<{
             if (!uploadFile) return;
 
             const setPopup = type === "url" ? setPopupUrl : setPopupPass;
-            copy(type === "url" ? uploadFile.fullUrl : uploadFile.password!);
+            copy(type === "url" ? uploadFile.fullUrl : (uploadFile.password as string));
 
             setPopup(true);
             setTimeout(() => setPopup(false), 2000);

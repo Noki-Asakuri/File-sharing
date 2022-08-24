@@ -34,7 +34,7 @@ const UploadForm: React.FC<{
                 type="file"
                 id="file"
                 name="file"
-                onChange={(e) => dispatch({ type: "CHANGE", payload: e.target.files![0] })}
+                onChange={(e) => dispatch({ type: "CHANGE", payload: e.target.files?.[0] })}
             />
             <div className="flex max-w-max items-center justify-center gap-x-4">
                 <label htmlFor="password" className="flex items-center justify-center gap-2">

@@ -1,6 +1,6 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import React from "react";
+
 import LoadingImage from "../Svg/Loading";
 import ProtectedRoute from "./ProtectedRoute";
 

@@ -1,14 +1,16 @@
-import NextAuth, { DefaultUser, DefaultSession, DefaultProfile, DefaultAccount } from "next-auth";
+import { DefaultProfile, DefaultSession, DefaultUser } from "next-auth";
 
 declare module "next-auth" {
     /**
      * Returned by `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
      */
     interface Session {
-        user: {
+        user: DefaultSession["user"] & {
             discordID: string;
             isAdmin: boolean;
-        } & DefaultSession["user"];
+            name: string;
+            image: string;
+        };
     }
 
     interface User extends DefaultUser {
@@ -35,5 +37,5 @@ declare module "next-auth" {
         verified: boolean;
     }
 
-    interface Account extends DefaultAccount {}
+    // interface Account extends DefaultAccount {}
 }
