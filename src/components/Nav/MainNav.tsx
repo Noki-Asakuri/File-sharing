@@ -12,7 +12,7 @@ const LoginProfile: React.FC = () => {
         return (
             <Dropdown>
                 <Image
-                    src={session.user.image!}
+                    src={session.user.image}
                     alt={"Discord profile image"}
                     width="44"
                     height="44"
@@ -34,8 +34,8 @@ const LoginProfile: React.FC = () => {
 
 const Navbar: React.FC = () => {
     return (
-        <nav className="absolute w-full">
-            <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800">
+        <nav className="absolute z-50 w-full">
+            <div className="bg-gray-800/60">
                 <div className="mx-auto flex max-w-7xl justify-between px-4 py-2">
                     <div className="flex items-center text-3xl tracking-wider text-blue-500">
                         <Link href={"/"}>Home</Link>
