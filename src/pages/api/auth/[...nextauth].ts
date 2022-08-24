@@ -1,5 +1,5 @@
+import { prisma } from "@/server/db/prisma";
 import { getNewAvatar } from "@/utils/getNewAvatar";
-import { prisma } from "@/server/db/client";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import NextAuth from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
@@ -59,7 +59,9 @@ export const authOptions: NextAuthOptions = {
         async session({ session }) {
             const { newAvatarID, user } = await getNewAvatar({ session });
 
-            const currentAvatar = user?.image?.slice(user?.image.lastIndexOf("/") + 1).split(".")!;
+            const currentAvatar = user?.image
+                ?.slice(user?.image.lastIndexOf("/") + 1)
+                .split(".") as string[];
             const currentAvatarID = currentAvatar[0];
             const currentAvatarFormat = currentAvatar[1];
 

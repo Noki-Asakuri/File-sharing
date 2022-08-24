@@ -15,12 +15,11 @@
         "jsx": "preserve",
         "incremental": true,
         "noUncheckedIndexedAccess": true,
-        "importsNotUsedAsValues": "error",
         "baseUrl": ".",
         "paths": {
             "@/*": ["./src/*"]
         }
     },
-    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.cjs", "**/*.mjs"],
     "exclude": ["node_modules"]
 }
