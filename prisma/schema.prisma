@@ -26,6 +26,8 @@ model File {
     unlockedUser String[] @default([])
 
     user User @relation(fields: [authorID], references: [discordID], onDelete: Cascade)
+
+    @@index([fileID])
 }
 
 model Account {

@@ -2,9 +2,9 @@ import type { NextPage } from "next";
 import dynamic from "next/dynamic";
 import { Reducer, useReducer, useState } from "react";
 
-import LoadingImage from "@/components/Svg/Loading";
-import useDebounce from "@/server/hooks/useDebounce";
-import { trpc } from "@/utils/trpc";
+import { trpc } from "$lib/utils/trpc";
+import LoadingImage from "@/lib/components/Svg/Loading";
+import useDebounce from "@/lib/server/hooks/useDebounce";
 
 import { Toaster } from "react-hot-toast";
 import {
@@ -16,10 +16,12 @@ import {
     FaSearch,
 } from "react-icons/fa";
 
-const DashboardFile = dynamic(() => import("@/components/Dashboard/DashboardFile"), { ssr: false });
+const DashboardFile = dynamic(() => import("$lib/components/Dashboard/DashboardFile"), {
+    ssr: false,
+});
 
 export interface ActionType {
-    type: "FIRST" | "PREV" | "NEXT" | "LAST" | "SET" | "UPDATE" | "DELETE";
+    type: "FIRST" | "PREV" | "NEXT" | "LAST" | "SET" | "UPDATE" | "DELETE" | "RESET";
     payload?: number | string;
 }
 
@@ -69,6 +71,11 @@ const reducer = (state: State, action: ActionType) => {
             }
 
             return { ...state, totalPages: payload, currentPage: 1 };
+
+        case "RESET":
+            state.refetch();
+
+            return state;
 
         default:
             return state;
@@ -126,6 +133,7 @@ const Dashboard: NextPage = () => {
             onSuccess: ({ totalPage }) => {
                 dispatch({ type: "UPDATE", payload: totalPage });
             },
+            refetchOnWindowFocus: false,
         },
     );
 
@@ -188,52 +196,46 @@ const Dashboard: NextPage = () => {
                     </div>
                 )}
 
-                {!isLoading && data && (
-                    <>
-                        <div className="flex h-full w-full flex-col gap-y-3 overflow-scroll pt-2">
-                            {data.pages[state.currentPage - 1]?.map((file) => {
-                                return (
-                                    <DashboardFile
-                                        key={file.fileID}
-                                        file={file}
-                                        dispatch={dispatch}
-                                    />
-                                );
-                            })}
-                            {!data.totalPage && (
-                                <div className="flex h-full w-full items-center justify-center">
-                                    Nothing here to show!
-                                </div>
-                            )}
-                        </div>
-
-                        {data.totalPage > 0 && (
-                            <div className="absolute top-full flex items-center justify-center gap-x-3 rounded-b-2xl bg-slate-800 px-5 pt-2 pb-5">
-                                <NavButton dispatch={dispatch} type="FIRST">
-                                    <FaAngleDoubleLeft />
-                                </NavButton>
-                                <NavButton dispatch={dispatch} type="PREV">
-                                    <FaAngleLeft />
-                                </NavButton>
-                                <div className="flex h-10 w-max items-center justify-center rounded-lg bg-slate-600 px-4 py-2">
-                                    {(state.currentPage - 1) * limit + 1}-
-                                    {state.currentPage * limit <= data.totalFiles
-                                        ? state.currentPage * limit
-                                        : state.currentPage * limit -
-                                          (state.currentPage * limit - data.totalFiles)}
-                                    /{data.totalFiles}
-                                </div>
-                                <NavButton dispatch={dispatch} type="NEXT">
-                                    <FaAngleRight />
-                                </NavButton>
-                                <NavButton dispatch={dispatch} type="LAST">
-                                    <FaAngleDoubleRight />
-                                </NavButton>
+                {!isLoading && (
+                    <div className="flex h-full w-full flex-col gap-y-3 overflow-scroll pt-2">
+                        {data?.pages[state.currentPage - 1]?.map((file) => {
+                            return (
+                                <DashboardFile key={file.fileID} file={file} dispatch={dispatch} />
+                            );
+                        })}
+                        {!data?.totalPage && (
+                            <div className="flex h-full w-full items-center justify-center">
+                                Nothing here to show!
                             </div>
                         )}
-                        <Toaster />
-                    </>
+                    </div>
                 )}
+
+                <div className="absolute top-full flex items-center justify-center gap-x-3 rounded-b-2xl bg-slate-800 px-5 pt-2 pb-5">
+                    <NavButton dispatch={dispatch} type="FIRST">
+                        <FaAngleDoubleLeft />
+                    </NavButton>
+                    <NavButton dispatch={dispatch} type="PREV">
+                        <FaAngleLeft />
+                    </NavButton>
+                    <div className="flex h-10 w-max items-center justify-center rounded-lg bg-slate-600 px-4 py-2">
+                        {data && data.totalPage !== 0
+                            ? `${(state.currentPage - 1) * limit + 1}-${
+                                  state.currentPage * limit <= data.totalFiles
+                                      ? state.currentPage * limit
+                                      : state.currentPage * limit -
+                                        (state.currentPage * limit - data.totalFiles)
+                              }/${data.totalFiles}`
+                            : "0-0/0"}
+                    </div>
+                    <NavButton dispatch={dispatch} type="NEXT">
+                        <FaAngleRight />
+                    </NavButton>
+                    <NavButton dispatch={dispatch} type="LAST">
+                        <FaAngleDoubleRight />
+                    </NavButton>
+                </div>
+                {!isLoading && data && <Toaster />}
             </div>
         </div>
     );

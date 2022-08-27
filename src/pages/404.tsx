@@ -16,7 +16,6 @@ const FourOhFourPage: NextPage = () => {
         }
 
         return () => clearInterval(myInterval);
-
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [delay]);
 

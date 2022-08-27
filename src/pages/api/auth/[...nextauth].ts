@@ -1,10 +1,11 @@
-import { prisma } from "@/server/db/prisma";
-import { getNewAvatar } from "@/utils/getNewAvatar";
+import type { NextAuthOptions } from "next-auth";
+
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import NextAuth from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
 
-import type { NextAuthOptions } from "next-auth";
+import { prisma } from "$lib/server/db/prisma";
+import { getNewAvatar } from "$lib/utils/getNewAvatar";
 
 export const authOptions: NextAuthOptions = {
     adapter: PrismaAdapter(prisma),
