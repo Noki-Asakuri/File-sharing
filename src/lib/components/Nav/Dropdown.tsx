@@ -17,12 +17,12 @@ const DropdownItem: React.FC<{ children: React.ReactNode; href?: string }> = ({
     href,
 }) => {
     return (
-        <Item className="rounded-md transition-colors focus:bg-slate-800 focus:outline-none">
+        <Item className="rounded-md transition-colors focus:bg-gray-600 focus:outline-none">
             {href && (
-                <Link href={href}>
-                    <div className="flex cursor-pointer items-center justify-between p-2">
+                <Link href={href} passHref>
+                    <a className="flex cursor-pointer items-center justify-between p-2">
                         {children}
-                    </div>
+                    </a>
                 </Link>
             )}
             {!href && (
