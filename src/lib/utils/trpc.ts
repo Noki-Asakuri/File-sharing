@@ -9,12 +9,18 @@ import superjson from "superjson";
 import getBaseUrl from "./getBaseUrl";
 
 export const trpc = setupTRPC<AppRouter>({
-    config() {
+    config({ ctx }) {
         /**
          * If you want to use SSR, you need to use the server's full URL
          * @link https://trpc.io/docs/ssr
          */
         const url = `${getBaseUrl()}/api/trpc`;
+        // optional: use SSG-caching for each rendered page (see caching section for more details)
+        const ONE_DAY_SECONDS = 60 * 60 * 24;
+        ctx?.res?.setHeader(
+            "Cache-Control",
+            `s-maxage=1, stale-while-revalidate=${ONE_DAY_SECONDS}`,
+        );
 
         return {
             links: [
@@ -52,7 +58,7 @@ export type TRouterPaths<TRouterKey extends TProcedures> =
 
 /**
  * This is a helper method to infer the output of a procedure
- * @example type HelloOutput = InferQueryOutput<'hello'>
+ * @example type HelloOutput = InferProceduresOutput<'hello'>
  */
 export type InferProceduresOutput<
     TRouteKey extends TProcedures,
