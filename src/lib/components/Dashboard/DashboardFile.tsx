@@ -1,9 +1,10 @@
 import type { File } from "@prisma/client";
+import { useSession } from "next-auth/react";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 
-import type { ActionType } from "@/pages/dashboard";
 import { trpc } from "$lib/utils/trpc";
+import type { ActionType } from "@/pages/dashboard";
 
 import {
     FaArrowAltCircleDown,
@@ -22,8 +23,6 @@ import ResetModal from "./ResetModal";
 
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { useSession } from "next-auth/react";
-
 dayjs.extend(relativeTime);
 
 type DashboardFileProps = { file: File; dispatch: ({ type, payload }: ActionType) => void };
@@ -34,33 +33,29 @@ const DashboardFile: React.FC<DashboardFileProps> = ({ file, dispatch }) => {
     const { mutate: deleteFile } = trpc.proxy.file.delete_by_id.useMutation({
         onError: ({ message }) => {
             toast.error(message, {
-                style: {
-                    borderRadius: "10px",
-                    background: "#262626",
-                    color: "#E8DCFF",
-                },
-                iconTheme: { primary: "#e06c75", secondary: "#262626" },
+                style: { borderRadius: "10px", background: "#262626", color: "#E8DCFF" },
                 duration: 2000,
             });
         },
         onMutate: () => setDeleting(true),
         onSettled: () => setDeleting(false),
+        onSuccess: () => dispatch({ type: "DELETE", payload: file.fileID }),
     });
 
     return (
         <div className="relative mx-3 flex max-w-full items-center justify-between rounded-lg border border-slate-700 bg-slate-800 px-5 py-2 ">
-            <ul className="grid w-4/5 grid-cols-[minxmax(200px,1fr)_1fr_1fr] gap-x-10 text-base">
+            <ul className="grid w-full grid-cols-[minmax(150px,1fr)_1fr_1fr] gap-x-10">
                 <li className="col-span-4">
-                    <div className="flex items-center justify-start gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
+                    <div className="flex items-center justify-start gap-2">
                         <FaIdCard />
                         Name: {file.name}
                     </div>
                 </li>
                 <li className="col-span-2">
-                    <div className="flex items-center justify-start gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
+                    <span className="flex items-center justify-start gap-2 whitespace-nowrap">
                         <FaUserAlt />
                         Author: {file.author}
-                    </div>
+                    </span>
                 </li>
                 <li className="col-span-2">
                     <div className="group relative max-w-max">
@@ -74,16 +69,21 @@ const DashboardFile: React.FC<DashboardFileProps> = ({ file, dispatch }) => {
                         </span>
                     </div>
                 </li>
-                <li className="col-span-2">
-                    <span className="flex items-center justify-start gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
+                <li className="col-span-2 overflow-hidden">
+                    <div className="flex items-center justify-start gap-2">
                         <FaCloudDownloadAlt /> Url:{" "}
-                        <a href={`file/${file.fileID}`} target="_blank" rel="noreferrer">
+                        <a
+                            href={`file/${file.fileID}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="overflow-hidden text-ellipsis whitespace-nowrap"
+                        >
                             {`file/${file.fileID}`}
                         </a>
-                    </span>
+                    </div>
                 </li>
                 <li>
-                    <div className="flex items-center justify-start gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
+                    <div className="flex w-max items-center justify-start gap-2">
                         <FaArrowAltCircleDown />
                         Download: {file.downloadCount}
                     </div>
@@ -104,28 +104,24 @@ const DashboardFile: React.FC<DashboardFileProps> = ({ file, dispatch }) => {
                     </div>
                 </li>
             </ul>
-
-            <ResetModal file={{ authorID: file.authorID, fileID: file.fileID }}>
+            <ResetModal file={{ ...file }}>
                 <button
-                    className="absolute top-2 right-14 rounded-full bg-slate-700 p-3 duration-500 enabled:hover:text-blue-500 disabled:cursor-not-allowed"
+                    className="absolute top-2 right-14 rounded-full bg-slate-700 p-2 duration-500 enabled:hover:text-blue-500 disabled:cursor-not-allowed md:p-3"
                     disabled={session?.user.discordID !== file.authorID}
                 >
-                    <FaEdit className="h-4 w-4" />
+                    <FaEdit className="h-3 w-3 md:h-4 md:w-4" />
                 </button>
             </ResetModal>
 
             <button
-                className="absolute top-2 right-2 rounded-full bg-slate-700 p-3 duration-500 hover:text-red-500"
+                className="absolute top-2 right-2 rounded-full bg-slate-700 p-2 duration-500 hover:text-red-500 md:p-3"
                 disabled={deleting}
-                onClick={() => {
-                    deleteFile({ fileID: file.fileID });
-                    dispatch({ type: "DELETE", payload: file.fileID });
-                }}
+                onClick={() => deleteFile({ ...file })}
             >
                 {deleting ? (
-                    <SpinningCircle className="h-4 w-4" />
+                    <SpinningCircle className="h-3 w-3 md:h-4 md:w-4" />
                 ) : (
-                    <FaTrash className="h-4 w-4" />
+                    <FaTrash className="h-3 w-3 md:h-4 md:w-4" />
                 )}
             </button>
         </div>
