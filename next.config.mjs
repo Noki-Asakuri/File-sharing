@@ -1,3 +1,9 @@
+import nextBundleAnalyzer from "@next/bundle-analyzer";
+
+const withBundleAnalyzer = nextBundleAnalyzer({
+    enabled: process.env.ANALYZE ? process.env.ANALYZE.toLowerCase() === "true" : false,
+});
+
 /**
  * Don't be scared of the generics here.
  * All they do is to give us autocompletion when using this.
@@ -7,7 +13,7 @@
  * @constraint {{import('next').NextConfig}}
  */
 function defineNextConfig(config) {
-    return config;
+    return withBundleAnalyzer(config);
 }
 
 export default defineNextConfig({
