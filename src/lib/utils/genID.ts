@@ -1,16 +1,9 @@
 import path from "path";
+import { v4 as uuidv4 } from "uuid";
 
-export const genID = (fileName: string, length = 10) => {
-    let result = "";
-    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    const charactersLength = characters.length;
-    for (let i = 0; i < length; i++) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    const parsedFile = path.parse(fileName);
+export const genID = (fileName: string) => {
+    const fileID = uuidv4();
+    const { name, ext } = path.parse(fileName);
 
-    const file = parsedFile.name;
-    const ext = parsedFile.ext;
-
-    return { fileID: result, path: `${file}-${result}${ext}` };
+    return { fileID, path: `${name}-${fileID}${ext}` };
 };
