@@ -1,21 +1,25 @@
-import { DefaultProfile, DefaultSession, DefaultUser } from "next-auth";
+import { Account, DefaultProfile, DefaultSession, DefaultUser, User } from "next-auth";
+import { DefaultJWT } from "next-auth/jwt";
 
 declare module "next-auth" {
     /**
      * Returned by `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
      */
-    interface Session {
+    interface Session extends DefaultSession {
+        accessToken?: string;
         user: DefaultSession["user"] & {
             discordID: string;
             isAdmin: boolean;
             name: string;
             image: string;
         };
+        expires: string;
     }
 
     interface User extends DefaultUser {
         discordID: string;
         isAdmin: boolean;
+        apiKey: string?;
     }
 
     interface Profile extends DefaultProfile {
@@ -38,4 +42,11 @@ declare module "next-auth" {
     }
 
     // interface Account extends DefaultAccount {}
+}
+
+declare module "next-auth/jwt" {
+    interface JWT extends DefaultJWT {
+        user: User;
+        account: Account;
+    }
 }
