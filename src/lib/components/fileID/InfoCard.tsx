@@ -33,6 +33,7 @@ const InfoCard: React.FC<ServerProps> = ({ author, file, session }) => {
         onMutate: () => setIsDownload(true),
         onSuccess: ({ downloadUrl }) => createDownload(file.name, downloadUrl),
         onSettled: () => setIsDownload(false),
+        trpc: { ssr: false },
     });
 
     return (

@@ -17,12 +17,7 @@ export const getNewAvatar = async ({ session }: { session: Session }) => {
                 provider: "discord",
             },
         },
-        select: {
-            user: true,
-            access_token: true,
-            refresh_token: true,
-            id: true,
-        },
+        select: { user: true, access_token: true, refresh_token: true, id: true },
     });
 
     const res = await fetch("https://discord.com/api/v10/users/@me", {

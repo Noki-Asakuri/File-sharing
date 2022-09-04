@@ -12,17 +12,15 @@ import { prisma } from "$lib/server/db/prisma";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { unstable_getServerSession as getServerSession } from "next-auth";
 
+import { useSession } from "next-auth/react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { useSession } from "next-auth/react";
 dayjs.extend(relativeTime);
 
 export type ServerProps = NonNullable<Awaited<ReturnType<typeof getServerSideProps>>["props"]>;
 
 const FileDownload: NextPage<ServerProps> = ({ author, file }) => {
-    const [parentRef] = useAutoAnimate<HTMLFormElement>({
-        disrespectUserMotionPreference: true,
-    });
+    const [parentRef] = useAutoAnimate<HTMLFormElement>();
 
     const { data: session } = useSession();
 
@@ -40,9 +38,9 @@ const FileDownload: NextPage<ServerProps> = ({ author, file }) => {
                 <meta property="og:site_name" content={author.fullName} />
                 <meta
                     property="og:description"
-                    content={`File: ${file?.name}\nDownload: ${file?.downloadCount}\nUpload ${file?.createdAt}`}
+                    content={`File: ${file.name}\nDownload: ${file.downloadCount}\nUpload ${file.createdAt}`}
                 />
-                <meta property="og:image" content={author?.image} />
+                <meta property="og:image" content={author.image} />
             </Head>
 
             <article className="flex h-screen items-center justify-center" ref={parentRef}>

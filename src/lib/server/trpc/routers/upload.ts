@@ -19,10 +19,10 @@ export const uploadRouter = t.router({
 
             await ctx.prisma.file.create({
                 data: {
-                    fileID: fileID,
-                    name: name,
-                    type: type,
-                    path: path,
+                    fileID,
+                    name,
+                    type,
+                    path,
                     author: ctx.session.user.name,
                     authorID: ctx.session.user.discordID,
                     password: password ? hashSync(password, 10) : null,

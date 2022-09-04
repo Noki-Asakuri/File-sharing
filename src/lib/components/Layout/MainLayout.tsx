@@ -4,14 +4,10 @@ import Head from "next/head";
 import React from "react";
 
 import AuthWrapper from "./AuthWrapper";
-
 const Navbar = dynamic(() => import("../Nav/MainNav"), { ssr: false });
 
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [parentAnimation] = useAutoAnimate<HTMLDivElement>({
-        disrespectUserMotionPreference: true,
-        easing: "linear",
-    });
+    const [parentAnimation] = useAutoAnimate<HTMLDivElement>({ easing: "linear" });
 
     return (
         <>
