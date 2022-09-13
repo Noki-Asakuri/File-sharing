@@ -1,6 +1,7 @@
 import type { GetServerSidePropsContext, NextPage } from "next";
 
 import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { useState } from "react";
 import { Toaster } from "react-hot-toast";
@@ -12,7 +13,6 @@ import { prisma } from "$lib/server/db/prisma";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { unstable_getServerSession as getServerSession } from "next-auth";
 
-import { useSession } from "next-auth/react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
@@ -48,15 +48,11 @@ const FileDownload: NextPage<ServerProps> = ({ author, file }) => {
                     <PasswordForm password={file.password} setLock={setLock} fileID={file.fileID} />
                 )}
 
-                {!isLocked && <InfoCard author={author} file={file} session={session} />}
+                {!isLocked && <InfoCard {...{ session, author, file }} />}
                 <Toaster
                     toastOptions={{
                         duration: 2000,
-                        style: {
-                            borderRadius: "10px",
-                            background: "#262626",
-                            color: "#E8DCFF",
-                        },
+                        style: { borderRadius: "10px", background: "#262626", color: "#E8DCFF" },
                     }}
                 />
             </article>
@@ -66,14 +62,14 @@ const FileDownload: NextPage<ServerProps> = ({ author, file }) => {
 
 export default FileDownload;
 
-export async function getServerSideProps(ctx: GetServerSidePropsContext) {
-    if (!ctx.params || typeof ctx.params.fileID !== "string") {
+export const getServerSideProps = async ({ params, req, res }: GetServerSidePropsContext) => {
+    if (!params || typeof params.fileID !== "string") {
         return { notFound: true };
     }
 
     const [file, session] = await Promise.all([
         prisma.file.findFirst({
-            where: { fileID: ctx.params.fileID },
+            where: { fileID: params.fileID },
             select: {
                 createdAt: true,
                 downloadCount: true,
@@ -93,7 +89,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
                 },
             },
         }),
-        getServerSession(ctx.req, ctx.res, authOptions),
+        getServerSession(req, res, authOptions),
     ]);
 
     if (!file) return { notFound: true };
@@ -111,7 +107,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
             },
             author: {
                 name: file.user.name?.split("#")[0] as string,
-                discriminator: ("#" + file.user.name?.split("#")[1]) as string,
+                discriminator: `#${file.user.name?.split("#")[1]}`,
                 fullName: file.user.name as string,
                 discordID: file.user.discordID,
                 image: file.user.image as string,
@@ -122,4 +118,4 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
             session,
         },
     };
-}
+};
