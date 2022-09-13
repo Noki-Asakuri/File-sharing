@@ -15,7 +15,7 @@ export interface UploadFile extends InferProceduresOutput<"upload", "file"> {
 
 const Upload: React.FC = () => {
     const passwordRef = useRef<HTMLInputElement>(null);
-    const { mutateAsync, isLoading } = trpc.proxy.upload.file.useMutation({
+    const { mutateAsync, isLoading } = trpc.upload.file.useMutation({
         onSuccess: (file) => {
             if (passwordRef.current) {
                 setUploaded({ ...file, password: passwordRef.current.value });

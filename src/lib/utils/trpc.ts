@@ -2,13 +2,13 @@
 import type { AppRouter } from "$lib/server/trpc/routers";
 
 import { httpBatchLink, loggerLink } from "@trpc/client";
-import { setupTRPC } from "@trpc/next";
+import { createTRPCNext } from "@trpc/next";
 import { inferProcedureOutput } from "@trpc/server";
 import superjson from "superjson";
 
 import getBaseUrl from "./getBaseUrl";
 
-export const trpc = setupTRPC<AppRouter>({
+export const trpc = createTRPCNext<AppRouter>({
     config({ ctx }) {
         /**
          * If you want to use SSR, you need to use the server's full URL

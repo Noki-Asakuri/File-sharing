@@ -30,7 +30,7 @@ const DashboardFile: React.FC<DashboardFileProps> = ({ file, dispatch }) => {
     const [deleting, setDeleting] = useState<boolean>(false);
     const { data: session } = useSession();
 
-    const { mutate: deleteFile } = trpc.proxy.file.delete_by_id.useMutation({
+    const { mutate: deleteFile } = trpc.file.delete_by_id.useMutation({
         onError: ({ message }) => {
             toast.error(message, {
                 style: { borderRadius: "10px", background: "#262626", color: "#E8DCFF" },

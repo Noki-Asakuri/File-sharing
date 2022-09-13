@@ -1,7 +1,7 @@
 import Image from "next/future/image";
 import { useState } from "react";
 
-import { ServerProps } from "@/pages/file/[fileID]";
+import type { ServerProps } from "@/pages/file/[fileID]";
 
 import SpinningCircle from "$lib/components/Svg/SpinningCircle";
 import createDownload from "$lib/utils/download";
@@ -29,7 +29,7 @@ const InfoCard: React.FC<ServerProps> = ({ author, file, session }) => {
         return setActiveTab({ tab, page });
     };
 
-    const { mutate: download } = trpc.proxy.file.download.useMutation({
+    const { mutate: download } = trpc.file.download.useMutation({
         onMutate: () => setIsDownload(true),
         onSuccess: ({ downloadUrl }) => createDownload(file.name, downloadUrl),
         onSettled: () => setIsDownload(false),

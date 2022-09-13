@@ -3,11 +3,9 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import type { Context } from "./context";
 
-export const t = initTRPC<{ ctx: Context }>()({
+export const t = initTRPC.context<Context>().create({
     transformer: superjson,
-    errorFormatter({ shape }) {
-        return shape;
-    },
+    errorFormatter: ({ shape }) => shape,
 });
 
 const isAuthed = t.middleware(({ next, ctx }) => {

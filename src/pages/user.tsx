@@ -28,13 +28,11 @@ const UserPage: NextPage = () => {
     const [isCopy, setCopy] = useState<boolean>(false);
 
     const updateTab = (tab: TabState["tab"]) => {
-        const page = tab === "User" ? "" : "translate-x-[126px]";
-
-        return setActiveTab({ tab, page });
+        return setActiveTab({ tab, page: tab === "User" ? "" : "translate-x-[126px]" });
     };
 
-    const { data, refetch } = trpc.proxy.user.getKey.useQuery();
-    const { mutate: generate, isLoading } = trpc.proxy.user.createKey.useMutation({
+    const { data, refetch } = trpc.user.getKey.useQuery();
+    const { mutate: generate, isLoading } = trpc.user.createKey.useMutation({
         onError: ({ message }) => toast.error(message),
         onSuccess: () => refetch(),
     });
@@ -42,11 +40,9 @@ const UserPage: NextPage = () => {
     const createToast = useCallback(() => {
         if (!data || !data.apiKey) return;
         setCopy(true);
-
         copy(data.apiKey);
 
         setTimeout(() => setCopy(false), 2000);
-
         toast.success("Copied to clipboard!");
     }, [data]);
 

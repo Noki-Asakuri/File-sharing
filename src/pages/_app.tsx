@@ -2,12 +2,16 @@
 import MainLayout from "$lib/components/Layout/MainLayout";
 import { trpc } from "$lib/utils/trpc";
 
-import type { AppType } from "next/dist/shared/lib/utils";
+import { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
+import type { AppProps } from "next/app";
 
 import "$lib/styles/globals.css";
 
-const MyApp: AppType = ({ Component, pageProps: { session, ...pageProps } }) => {
+const MyApp = ({
+    Component,
+    pageProps: { session, ...pageProps },
+}: AppProps<{ session: Session }>) => {
     return (
         <SessionProvider session={session}>
             <MainLayout>

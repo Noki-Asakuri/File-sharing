@@ -15,7 +15,7 @@ const PasswordForm: React.FC<PasswordFormType> = ({ fileID, password, setLock })
     const inputPasswordRef = useRef<HTMLInputElement>(null);
     const [showPassword, setShowPassword] = useState<boolean>(false);
 
-    const { mutate: checkPass, isLoading } = trpc.proxy.check.password.useMutation({
+    const { mutate: checkPass, isLoading } = trpc.check.password.useMutation({
         onSuccess: ({ download }) => {
             if (download) {
                 setLock(false);

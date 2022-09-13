@@ -59,7 +59,7 @@ const ResetModal: React.FC<ResetModalProps> = ({ file, children }) => {
     const newPassRef = useRef<HTMLInputElement>(null);
     const confirmPassRef = useRef<HTMLInputElement>(null);
 
-    const { mutate: updatePass, isLoading } = trpc.proxy.file.update_pass.useMutation({
+    const { mutate: updatePass, isLoading } = trpc.file.update_pass.useMutation({
         onError: ({ message }) => {
             toast.error(message, {
                 style: { borderRadius: "10px", background: "#262626", color: "#E8DCFF" },
