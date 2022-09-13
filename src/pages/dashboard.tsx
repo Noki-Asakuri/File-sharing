@@ -3,8 +3,8 @@ import dynamic from "next/dynamic";
 import { Reducer, useReducer, useState } from "react";
 
 import { trpc } from "$lib/utils/trpc";
-import LoadingImage from "@/lib/components/Svg/Loading";
-import useDebounce from "@/lib/server/hooks/useDebounce";
+import LoadingImage from "$lib/components/Svg/Loading";
+import useDebounce from "$lib/server/hooks/useDebounce";
 
 import { Toaster } from "react-hot-toast";
 import {
@@ -28,7 +28,7 @@ export interface ActionType {
 export interface State {
     currentPage: number;
     totalPages: number;
-    refetch(): void;
+    refetch: () => void;
 }
 
 const reducer = (state: State, action: ActionType) => {
@@ -42,50 +42,41 @@ const reducer = (state: State, action: ActionType) => {
             return { ...state, currentPage: state.totalPages };
 
         case "NEXT":
-            if (state.currentPage + 1 > state.totalPages) {
-                return state;
-            }
+            if (state.currentPage + 1 > state.totalPages) break;
+
             return { ...state, currentPage: state.currentPage + 1 };
 
         case "PREV":
-            if (state.currentPage - 1 <= 0) {
-                return state;
-            }
+            if (state.currentPage - 1 <= 0) break;
+
             return { ...state, currentPage: state.currentPage - 1 };
 
         case "SET":
-            if (!payload || typeof payload === "string") {
-                return state;
-            }
+            if (!payload || typeof payload === "string") break;
 
             return { ...state, currentPage: payload };
 
         case "DELETE":
             state.refetch();
 
-            return state;
-
         case "UPDATE":
-            if (typeof payload !== "number") {
-                return state;
-            }
+            if (typeof payload !== "number") break;
 
             return { ...state, totalPages: payload, currentPage: 1 };
 
         case "RESET":
             state.refetch();
-
-            return state;
-
-        default:
-            return state;
     }
+
+    return state;
 };
 
+type Limit = 5 | 10 | 25;
+
 type LimitButtonProps = {
-    limit: 5 | 10 | 25;
+    limit: Limit;
     currentLimit: number;
-    setLimit: (a: 5 | 10 | 25) => void;
+    setLimit: (a: Limit) => void;
 };
 type NavButtonProps = {
     children: React.ReactNode;
@@ -118,16 +109,15 @@ const NavButton: React.FC<NavButtonProps> = ({ dispatch, type, children }) => {
 };
 
 const Dashboard: NextPage = () => {
-    const [limit, setLimit] = useState<5 | 10 | 25>(5);
+    const [limit, setLimit] = useState<Limit>(5);
 
     const [searchText, setSearchText] = useState<string>("");
     const [search, setSearch] = useState<string>("");
 
     const [isRefetching, setFetching] = useState<boolean>(false);
-
     useDebounce(() => setSearch(searchText), 500, [searchText]);
 
-    const { data, isLoading, refetch } = trpc.proxy.file.dashboard.useQuery(
+    const { data, isLoading, refetch } = trpc.file.dashboard.useQuery(
         { limit, search },
         {
             onSuccess: ({ totalPage }) => {
