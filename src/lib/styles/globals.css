@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+    font-family: "Firecode";
+    src: url("../../../public/FiraCode.ttf");
+    font-display: swap;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Firecode", Courier, monospace;
+}
+
+/* Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #475569 transparent;
+}
+
+@layer utilities {
+    .arrow {
+        clip-path: polygon(0 50%, 100% 100%, 100% 0);
+    }
+}

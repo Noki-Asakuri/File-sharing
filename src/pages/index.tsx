@@ -6,7 +6,7 @@ import Head from "next/head";
 
 import { FaExclamationTriangle } from "react-icons/fa";
 
-const Upload = dynamic(() => import("@/components/Upload"), { ssr: false });
+const Upload = dynamic(() => import("@/lib/components/Upload"), { ssr: false });
 
 const Home: NextPage = () => {
     const { data: session } = useSession();
@@ -22,11 +22,7 @@ const Home: NextPage = () => {
                 />
                 <meta property="og:image" content="/favicon.svg" />
             </Head>
-            <div
-                className={`container ${
-                    session ? "h-full" : "h-screen"
-                } mx-auto md:h-full 2xl:h-screen`}
-            >
+            <div className="container mx-auto flex flex-col items-center justify-center md:h-full lg:h-screen">
                 <header className="pt-28">
                     <h2 className="text-center text-4xl ">File Sharing</h2>
                     <p className="m-auto max-w-2xl pt-5 text-center">
@@ -43,7 +39,7 @@ const Home: NextPage = () => {
                                 <FaExclamationTriangle />
                                 Error 401
                             </h2>
-                            <span className="flex items-center justify-center">
+                            <span className="flex items-center justify-center text-center">
                                 You need to login before you can upload file.
                             </span>
                         </div>

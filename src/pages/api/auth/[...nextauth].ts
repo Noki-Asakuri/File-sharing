@@ -1,18 +1,20 @@
-import { getNewAvatar } from "@/utils/getNewAvatar";
-import { prisma } from "@/server/db/client";
+import type { NextAuthOptions } from "next-auth";
+
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import NextAuth from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
 
-import type { NextAuthOptions } from "next-auth";
+import { prisma } from "$lib/server/db/prisma";
+import { getNewAvatar } from "$lib/utils/getNewAvatar";
 
 export const authOptions: NextAuthOptions = {
     adapter: PrismaAdapter(prisma),
     session: {
-        strategy: "database",
+        strategy: "jwt",
         maxAge: 30 * 24 * 60 * 60, // ? NOTE: 30 days session.
         updateAge: 24 * 60 * 60, // ? NOTE: 1 day update.
     },
+    secret: process.env.NEXTAUTH_JWT,
     theme: {
         colorScheme: "dark", // "auto" | "dark" | "light"
         brandColor: "#3a82f6", // Hex color code
@@ -29,12 +31,10 @@ export const authOptions: NextAuthOptions = {
         async signIn({ user, profile }) {
             user.name = `${profile.username}#${profile.discriminator}`;
             user.discordID = profile.id;
-
             user.isAdmin = profile.id === "188903265931362304";
 
-            // Future ban list?
+            // ? Future ban list?
             const isAllowedToSignIn = true;
-
             if (isAllowedToSignIn) {
                 return true;
             } else {
@@ -44,22 +44,36 @@ export const authOptions: NextAuthOptions = {
                 // return '/unauthorized'
             }
         },
-        async session({ session, user }) {
+        async jwt({ token, account, user }) {
+            // Persist the OAuth access_token to the token right after signing in
+            if (account) {
+                token.account = account;
+            }
+            if (user) {
+                token.user = user;
+            }
+
+            return token;
+        },
+        async session({ session, token }) {
             return {
+                accessToken: token.account.access_token,
+                expires: session.expires,
                 user: {
                     ...session.user,
-                    discordID: user.discordID,
-                    isAdmin: user.isAdmin,
+                    discordID: token.user.discordID,
+                    isAdmin: token.user.isAdmin,
                 },
-                expires: session.expires,
             };
         },
     },
     events: {
         async session({ session }) {
             const { newAvatarID, user } = await getNewAvatar({ session });
+            const currentAvatar = user?.image
+                ?.slice(user?.image.lastIndexOf("/") + 1)
+                .split(".") as string[];
 
-            const currentAvatar = user?.image?.slice(user?.image.lastIndexOf("/") + 1).split(".")!;
             const currentAvatarID = currentAvatar[0];
             const currentAvatarFormat = currentAvatar[1];
 
