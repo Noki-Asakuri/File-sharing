@@ -44,7 +44,7 @@ const DashboardFile: React.FC<DashboardFileProps> = ({ file, dispatch }) => {
 
     return (
         <div className="relative mx-3 flex max-w-full items-center justify-between rounded-lg border border-slate-700 bg-slate-800 px-5 py-2 ">
-            <ul className="grid w-full grid-cols-[minmax(150px,1fr)_1fr_1fr] gap-x-10">
+            <ul className="grid w-full grid-cols-[min-content_1fr_1fr] gap-x-10">
                 <li className="col-span-4">
                     <div className="flex items-center justify-start gap-2">
                         <FaIdCard />
