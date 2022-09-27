@@ -2,8 +2,8 @@
 import MainLayout from "$lib/components/Layout/MainLayout";
 import { trpc } from "$lib/utils/trpc";
 
-import { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
+import type { Session } from "next-auth";
 import type { AppProps } from "next/app";
 
 import "$lib/styles/globals.css";
