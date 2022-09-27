@@ -4,9 +4,7 @@ import { useSession } from "next-auth/react";
 import dynamic from "next/dynamic";
 import Head from "next/head";
 
-import { FaExclamationTriangle } from "react-icons/fa";
-
-const Upload = dynamic(() => import("@/lib/components/Upload"), { ssr: false });
+const Upload = dynamic(() => import("$lib/components/Upload"), { ssr: false });
 
 const Home: NextPage = () => {
     const { data: session } = useSession();
@@ -32,21 +30,7 @@ const Home: NextPage = () => {
                     </p>
                 </header>
 
-                {!session && (
-                    <div className="flex h-80 flex-wrap justify-around gap-10 pt-20">
-                        <div className="relative flex max-w-max flex-col items-start gap-y-7 rounded-2xl bg-gradient-to-tl from-slate-800 to-slate-900 p-10 drop-shadow-lg">
-                            <h2 className="flex w-full items-center justify-center gap-2 pb-6 text-4xl text-red-500">
-                                <FaExclamationTriangle />
-                                Error 401
-                            </h2>
-                            <span className="flex items-center justify-center text-center">
-                                You need to login before you can upload file.
-                            </span>
-                        </div>
-                    </div>
-                )}
-
-                {session && <Upload />}
+                <Upload isAuth={!!session} />
 
                 <footer className="relative bottom-0 my-20 flex flex-col items-center justify-center gap-y-3">
                     <span className="animate-rainbow bg-rainbow-text bg-clip-text text-2xl font-bold tracking-wide text-transparent">

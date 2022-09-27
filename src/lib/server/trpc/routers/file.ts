@@ -6,9 +6,9 @@ import { hashSync } from "bcrypt";
 
 export const fileRouter = t.router({
     dashboard: authedProcedure
-        .input(z.object({ search: z.string().optional(), limit: z.number().min(0).max(25) }))
+        .input(z.object({ search: z.string().optional() }))
         .query(async ({ input, ctx }) => {
-            const { limit, search } = input;
+            const { search } = input;
             const { prisma, session } = ctx;
 
             const files = await prisma.file.findMany({
@@ -19,14 +19,7 @@ export const fileRouter = t.router({
                 orderBy: { id: "desc" },
             });
 
-            const totalPage = Math.ceil(files.length / limit);
-            let pages: typeof files[] = [];
-
-            for (let i = 0; i < totalPage; i++) {
-                pages = [...pages, files.slice(i * limit, (i + 1) * limit)];
-            }
-
-            return { totalPage, pages, totalFiles: files.length };
+            return { files };
         }),
     delete_by_id: authedProcedure
         .input(z.object({ fileID: z.string() }))
