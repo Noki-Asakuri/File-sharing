@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
-import { FaEye, FaEyeSlash, FaFile, FaLock, FaUpload } from "react-icons/fa";
+import { FaEye, FaEyeSlash, FaFile, FaKey, FaLock, FaUpload } from "react-icons/fa";
 
 import SpinningCircle from "$lib/components/Svg/SpinningCircle";
 import { supabase } from "$lib/server/db/supabase";
@@ -9,13 +9,23 @@ import { InferProceduresOutput, trpc } from "$lib/utils/trpc";
 
 import UploadInfo from "./UploadInfo";
 
-export interface UploadFile extends InferProceduresOutput<"upload", "file"> {
+export interface UploadFile extends InferProceduresOutput<"upload", "withAuth"> {
     password?: string;
 }
 
-const Upload: React.FC = () => {
+const Upload: React.FC<{ isAuth: boolean }> = ({ isAuth }) => {
     const passwordRef = useRef<HTMLInputElement>(null);
-    const { mutateAsync, isLoading } = trpc.upload.file.useMutation({
+    const apiKeyRef = useRef<HTMLInputElement>(null);
+
+    const [showPassword, setShowPassword] = useState<boolean>(false);
+    const [showKey, setShowKey] = useState<boolean>(false);
+
+    const [userFile, setUserFile] = useState<File | undefined>();
+    const [uploaded, setUploaded] = useState<UploadFile>();
+
+    const { mutateAsync, isLoading } = (
+        isAuth ? trpc.upload.withAuth : trpc.upload.noAuth
+    ).useMutation({
         onSuccess: (file) => {
             if (passwordRef.current) {
                 setUploaded({ ...file, password: passwordRef.current.value });
@@ -25,11 +35,10 @@ const Upload: React.FC = () => {
             }
             return setUploaded({ ...file });
         },
+        onError: ({ message }) => {
+            toast.error(message);
+        },
     });
-
-    const [showPassword, setShowPassword] = useState<boolean>(true);
-    const [userFile, setUserFile] = useState<File | undefined>();
-    const [uploaded, setUploaded] = useState<UploadFile>();
 
     const HandleChangeFile = (file?: File) => {
         if (!file || file.size >= 52428800) {
@@ -46,9 +55,13 @@ const Upload: React.FC = () => {
             return toast.error("No file to upload!");
         }
 
+        if (!isAuth && !apiKeyRef.current!.value) {
+            return toast.error("Please login or enter your api key.");
+        }
+
         const { fileID, path } = genID(userFile.name);
 
-        const [{}, file] = await Promise.all([
+        const [, file] = await Promise.all([
             supabase.upload(path, userFile, { contentType: userFile.type, cacheControl: "3600" }),
             mutateAsync({
                 fileID,
@@ -56,6 +69,7 @@ const Upload: React.FC = () => {
                 path,
                 type: userFile.type,
                 password: passwordRef.current?.value,
+                apiKey: isAuth ? undefined : apiKeyRef.current!.value,
             }),
         ]);
 
@@ -67,7 +81,9 @@ const Upload: React.FC = () => {
             <div className="flex w-full flex-wrap justify-around gap-10 pt-20">
                 {/* Upload Form */}
                 <form
-                    className="relative flex h-80 flex-col items-start gap-y-6 rounded-2xl bg-gradient-to-tl from-slate-800 to-slate-900 p-10 drop-shadow-lg"
+                    className={`relative flex flex-col items-start gap-y-6 rounded-2xl bg-gradient-to-tl from-slate-800 to-slate-900 p-10 drop-shadow-lg ${
+                        isAuth ? "h-80" : "h-[23rem]"
+                    }`}
                     onSubmit={(e) => {
                         e.preventDefault();
                         HandleSubmitFile();
@@ -101,7 +117,7 @@ const Upload: React.FC = () => {
                         <div className="flex w-full items-center justify-between rounded-2xl bg-slate-700">
                             <input
                                 className="ml-4 w-full bg-inherit py-2 focus:outline-none"
-                                type={showPassword ? "password" : "text"}
+                                type={showPassword ? "text" : "password"}
                                 id="password"
                                 ref={passwordRef}
                             />
@@ -111,10 +127,38 @@ const Upload: React.FC = () => {
                                 type="button"
                                 onClick={() => setShowPassword((current) => !current)}
                             >
-                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                {showPassword ? <FaEye /> : <FaEyeSlash />}
                             </button>
                         </div>
                     </div>
+
+                    {!isAuth && (
+                        <div className="flex w-full items-center justify-center gap-x-4">
+                            <label
+                                htmlFor="apiKey"
+                                className="flex items-center justify-center gap-2 whitespace-nowrap"
+                            >
+                                <FaKey /> API Key:
+                            </label>
+
+                            <div className="flex w-full items-center justify-between rounded-2xl bg-slate-700">
+                                <input
+                                    className="ml-4 w-full bg-inherit py-2 focus:outline-none"
+                                    type={showKey ? "text" : "password"}
+                                    id="apiKey"
+                                    ref={apiKeyRef}
+                                />
+                                <button
+                                    className="px-4"
+                                    aria-label="toggle password display"
+                                    type="button"
+                                    onClick={() => setShowKey((current) => !current)}
+                                >
+                                    {showKey ? <FaEye /> : <FaEyeSlash />}
+                                </button>
+                            </div>
+                        </div>
+                    )}
 
                     <button
                         className="h-10 w-full rounded-2xl bg-slate-700 py-2 drop-shadow-lg"

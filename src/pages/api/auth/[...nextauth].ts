@@ -5,7 +5,7 @@ import NextAuth from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
 
 import { prisma } from "$lib/server/db/prisma";
-import { getNewAvatar } from "$lib/utils/getNewAvatar";
+// import { getNewAvatar } from "$lib/utils/getNewAvatar";
 
 export const authOptions: NextAuthOptions = {
     adapter: PrismaAdapter(prisma),
@@ -35,14 +35,8 @@ export const authOptions: NextAuthOptions = {
 
             // ? Future ban list?
             const isAllowedToSignIn = true;
-            if (isAllowedToSignIn) {
-                return true;
-            } else {
-                // Return false to display a default error message
-                return false;
-                // Or you can return a URL to redirect to:
-                // return '/unauthorized'
-            }
+
+            return isAllowedToSignIn;
         },
         async jwt({ token, account, user }) {
             // Persist the OAuth access_token to the token right after signing in
@@ -68,24 +62,22 @@ export const authOptions: NextAuthOptions = {
         },
     },
     events: {
-        async session({ session }) {
-            const { newAvatarID, user } = await getNewAvatar({ session });
-            const currentAvatar = user?.image
-                ?.slice(user?.image.lastIndexOf("/") + 1)
-                .split(".") as string[];
-
-            const currentAvatarID = currentAvatar[0];
-            const currentAvatarFormat = currentAvatar[1];
-
-            if (currentAvatarID !== newAvatarID) {
-                await prisma.user.update({
-                    where: { discordID: session.user.discordID },
-                    data: {
-                        image: `https://cdn.discordapp.com/avatars/${session.user.discordID}/${newAvatarID}.${currentAvatarFormat}`,
-                    },
-                });
-            }
-        },
+        // async session({ session }) {
+        //     const { newAvatarID, user } = await getNewAvatar({ session });
+        //     const currentAvatar = user?.image
+        //         ?.slice(user?.image.lastIndexOf("/") + 1)
+        //         .split(".") as string[];
+        //     const currentAvatarID = currentAvatar[0];
+        //     const currentAvatarFormat = currentAvatar[1];
+        //     if (currentAvatarID !== newAvatarID) {
+        //         await prisma.user.update({
+        //             where: { discordID: session.user.discordID },
+        //             data: {
+        //                 image: `https://cdn.discordapp.com/avatars/${session.user.discordID}/${newAvatarID}.${currentAvatarFormat}`,
+        //             },
+        //         });
+        //     }
+        // },
     },
 };
 
