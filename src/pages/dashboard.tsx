@@ -2,19 +2,12 @@ import type { NextPage } from "next";
 import dynamic from "next/dynamic";
 import { Reducer, useReducer, useState } from "react";
 
-import { trpc } from "$lib/utils/trpc";
 import LoadingImage from "$lib/components/Svg/Loading";
 import useDebounce from "$lib/server/hooks/useDebounce";
+import { trpc } from "$lib/utils/trpc";
 
 import { Toaster } from "react-hot-toast";
-import {
-    FaAngleDoubleLeft,
-    FaAngleDoubleRight,
-    FaAngleLeft,
-    FaAngleRight,
-    FaRedo,
-    FaSearch,
-} from "react-icons/fa";
+import { FaRedo, FaSearch } from "react-icons/fa";
 
 const DashboardFile = dynamic(() => import("$lib/components/Dashboard/DashboardFile"), {
     ssr: false,
@@ -67,7 +60,7 @@ const Dashboard: NextPage = () => {
         { refetchOnWindowFocus: false },
     );
 
-    const [state, dispatch] = useReducer<Reducer<State, ActionType>>(reducer, { refetch: refetch });
+    const [, dispatch] = useReducer<Reducer<State, ActionType>>(reducer, { refetch: refetch });
 
     return (
         <div className="flex h-screen w-full items-center justify-center">

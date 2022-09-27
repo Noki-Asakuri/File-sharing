@@ -2,11 +2,8 @@ import { useSession } from "next-auth/react";
 
 import LoadingImage from "../Svg/Loading";
 
-const protectedRoute: string[] = ["/dashboard", "/user"];
-
 const AuthWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { status } = useSession();
-    // const router = useRouter();
 
     return (
         <>

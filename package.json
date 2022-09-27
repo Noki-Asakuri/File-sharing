@@ -10,7 +10,7 @@
         "build/start": "next build && next start",
         "lint": "next lint",
         "tscheck": "tsc --noEmit --pretty",
-        "check": "next lint && pnpm run tscheck",
+        "check": "next lint && pnpm tscheck",
         "format": "prettier --write --plugin-search-dir=. .",
         "analyze": "pnpm build",
         "postinstall": "prisma generate"
